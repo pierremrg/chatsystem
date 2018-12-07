@@ -4,4 +4,5 @@ Système de chat pour la POO
 
 # Liens
 
-https://www.draw.io/#G1V-Kt5rgTPScUG5Wes187R13PkTTwpHBO
+Lien vers le diagramme de classes :
+https://drive.google.com/open?id=1V-Kt5rgTPScUG5Wes187R13PkTTwpHBO
