@@ -1,16 +1,18 @@
 package client_server;
 
-import java.io.IOError;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Date;
 
 public class Server extends Thread {
+	
+	private int port;
 
-	public Server() {
+	public Server(int port) {
 		super();
+		
+		this.port = port;
 	}
 
 	public void run() {
@@ -19,7 +21,7 @@ public class Server extends Thread {
 		Socket socket = null;
 		
 		try {
-			serverSocket = new ServerSocket(5000);
+			serverSocket = new ServerSocket(port);
 			socket = serverSocket.accept();
 	
 			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);

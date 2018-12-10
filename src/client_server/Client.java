@@ -7,16 +7,20 @@ import java.net.InetAddress;
 import java.net.Socket;
 
 public class Client extends Thread {
+	
+	private int port;
 
-	public Client() {
+	public Client(int port) {
 		super();
+		
+		this.port = port;
 	}
 	
 	public void run() {
 		Socket client = null;
 		
 		try {
-			client = new Socket(InetAddress.getLocalHost(), 5000);
+			client = new Socket(InetAddress.getLocalHost(), port);
 			System.out.println("Connected...");
 			
 			BufferedReader in_data = new BufferedReader(new InputStreamReader(client.getInputStream()));
