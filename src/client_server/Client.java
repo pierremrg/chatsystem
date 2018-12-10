@@ -20,7 +20,8 @@ public class Client extends Thread {
 		Socket client = null;
 		
 		try {
-			client = new Socket(InetAddress.getLocalHost(), port);
+			byte ip[] = new byte[] {10,1,5,42};
+			client = new Socket(InetAddress.getByAddress(ip), port);
 			System.out.println("Connected...");
 			
 			BufferedReader in_data = new BufferedReader(new InputStreamReader(client.getInputStream()));
@@ -28,7 +29,8 @@ public class Client extends Thread {
 			String data = null;
 			
 			while((data = in_data.readLine()) != "-1") {
-				System.out.println("Message : " + data);
+				if(data != null)
+					System.out.println("Message : " + data);
 			}
 		} catch (Exception e) {
 			System.out.println("Erreur client...");

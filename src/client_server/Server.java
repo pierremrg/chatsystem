@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Date;
+import java.util.Scanner;
 
 public class Server extends Thread {
 	
@@ -25,8 +26,17 @@ public class Server extends Thread {
 			socket = serverSocket.accept();
 	
 			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-	
-			out.println(new Date().toString());
+			
+			Scanner sc = new Scanner(System.in);
+			String msg = sc.nextLine();
+			
+			while(msg != "-1") {
+				out.println(msg);
+				
+				msg = sc.nextLine();
+			}
+			
+			
 		}
 		catch(Exception e) {
 			System.out.println("Erreur sur le serveur");

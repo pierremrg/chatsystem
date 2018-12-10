@@ -9,15 +9,16 @@ public class Main {
 		Scanner sc = new Scanner(System.in);
 		int serverPort = sc.nextInt();
 		
-		System.out.println("Port du client : ");
-		Scanner sc2 = new Scanner(System.in);
-		int clientPort = sc2.nextInt();
-		
 		Server server = new Server(serverPort);
 		server.start();
 		
+		System.out.println("Port du client : ");
+		int clientPort = sc.nextInt();
+		
 		Client client = new Client(clientPort);
 		client.start();
+		
+		sc.close();
 		
 		
 	}
