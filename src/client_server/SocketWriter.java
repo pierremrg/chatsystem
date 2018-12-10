@@ -2,7 +2,10 @@ package client_server;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class SocketWriter extends Thread {
 	
@@ -15,26 +18,31 @@ public class SocketWriter extends Thread {
 	
 	public void run() {		
 		try {
-			System.out.println("Connected...");
+			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 			
-			BufferedReader in_data = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			Scanner sc = new Scanner(System.in);
+			String msg = sc.nextLine();
 			
-			String data = null;
-			
-			while(!(data = in_data.readLine()).equals("-1")) {
-				if(data != null)
-					System.out.println("Message : " + data);
+			while(msg != null && !msg.equals("-1")) {
+				out.println(msg);
+				
+				msg = sc.nextLine();
 			}
-		} catch (Exception e) {
-			System.out.println("Erreur client...");
-		} finally {			
-			System.out.println("Deconnecting...");
-			try {
-				socket.close();
-			} catch (Exception e) {
-				System.out.println("Erreur deconnexion");
+			
+			
+		}
+		catch(Exception e) {
+			System.out.println("Erreur sur le serveur");
+		}
+		
+		finally {
+			if (socket != null) {
+				try {
+					socket.close();
+				} catch (Exception e) {
+					System.out.println("Erreur fermeture socket");
+				}
 			}
-			System.out.println("Deconnected...");	
-		}	
+		}
 	}
 }
