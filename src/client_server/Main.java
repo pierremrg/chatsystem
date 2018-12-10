@@ -18,7 +18,7 @@ public class Main {
 		Client client = new Client(clientPort);
 		client.start();
 		
-		sc.close();
+		//sc.close();
 		
 		
 	}

@@ -30,7 +30,7 @@ public class Server extends Thread {
 			Scanner sc = new Scanner(System.in);
 			String msg = sc.nextLine();
 			
-			while(msg != "-1") {
+			while(msg != null && !msg.equals("-1")) {
 				out.println(msg);
 				
 				msg = sc.nextLine();

@@ -28,7 +28,7 @@ public class Client extends Thread {
 			
 			String data = null;
 			
-			while((data = in_data.readLine()) != "-1") {
+			while(!(data = in_data.readLine()).equals("-1")) {
 				if(data != null)
 					System.out.println("Message : " + data);
 			}
