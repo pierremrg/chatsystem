@@ -29,6 +29,8 @@ public class SocketWriter extends Thread {
 				msg = sc.nextLine();
 			}
 			
+			out.println(msg);
+			sc.close();
 			
 		}
 		catch(Exception e) {
