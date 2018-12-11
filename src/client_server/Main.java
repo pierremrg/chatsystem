@@ -54,7 +54,7 @@ public class Main {
 			int clientPort = sc.nextInt();
 			
 			byte ip[] = new byte[] {10,1,5,42};
-			Socket socket = new Socket(InetAddress.getByAddress(ip), port);
+			Socket socket = new Socket(InetAddress.getByAddress(ip), clientPort);
 			
 			SocketWriter socketWriter = new SocketWriter(socket);
 			SocketReader socketReader = new SocketReader(socket);
