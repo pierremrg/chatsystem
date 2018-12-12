@@ -11,6 +11,10 @@ public class Udp extends Thread {
 	private Controller controller;
 	private DatagramSocket socket;
 	
+	/**
+	 * Creer un Udp
+	 * @param controller associé à l'UDP
+	 */
 	public Udp(Controller controller) {
 		super();
 		this.controller = controller;
@@ -29,6 +33,11 @@ public class Udp extends Thread {
 		}
 	}
 	
+	/**
+	 * Envoie d'un message UDP
+	 * @param message à envoyer
+	 * @param ip où envoyer le message
+	 */
 	public void sendUdpMessage(String message, String ip) {
 		InetAddress address = null;
 		try {
@@ -48,14 +57,25 @@ public class Udp extends Thread {
 		}
 	}
 	
+	/**
+	 * Permet au controller d'ajouter l'utilisateur qui vient de se connecter
+	 * @param idUser ID de l'utilisateur à ajouter
+	 */
 	public void addConnectedUser(int idUser) {
 		controller.receiveConnection(idUser);
 	}
 	
+	/**
+	 * Permet au controller de retirer l'utilisateur qui se déconnecte
+	 * @param idUser ID de l'utilisateur à retirer
+	 */
 	public void removeConnectedUser(int idUser) {
 		controller.receiveDeconnection(idUser);
 	}
 	
+	/**
+	 * Thread qui écoute en UDP et qui traite les messages suivant le contenu
+	 */
 	public void run() {
 		byte[] buffer = new byte[256];
 		DatagramPacket in = new DatagramPacket(buffer, buffer.length);
@@ -68,19 +88,16 @@ public class Udp extends Thread {
 	
 		String messageRecu = new String(in.getData(), 0, in.getLength());		
 		int statutConnexion = Integer.parseInt(messageRecu.substring(0, 1));
-		int idUser = Integer.parseInt(messageRecu.substring(2));
-		
+		int idUser = Integer.parseInt(messageRecu.substring(2));		
 		
 		if(statutConnexion == 0) {
 			removeConnectedUser(idUser);
 		}
 		else if(statutConnexion == 1) {
 			addConnectedUser(idUser);
-			this.sendUdpMessage("2 " + this.controller.getUser().getID(), in.getAddress().toString());
+			this.sendUdpMessage("2 " + controller.getUser().getID(), in.getAddress().toString());
 		} else if(statutConnexion == 2) {
 			addConnectedUser(idUser);
-		}
-		
-	}
-	
+		}		
+	}	
 }
