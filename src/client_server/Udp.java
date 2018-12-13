@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.List;
 
 public class Udp extends Thread {
 	private Controller controller;
@@ -40,16 +43,10 @@ public class Udp extends Thread {
 	 * @param message � envoyer
 	 * @param ip o� envoyer le message
 	 */
-	public void sendUdpMessage(String message, String ip) {
-		InetAddress address = null;
-		try {
-			address = InetAddress.getByName(ip);
-		} catch (UnknownHostException e) {
-			System.out.println("Erreur adresse IP");
-			e.printStackTrace();
-		}
+	public void sendUdpMessage(String message, InetAddress ipAddress) {
 		byte[] buffer = message.getBytes();
-		DatagramPacket out = new DatagramPacket(buffer, buffer.length, address, PORT);
+		DatagramPacket out = new DatagramPacket(buffer, buffer.length, ipAddress, PORT);
+		
 		try {
 			socket.send(out);
 		} catch (IOException e) {
@@ -96,7 +93,7 @@ public class Udp extends Thread {
 		}
 		else if(statutConnexion == 1) {
 			addConnectedUser(idUser);
-			this.sendUdpMessage("2 " + controller.getUser().getID(), in.getAddress().toString());
+			this.sendUdpMessage("2 " + controller.getUser().getID(), in.getAddress());
 		} else if(statutConnexion == 2) {
 			addConnectedUser(idUser);
 		}		
