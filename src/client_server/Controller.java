@@ -3,7 +3,12 @@ package client_server;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Controller {
 	private User user;
@@ -11,6 +16,7 @@ public class Controller {
 	private ArrayList<Message> messages;
 	private ArrayList<User> connectedUsers;
 	private Udp udp;
+	private InetAddress ipBroadcast;
 	
 	/**
 	 * Creer un controler
@@ -19,6 +25,7 @@ public class Controller {
 	public Controller (User user) {
 		this.user = user;
 		this.udp = new Udp(this);
+		this.ipBroadcast = getBroadcast();
 		
 		this.connectedUsers = null;
 		//Récupérer groupe dont l'utilisateur est membres dans la BDD
@@ -31,6 +38,10 @@ public class Controller {
 	 */
 	public User getUser() {
 		return user;
+	}
+
+	public ArrayList<User> getConnectedUsers() {
+		return connectedUsers;
 	}
 
 	public void sendMessage(Message message) {
@@ -56,9 +67,8 @@ public class Controller {
 		// TODO
 		
 		//Annonce à tous le monde la connexion
-		//Récup ip broadcast
 		udp.start();
-		udp.sendUdpMessage("1 " + user.getID(), "255.255.255.255");
+		udp.sendUdpMessage("1 " + user.getID(), ipBroadcast);
 		return 1;		
 	}
 	
@@ -68,15 +78,18 @@ public class Controller {
 	 */
 	public void receiveConnection(int idUser) {
 		//recup info user dans la bdd 
-		connectedUsers.add(user);
+		User newUser = null;
+		connectedUsers.add(newUser);
 	}
 	
 	/**
 	 * Retire de la liste l'utilisateur qui vient de se déconnecter
 	 * @param idUser ID de l'utilisateur qui se déconnecte
 	 */
-	public void receiveDeconnection(int idUser) {		
-		connectedUsers.remove(user);
+	public void receiveDeconnection(int idUser) {
+		User delUser = null;
+		//recup info user avec idUser
+		connectedUsers.remove(delUser);
 	}	
 	
 	/**
@@ -86,7 +99,7 @@ public class Controller {
 	public int deconnect() {
 		// TODO
 		
-		udp.sendUdpMessage("0 " + user.getID(), "255.255.255.2555");
+		udp.sendUdpMessage("0 " + user.getID(), ipBroadcast);
 		return 1;
 	}
 	
@@ -100,5 +113,32 @@ public class Controller {
 	
 	public int editUser(String username, String password) {
 		// TODO
+	}
+	
+	/**
+	 * Récupère l'adresse de broadcast de la machine
+	 * @return adresse de broadcast en String
+	 */
+	private static InetAddress getBroadcast() {
+		InetAddress local = null;
+		NetworkInterface temp;
+		InetAddress broadcast = null;
+		
+		try {
+			local = InetAddress.getLocalHost();
+		} catch (UnknownHostException e1) {
+			e1.printStackTrace();
+			System.out.println("getLocal " + e1.getMessage());
+		}		
+		try {
+			temp = NetworkInterface.getByInetAddress(local);
+			List<InterfaceAddress> addresses = temp.getInterfaceAddresses();			
+			broadcast = addresses.get(0).getBroadcast();
+			return broadcast;				
+		} catch (SocketException e) {
+			e.printStackTrace();
+			System.out.println("getBroadcast " + e.getMessage());
+		}
+		return null;
 	}
 }
