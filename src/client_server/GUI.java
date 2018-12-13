@@ -5,6 +5,11 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.Statement;
+import java.net.SocketException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -118,12 +123,21 @@ public class GUI extends JFrame{
 	/**
 	 * Fonction principale du programme
 	 * @param args
+	 * @throws SocketException 
+	 * @throws ClassNotFoundException 
+	 * @throws SQLException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SocketException, ClassNotFoundException, SQLException {
 		
-		new GUI();
+		//new GUI();
 		
-
+		
+		Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
+		Connection con = DriverManager.getConnection("jdbc:odbc:MovieCatalog");
+		Statement statement = (Statement) con.createStatement();
+		
+		
+		
 	}
 	
 
