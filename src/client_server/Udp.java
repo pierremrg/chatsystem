@@ -11,16 +11,18 @@ public class Udp extends Thread {
 	private Controller controller;
 	private DatagramSocket socket;
 	
+	private static final int PORT = 5001;
+	
 	/**
 	 * Creer un Udp
-	 * @param controller associé à l'UDP
+	 * @param controller associï¿½ ï¿½ l'UDP
 	 */
 	public Udp(Controller controller) {
 		super();
 		this.controller = controller;
 		
 		try {
-			this.socket = new DatagramSocket(5000);
+			this.socket = new DatagramSocket(PORT);
 		} catch (SocketException e) {
 			System.out.println("Erreur socket udp 1");
 			e.printStackTrace();
@@ -35,8 +37,8 @@ public class Udp extends Thread {
 	
 	/**
 	 * Envoie d'un message UDP
-	 * @param message à envoyer
-	 * @param ip où envoyer le message
+	 * @param message ï¿½ envoyer
+	 * @param ip oï¿½ envoyer le message
 	 */
 	public void sendUdpMessage(String message, String ip) {
 		InetAddress address = null;
@@ -46,9 +48,8 @@ public class Udp extends Thread {
 			System.out.println("Erreur adresse IP");
 			e.printStackTrace();
 		}
-		int port = 5000;
 		byte[] buffer = message.getBytes();
-		DatagramPacket out = new DatagramPacket(buffer, buffer.length, address, port);
+		DatagramPacket out = new DatagramPacket(buffer, buffer.length, address, PORT);
 		try {
 			socket.send(out);
 		} catch (IOException e) {
@@ -59,22 +60,22 @@ public class Udp extends Thread {
 	
 	/**
 	 * Permet au controller d'ajouter l'utilisateur qui vient de se connecter
-	 * @param idUser ID de l'utilisateur à ajouter
+	 * @param idUser ID de l'utilisateur ï¿½ ajouter
 	 */
 	public void addConnectedUser(int idUser) {
 		controller.receiveConnection(idUser);
 	}
 	
 	/**
-	 * Permet au controller de retirer l'utilisateur qui se déconnecte
-	 * @param idUser ID de l'utilisateur à retirer
+	 * Permet au controller de retirer l'utilisateur qui se dï¿½connecte
+	 * @param idUser ID de l'utilisateur ï¿½ retirer
 	 */
 	public void removeConnectedUser(int idUser) {
 		controller.receiveDeconnection(idUser);
 	}
 	
 	/**
-	 * Thread qui écoute en UDP et qui traite les messages suivant le contenu
+	 * Thread qui ï¿½coute en UDP et qui traite les messages suivant le contenu
 	 */
 	public void run() {
 		byte[] buffer = new byte[256];

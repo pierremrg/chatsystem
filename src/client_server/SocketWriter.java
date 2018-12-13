@@ -1,36 +1,37 @@
 package client_server;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Scanner;
 
 public class SocketWriter extends Thread {
 	
 	private Socket socket;
+	private String content;
 	
 	public SocketWriter(Socket socket) {
 		super();
 		this.socket = socket;
+		this.content = null;
 	}
 	
-	public void run() {		
+	public void run() {
 		try {
 			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 			
-			Scanner sc = new Scanner(System.in);
-			String msg = sc.nextLine();
+			/*Scanner sc = new Scanner(System.in);
+			String msg = sc.nextLine();*/
 			
-			while(msg != null && !msg.equals("-1")) {
-				out.println(msg);
+			while(true) {
+				if(content != null) {
+					out.println(content);
+					System.out.println("Message envoyé");
+				}
 				
-				msg = sc.nextLine();
+				//msg = sc.nextLine();
 			}
 			
-			out.println(msg);
-			sc.close();
+			/*out.println(msg);
+			sc.close();*/
 			
 		}
 		catch(Exception e) {
@@ -46,5 +47,9 @@ public class SocketWriter extends Thread {
 				}
 			}
 		}
+	}
+	
+	public void setContent(String content) {
+		this.content = content;
 	}
 }

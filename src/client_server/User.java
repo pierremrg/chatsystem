@@ -1,12 +1,26 @@
 package client_server;
 
+import java.net.InetAddress;
+
 public class User {
 
 	private int id;
 	private String username; // TODO : crypter ?
 	private String password;
-	private String ip;
+	private InetAddress ip;
 	private int port;
+	
+	/**
+	 * Crée un utilisateur
+	 * @param id ID de l'utilisateur
+	 * @param username Le username de l'utilisateur
+	 * @param password Le password de l'utilisateur
+	 */
+	public User(int id, String username, String password) {
+		this.id = id;
+		this.username = username;
+		this.password = password;
+	}
 
 	/**
 	 * Crée un utilisateur
@@ -62,8 +76,16 @@ public class User {
 	 * Retourne l'IP de l'utilisateur
 	 * @return l'IP de l'utilisateur
 	 */
-	public String getIP() {
+	public InetAddress getIP() {
 		return ip;
+	}
+	
+	/**
+	 * Modifie l'IP de l'utilisateur
+	 * @param ip l'IP de l'utilisateur
+	 */
+	public void setIP(InetAddress ip) {
+		this.ip = ip;
 	}
 
 	/**
@@ -72,6 +94,14 @@ public class User {
 	 */
 	public int getPort() {
 		return port;
+	}
+	
+	/**
+	 * Modifie le port associé à l'utilisateur
+	 * @param port Port associé à l'utilisateur
+	 */
+	public void setPort(int port) {
+		this.port = port;
 	}
 
 }

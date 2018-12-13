@@ -1,28 +1,41 @@
 package client_server;
 
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
+import java.io.IOException;
 import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Controller {
+	
+	// Utilisateur associÃ© au controller
 	private User user;
+	
+	// Groupes de l'utilisateur
 	private ArrayList<Group> groups;
+	
+	// Messages (tous) de l'utilisateur
 	private ArrayList<Message> messages;
+	
+	// Liste des utilisateurs connectÃ©s
 	private ArrayList<User> connectedUsers;
+	
+	// Service UDP utilisÃ© pour le broadcast (connexion, dÃ©connexion)
 	private Udp udp;
 	
+	
 	/**
-	 * Creer un controler
-	 * @param user utilisateur associer au controleur
+	 * CrÃ©e un controller
+	 * @param user utilisateur associÃ© au controller
 	 */
-	public Controller (User user) {
-		this.user = user;
+	public Controller () {
 		this.udp = new Udp(this);
 		
 		this.connectedUsers = null;
-		//Récupérer groupe dont l'utilisateur est membres dans la BDD
-		//Récupérer tous les messages de l'utilisateur dans la BDD
+		//Rï¿½cupï¿½rer groupe dont l'utilisateur est membre dans la BDD
+		//Rï¿½cupï¿½rer tous les messages de l'utilisateur dans la BDD
+		
 	}
 	
 	/**
@@ -39,66 +52,124 @@ public class Controller {
 	
 	public Message receiveMessage() {
 		// TODO
+		
+		return null;
 	}
 	
 	public ArrayList<Message> getGroupMessages(Group group){
 		// TODO
+		
+		return null;
 	}
 	
 	/**
-	 * Connection de l'utilisateur au service et envoi un message à tout le monde pour annoncer sa connection
+	 * Connection de l'utilisateur au service et envoi un message ï¿½ tout le monde pour annoncer sa connection
 	 * @param username Username de l'utilisateur
 	 * @param password Mot de passe de l'utilisateur
-	 * @return 0 si connexion échoue, 1 si OK
+	 * @return 0 si connexion ï¿½choue, 1 si OK
+	 * @throws IOException 
 	 */
-	public int connect(String username, String password) {
-		//Check dans la BDD si info ok
-		// TODO
+	public void connect(String username, String password) throws IOException {
+		// TODO Check dans la BDD si info ok
+		// TODO id de l'utilisateur
+		user = new User(1, username, password);
 		
-		//Annonce à tous le monde la connexion
-		//Récup ip broadcast
-		udp.start();
-		udp.sendUdpMessage("1 " + user.getID(), "255.255.255.255");
-		return 1;		
+		// TODO Infos sur l'utilisateur
+		user.setIP(InetAddress.getLocalHost());
+		Random rand = new Random();
+		int portRand = rand.nextInt(65000 - 10000 + 1) + 1000; // Rand(10000,65000)
+		user.setPort(portRand);
+		
+		
+		// DÃ©marrage du serveur : l'utilisateur peut Ãªtre sollicitÃ© pour une conversation
+		int serverPort = user.getPort(); // Port du serveur = celui associÃ© Ã  l'utilisateur
+		ServerSocket serverSocket = new ServerSocket(serverPort);
+		ServerSocketWaiter serverSocketWaiter = new ServerSocketWaiter(serverSocket);
+		serverSocketWaiter.start();
+
+		
+		// TODO Gerer l'erreur
+		
+		//Annonce ï¿½ tout le monde la connexion
+		//Rï¿½cup ip broadcast
+		//udp.start();
+		//udp.sendUdpMessage("1 " + user.getID(), "255.255.255.255");
 	}
 	
 	/**
-	 * Récupère les infos d'un nouvelle utilisateur connecté et ajout dans la liste des utilisateurs connectés
+	 * Rï¿½cupï¿½re les infos d'un nouvelle utilisateur connectï¿½ et ajout dans la liste des utilisateurs connectï¿½s
 	 * @param idUser ID de l'utilisateur qui vient de se connecter
 	 */
 	public void receiveConnection(int idUser) {
 		//recup info user dans la bdd 
-		connectedUsers.add(user);
+		//connectedUsers.add(user);
 	}
 	
 	/**
-	 * Retire de la liste l'utilisateur qui vient de se déconnecter
-	 * @param idUser ID de l'utilisateur qui se déconnecte
+	 * Retire de la liste l'utilisateur qui vient de se dï¿½connecter
+	 * @param idUser ID de l'utilisateur qui se dï¿½connecte
 	 */
-	public void receiveDeconnection(int idUser) {		
+	public void receiveDeconnection(int idUser) {
 		connectedUsers.remove(user);
 	}	
 	
 	/**
-	 * Deconnecte l'utilisateur et l'annonce à tout le monde
-	 * @return 0 si deconnexion echoue, 1 si OK
+	 * Deconnecte l'utilisateur et l'annonce ï¿½ tout le monde
 	 */
-	public int deconnect() {
-		// TODO
+	public void deconnect() {
+		// TODO Gestion de l'erreur
 		
-		udp.sendUdpMessage("0 " + user.getID(), "255.255.255.2555");
-		return 1;
+		//udp.sendUdpMessage("0 " + user.getID(), "255.255.255.255");
 	}
 	
-	public int startGroup(ArrayList<User> members) {
-		// TODO
+	/**
+	 * DÃ©marre une conversation
+	 * @param members Utilisateurs prÃ©sents dans la conversation
+	 * @throws IOException 
+	 */
+	public void startGroup(ArrayList<User> members) throws IOException {
+		
+		// PremiÃ¨re version : uniquement deux utilisateurs dans la conversation
+		// TODO Faire pour plusieurs personnes
+		User contact = members.get(0);
+		
+		
+		// TODO Obtenir l'ID dans la BDD
+		// TODO GÃ©rer l'erreur
+		int idGroup = 1;
+		
+		Group group = new Group(idGroup, members);
+		groups.add(group);
+		
+		// TODO Ajout Ã  la BDD
+		
+		
+		// CrÃ©ation d'un socket client : l'utilisateur peut se connecter aux autres utilisateurs
+		Socket socket = new Socket(contact.getIP(), contact.getPort());
+		
+		SocketWriter socketWriter = new SocketWriter(socket);
+		SocketReader socketReader = new SocketReader(socket);
+		socketWriter.start();
+		socketReader.start();
 	}
 	
-	public User createUser(String username, String password) {
-		// TODO
+	public void createUser(String username, String password) {
+		// TODO Check si username pas pris
+		// TODO Gestion erreur
+		
+		// TODO RÃ©cupÃ©rer ID BDD
+		int idUser = 1;
+		user = new User(username, password);
+
+		// TODO Ajout Ã  la BDD
 	}
 	
-	public int editUser(String username, String password) {
-		// TODO
+	public void editUser(String username, String password) {
+		// TODO Check si username pas pris
+		// TODO Gestion erreur
+		
+		user.setUsername(username);
+		user.setPassword(password);
+		// TODO Update user BDD
 	}
 }

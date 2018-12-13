@@ -5,10 +5,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.Statement;
+import java.io.IOException;
 import java.net.SocketException;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import javax.swing.BorderFactory;
@@ -132,9 +130,20 @@ public class GUI extends JFrame{
 		//new GUI();
 		
 		
-		Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
+		/*Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
 		Connection con = DriverManager.getConnection("jdbc:odbc:MovieCatalog");
-		Statement statement = (Statement) con.createStatement();
+		
+		Statement statement = (Statement) con.createStatement();*/
+		
+		try {
+			Controller controller = new Controller();
+			
+			controller.connect("toto", "password");
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		
 		
