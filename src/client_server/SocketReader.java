@@ -9,10 +9,12 @@ import java.util.concurrent.ExecutionException;
 public class SocketReader extends Thread {
 	
 	private Socket socket;
+	private Controller controller;
 
-	public SocketReader(Socket socket) {
+	public SocketReader(Socket socket, Controller controller) {
 		super();
 		this.socket = socket;
+		this.controller = controller;
 	}
 	
 	public void run() {
@@ -25,7 +27,8 @@ public class SocketReader extends Thread {
 			String data = in_data.readLine();
 			
 			while(data != null && !data.equals("-1")) {
-				System.out.println("Message : " + data);
+//				System.out.println("Message : " + data);
+				controller.receiveMessage("Message : " + data);
 
 				data = in_data.readLine();
 			}

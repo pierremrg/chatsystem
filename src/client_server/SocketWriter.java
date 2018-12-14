@@ -7,11 +7,13 @@ public class SocketWriter extends Thread {
 	
 	private Socket socket;
 	private String content;
+	private Controller controller;
 	
-	public SocketWriter(Socket socket) {
+	public SocketWriter(Socket socket, Controller controller) {
 		super();
 		this.socket = socket;
 		this.content = null;
+		this.controller = controller;
 	}
 	
 	public void run() {

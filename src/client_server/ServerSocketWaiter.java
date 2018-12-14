@@ -7,8 +7,9 @@ import java.net.Socket;
 public class ServerSocketWaiter extends Thread {
 
 	private ServerSocket serverSocket;
+	private Controller controller;
 	
-	public ServerSocketWaiter(ServerSocket serverSocket) {
+	public ServerSocketWaiter(ServerSocket serverSocket, Controller controller) {
 		this.serverSocket = serverSocket;
 	}
 	
@@ -18,8 +19,8 @@ public class ServerSocketWaiter extends Thread {
 		try {
 			socket = serverSocket.accept();
 			
-			SocketWriter socketWriter = new SocketWriter(socket);
-			SocketReader socketReader = new SocketReader(socket);
+			SocketWriter socketWriter = new SocketWriter(socket, controller);
+			SocketReader socketReader = new SocketReader(socket, controller);
 			socketWriter.start();
 			socketReader.start();
 			

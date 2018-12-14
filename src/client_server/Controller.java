@@ -14,7 +14,7 @@ import java.util.Random;
 
 public class Controller {
 	
-	// Utilisateur associé au controller
+	// Utilisateur associe au controller
 	private User user;
 	
 	// Groupes de l'utilisateur
@@ -23,12 +23,18 @@ public class Controller {
 	// Messages (tous) de l'utilisateur
 	private ArrayList<Message> messages;
 	
-	// Liste des utilisateurs connectés
+	// Liste des utilisateurs connectes
 	private ArrayList<User> connectedUsers;
 	
-	// Service UDP utilisé pour le broadcast (connexion, déconnexion)
+	// Service UDP utilise pour le broadcast (connexion, deconnexion)
 	private Udp udp;
+	
+	// Adresse IP de broadcast du réseau
 	private InetAddress ipBroadcast;
+	
+	// Utilisé pour envoyer un message
+	private Message messageToSend = null;
+	
 	
 	
 	/**
@@ -59,10 +65,18 @@ public class Controller {
 
 	public void sendMessage(Message message) {
 		// TODO
+		
+		messageToSend = message;
+		
 	}
 	
-	public Message receiveMessage() {
+	public Message getMessageToSend() {
+		return messageToSend;
+	}
+	
+	public Message receiveMessage(String message) {
 		// TODO
+		System.out.println(message);
 		
 		return null;
 	}
@@ -95,7 +109,7 @@ public class Controller {
 		// Démarrage du serveur : l'utilisateur peut être sollicité pour une conversation
 		int serverPort = user.getPort(); // Port du serveur = celui associé à l'utilisateur
 		ServerSocket serverSocket = new ServerSocket(serverPort);
-		ServerSocketWaiter serverSocketWaiter = new ServerSocketWaiter(serverSocket);
+		ServerSocketWaiter serverSocketWaiter = new ServerSocketWaiter(serverSocket, this);
 		serverSocketWaiter.start();
 
 		
@@ -163,8 +177,8 @@ public class Controller {
 		// Création d'un socket client : l'utilisateur peut se connecter aux autres utilisateurs
 		Socket socket = new Socket(contact.getIP(), contact.getPort());
 		
-		SocketWriter socketWriter = new SocketWriter(socket);
-		SocketReader socketReader = new SocketReader(socket);
+		SocketWriter socketWriter = new SocketWriter(socket, this);
+		SocketReader socketReader = new SocketReader(socket, this);
 		socketWriter.start();
 		socketReader.start();
 	}

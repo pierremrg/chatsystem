@@ -32,7 +32,7 @@ public class Main {
 		int mode = sc.nextInt();
 		
 		// Serveur
-		if(mode == 0) {
+		/*if(mode == 0) {
 			System.out.println("Port du serveur : ");
 			int serverPort = sc.nextInt();
 			ServerSocket serverSocket = new ServerSocket(serverPort);
@@ -63,7 +63,7 @@ public class Main {
 			
 			System.out.println("Client started");
 			
-		}
+		}*/
 		
 	}
 
