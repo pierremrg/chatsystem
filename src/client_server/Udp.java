@@ -78,6 +78,7 @@ public class Udp extends Thread {
 	public void run() {
 		byte[] buffer = new byte[256];
 		DatagramPacket in = new DatagramPacket(buffer, buffer.length);
+		while(true) {
 		try {
 			socket.receive(in);
 		} catch (IOException e) {
@@ -99,10 +100,12 @@ public class Udp extends Thread {
 					this.sendUdpMessage("2 " + controller.getUser().getID(), in.getAddress());
 				}
 			} catch (SocketException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} else if(statutConnexion == 2) {
 			addConnectedUser(idUser);
 		}		
+		}
 	}	
 }
