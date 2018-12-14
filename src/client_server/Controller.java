@@ -35,7 +35,7 @@ public class Controller {
 	private InetAddress ipBroadcast;
 	
 	// Utilisé pour envoyer un message
-	private Message messageToSend = null;
+	private String messageToSend = null;
 	
 	
 	
@@ -77,7 +77,7 @@ public class Controller {
 	 * Permet d'envoyer un message
 	 * @param message le message a envoyer
 	 */
-	public void sendMessage(Message message) {
+	public void sendMessage(String message) {
 		// TODO
 		
 		messageToSend = message;
@@ -88,7 +88,7 @@ public class Controller {
 	 * Utilisé par les threads d'écriture
 	 * @return le message à envoyer
 	 */
-	public Message getMessageToSend() {
+	public String getMessageToSend() {
 		return messageToSend;
 	}
 	
@@ -126,7 +126,7 @@ public class Controller {
 	public void connect(String username, String password) throws IOException {
 		// TODO Check dans la BDD si info ok
 		// TODO id de l'utilisateur
-		user = new User(2, username, password);
+		user = new User(1, username, password);
 		
 		// TODO Infos sur l'utilisateur
 		user.setIP(InetAddress.getLocalHost());
