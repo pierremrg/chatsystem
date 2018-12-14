@@ -147,16 +147,17 @@ public class Controller {
 		//R�cup ip broadcast
 		
 		udp.start();
-		udp.sendUdpMessage("1 " + user.getID(), ipBroadcast);
+		udp.sendUdpMessage(udp.createMessage(1, getUser()), ipBroadcast);
 	}
 	
 	/**
 	 * Deconnecte l'utilisateur et l'annonce � tout le monde
+	 * @throws IOException 
 	 */
-	public void deconnect() {
+	public void deconnect() throws IOException {
 		// TODO Gestion de l'erreur
 
-		udp.sendUdpMessage("0 " + user.getID(), ipBroadcast);
+		udp.sendUdpMessage(udp.createMessage(0, getUser()), ipBroadcast);
 
 	}
 	
@@ -164,22 +165,27 @@ public class Controller {
 	 * R�cup�re les infos d'un nouvelle utilisateur connect� et ajout dans la liste des utilisateurs connect�s
 	 * @param idUser ID de l'utilisateur qui vient de se connecter
 	 */
-	public void receiveConnection(int idUser) {
+	public void receiveConnection(User receivedUser) {
+		if(receivedUser == null)
+			return;
+		
 		//recup info user dans la bdd 
-		System.out.println("connexion reçu! iduser=" +idUser);
+		System.out.println("connexion reçu! iduser=" +receivedUser.getID());
 
-		User newUser = null;
-		connectedUsers.add(newUser);
+		if(!connectedUsers.contains(receivedUser))
+			connectedUsers.add(receivedUser);
 	}
 	
 	/**
 	 * Retire de la liste l'utilisateur qui vient de se d�connecter
 	 * @param idUser ID de l'utilisateur qui se d�connecte
 	 */
-	public void receiveDeconnection(int idUser) {
-		User delUser = null;
+	public void receiveDeconnection(User receivedUser) {
+		if(receivedUser == null)
+			return;
+		
 		//recup info user avec idUser
-		connectedUsers.remove(delUser);
+		connectedUsers.remove(receivedUser);
 	}	
 	
 	/**

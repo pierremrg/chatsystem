@@ -1,8 +1,9 @@
 package client_server;
 
+import java.io.Serializable;
 import java.net.InetAddress;
 
-public class User {
+public class User implements Serializable{
 
 	private int id;
 	private String username; // TODO : crypter ?

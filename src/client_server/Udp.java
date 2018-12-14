@@ -1,6 +1,11 @@
 package client_server;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -14,7 +19,7 @@ public class Udp extends Thread {
 	private Controller controller;
 	private DatagramSocket socket;
 	
-	private static final int PORT = 5001;
+	private static final int PORT = 5003;
 	
 	/**
 	 * Creer un Udp
@@ -38,14 +43,22 @@ public class Udp extends Thread {
 		}
 	}
 	
+	public byte[] createMessage(int status, User user) throws IOException {
+		ByteArrayOutputStream bStream = new ByteArrayOutputStream();
+		ObjectOutput oo = new ObjectOutputStream(bStream);
+		oo.writeInt(status);
+		oo.writeObject(user);
+		oo.close();
+		return bStream.toByteArray();
+	}
+	
 	/**
 	 * Envoie d'un message UDP
 	 * @param message � envoyer
 	 * @param ip o� envoyer le message
 	 */
-	public void sendUdpMessage(String message, InetAddress ipAddress) {
-		byte[] buffer = message.getBytes();
-		DatagramPacket out = new DatagramPacket(buffer, buffer.length, ipAddress, PORT);
+	public void sendUdpMessage(byte[] message, InetAddress ipAddress) {
+		DatagramPacket out = new DatagramPacket(message, message.length, ipAddress, PORT);
 		
 		try {
 			socket.send(out);
@@ -57,55 +70,53 @@ public class Udp extends Thread {
 	}
 	
 	/**
-	 * Permet au controller d'ajouter l'utilisateur qui vient de se connecter
-	 * @param idUser ID de l'utilisateur � ajouter
-	 */
-	public void addConnectedUser(int idUser) {
-		controller.receiveConnection(idUser);
-	}
-	
-	/**
-	 * Permet au controller de retirer l'utilisateur qui se d�connecte
-	 * @param idUser ID de l'utilisateur � retirer
-	 */
-	public void removeConnectedUser(int idUser) {
-		controller.receiveDeconnection(idUser);
-	}
-	
-	/**
 	 * Thread qui �coute en UDP et qui traite les messages suivant le contenu
 	 */
 	public void run() {
 		byte[] buffer = new byte[256];
 		DatagramPacket in = new DatagramPacket(buffer, buffer.length);
+		int statutConnexion = -1;
+		User receivedUser = null;
 		while(true) {
-		try {
-			socket.receive(in);
-		} catch (IOException e) {
-			System.out.println("Erreur socket");
-			e.printStackTrace();
-		}
-	
-		String messageRecu = new String(in.getData(), 0, in.getLength());		
-		int statutConnexion = Integer.parseInt(messageRecu.substring(0, 1));
-		int idUser = Integer.parseInt(messageRecu.substring(2));		
-		
-		if(statutConnexion == 0) {
-			removeConnectedUser(idUser);
-		}
-		else if(statutConnexion == 1) {
 			try {
-				if (!Controller.getIP().equals(in.getAddress())) {
-					addConnectedUser(idUser);
-					this.sendUdpMessage("2 " + controller.getUser().getID(), in.getAddress());
-				}
-			} catch (SocketException e) {
+				socket.receive(in);
+			} catch (IOException e) {
+				System.out.println("Erreur socket");
+				e.printStackTrace();
+			}
+			byte[] receivedMessage = in.getData();
+			ObjectInputStream iStream;
+			try {
+				iStream = new ObjectInputStream(new ByteArrayInputStream(receivedMessage));
+				statutConnexion = (int) iStream.readInt();
+				receivedUser = (User) iStream.readObject();
+				iStream.close();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		} else if(statutConnexion == 2) {
-			addConnectedUser(idUser);
-		}		
+			
+			if(statutConnexion == 0) {
+				controller.receiveDeconnection(receivedUser);
+			}
+			else if(statutConnexion == 1) {
+				try {
+					if (!Controller.getIP().equals(in.getAddress())) {
+						controller.receiveConnection(receivedUser);						
+						sendUdpMessage(createMessage(2, controller.getUser()), in.getAddress());
+					}
+				} catch (SocketException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else if(statutConnexion == 2) {
+				controller.receiveConnection(receivedUser);
+			}		
 		}
 	}	
 }
