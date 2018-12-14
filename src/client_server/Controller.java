@@ -126,7 +126,7 @@ public class Controller {
 	public void connect(String username, String password) throws IOException {
 		// TODO Check dans la BDD si info ok
 		// TODO id de l'utilisateur
-		user = new User(1, username, password);
+		user = new User(2, username, password);
 		
 		// TODO Infos sur l'utilisateur
 		user.setIP(InetAddress.getLocalHost());
@@ -145,9 +145,9 @@ public class Controller {
 		// TODO Gerer l'erreur
 		//Annonce � tout le monde la connexion
 		//R�cup ip broadcast
-		udp.sendUdpMessage("1 " + user.getID(), ipBroadcast);
-		udp.start();
 		
+		udp.start();
+		udp.sendUdpMessage("1 " + user.getID(), ipBroadcast);
 	}
 	
 	/**
@@ -166,7 +166,7 @@ public class Controller {
 	 */
 	public void receiveConnection(int idUser) {
 		//recup info user dans la bdd 
-		System.out.println("connexion reçu : " +idUser);
+		System.out.println("connexion reçu! iduser=" +idUser);
 
 		User newUser = null;
 		connectedUsers.add(newUser);
