@@ -43,10 +43,11 @@ public class Controller {
 	 * Cree un controller
 	 * @param user utilisateur associe au controller
 	 * @throws SocketException 
+	 * @throws UnknownHostException 
 	 */
-	public Controller () throws SocketException {
+	public Controller () throws SocketException, UnknownHostException {
 		this.udp = new Udp(this);
-		this.ipBroadcast = getBroadcast();
+		this.ipBroadcast = InetAddress.getByName("10.1.255.255");
 		
 		this.connectedUsers = new ArrayList<User>();
 		this.groups = new ArrayList<Group>();
@@ -129,7 +130,7 @@ public class Controller {
 		user = new User(1, username, password);
 		
 		// TODO Infos sur l'utilisateur
-		user.setIP(InetAddress.getLocalHost());
+		user.setIP(InetAddress.getByName("10.1.5.49"));
 		Random rand = new Random();
 		int portRand = rand.nextInt(65000 - 10000 + 1) + 1000; // Rand(10000,65000)
 		user.setPort(portRand);
@@ -166,7 +167,7 @@ public class Controller {
 	 * @param idUser ID de l'utilisateur qui vient de se connecter
 	 */
 	public void receiveConnection(User receivedUser) {
-		if(receivedUser == null)
+		if(receivedUser == null && receivedUser.getID() != user.getID())
 			return;
 		
 		//recup info user dans la bdd 

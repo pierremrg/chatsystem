@@ -18,6 +18,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
+
+import sun.font.TextRecord;
 	
 public class GUI extends JFrame{
 	
@@ -120,8 +122,18 @@ public class GUI extends JFrame{
 			textField.setText(null);
 			
 			/* Envoi du message */
-			Message message = new Message(textToSend);
-			controller.sendMessage(message);
+			/*Message message = new Message(textToSend);
+			controller.sendMessage(message);*/
+			
+			try {
+				controller.startGroup(controller.getConnectedUsers());
+				
+				controller.sendMessage(textToSend);
+				
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			
 			
 		}
