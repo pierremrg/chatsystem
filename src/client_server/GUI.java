@@ -121,7 +121,7 @@ public class GUI extends JFrame{
 			
 			/* Envoi du message */
 			Message message = new Message(textToSend);
-			controller.sendMessage(message);
+			controller.sendMessage(textToSend);
 			
 			
 		}

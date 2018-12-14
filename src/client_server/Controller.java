@@ -43,10 +43,11 @@ public class Controller {
 	 * Cree un controller
 	 * @param user utilisateur associe au controller
 	 * @throws SocketException 
+	 * @throws UnknownHostException 
 	 */
-	public Controller () throws SocketException {
+	public Controller () throws SocketException, UnknownHostException {
 		this.udp = new Udp(this);
-		this.ipBroadcast = getBroadcast();
+		this.ipBroadcast = InetAddress.getByName("10.1.255.255");
 		
 		this.connectedUsers = new ArrayList<User>();
 		this.groups = new ArrayList<Group>();
@@ -126,10 +127,10 @@ public class Controller {
 	public void connect(String username, String password) throws IOException {
 		// TODO Check dans la BDD si info ok
 		// TODO id de l'utilisateur
-		user = new User(1, username, password);
+		user = new User(2, username, password);
 		
 		// TODO Infos sur l'utilisateur
-		user.setIP(InetAddress.getLocalHost());
+		user.setIP(InetAddress.getByName("10.1.5.43"));
 		Random rand = new Random();
 		int portRand = rand.nextInt(65000 - 10000 + 1) + 1000; // Rand(10000,65000)
 		user.setPort(portRand);
@@ -172,7 +173,7 @@ public class Controller {
 		//recup info user dans la bdd 
 		System.out.println("connexion reçu! iduser=" +receivedUser.getID());
 
-		if(!connectedUsers.contains(receivedUser))
+		if(!connectedUsers.contains(receivedUser) && receivedUser.getID() != user.getID())
 			connectedUsers.add(receivedUser);
 	}
 	
