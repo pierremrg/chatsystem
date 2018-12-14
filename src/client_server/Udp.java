@@ -93,8 +93,14 @@ public class Udp extends Thread {
 			removeConnectedUser(idUser);
 		}
 		else if(statutConnexion == 1) {
-			addConnectedUser(idUser);
-			this.sendUdpMessage("2 " + controller.getUser().getID(), in.getAddress());
+			try {
+				if (!Controller.getIP().equals(in.getAddress())) {
+					addConnectedUser(idUser);
+					this.sendUdpMessage("2 " + controller.getUser().getID(), in.getAddress());
+				}
+			} catch (SocketException e) {
+				e.printStackTrace();
+			}
 		} else if(statutConnexion == 2) {
 			addConnectedUser(idUser);
 		}		

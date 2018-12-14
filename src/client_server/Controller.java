@@ -257,7 +257,7 @@ public class Controller {
 		return null;
 	}
 	
-	private static InetAddress getIP() throws SocketException {
+	public static InetAddress getIP() throws SocketException {
 		List<InetAddress> IPList = new ArrayList<>();
 	    Enumeration<NetworkInterface> interfaces 
 	      = NetworkInterface.getNetworkInterfaces();
