@@ -21,6 +21,8 @@ import javax.swing.ScrollPaneConstants;
 	
 public class GUI extends JFrame{
 	
+	private static Controller controller;
+	
 	private JPanel panel; // Panel principal
 	private JButton sendButton; // Bouton Envoyer 
 	private JTextField textField; // Zone de texte
@@ -105,8 +107,10 @@ public class GUI extends JFrame{
 		
 		public void actionPerformed(ActionEvent e) {
 			
+			String textToSend = textField.getText();
+			
 			String history = messagesArea.getText();
-			String newText = "Moi >> " + textField.getText();
+			String newText = "Moi >> " + textToSend;
 			
 			if(history.equals(""))
 				messagesArea.setText(newText);
@@ -114,6 +118,12 @@ public class GUI extends JFrame{
 				messagesArea.setText(history + "\n" + newText);
 			
 			textField.setText(null);
+			
+			/* Envoi du message */
+			Message message = new Message(textToSend);
+			controller.sendMessage(message);
+			
+			
 		}
 		
 	}
@@ -136,7 +146,7 @@ public class GUI extends JFrame{
 		Statement statement = (Statement) con.createStatement();*/
 		
 		try {
-			Controller controller = new Controller();
+			controller = new Controller();
 			
 			controller.connect("toto", "password");
 			

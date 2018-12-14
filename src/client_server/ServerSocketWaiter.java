@@ -10,6 +10,7 @@ public class ServerSocketWaiter extends Thread {
 	private Controller controller;
 	
 	public ServerSocketWaiter(ServerSocket serverSocket, Controller controller) {
+		super();
 		this.serverSocket = serverSocket;
 	}
 	

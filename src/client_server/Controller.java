@@ -38,16 +38,16 @@ public class Controller {
 	
 	
 	/**
-	 * Crée un controller
-	 * @param user utilisateur associé au controller
+	 * Cree un controller
+	 * @param user utilisateur associe au controller
 	 */
 	public Controller () {
 		this.udp = new Udp(this);
 		this.ipBroadcast = getBroadcast();
 		
 		this.connectedUsers = null;
-		//R�cup�rer groupe dont l'utilisateur est membre dans la BDD
-		//R�cup�rer tous les messages de l'utilisateur dans la BDD
+		//Recuperer groupe dont l'utilisateur est membre dans la BDD
+		//Recuperer tous les messages de l'utilisateur dans la BDD
 		
 	}
 	
@@ -59,20 +59,43 @@ public class Controller {
 		return user;
 	}
 
+	/**
+	 * Retourne la liste des utilisateurs connectes
+	 * @return la liste des utilisateurs connectes
+	 */
 	public ArrayList<User> getConnectedUsers() {
 		return connectedUsers;
 	}
 
+	/**
+	 * Permet d'envoyer un message
+	 * @param message le message a envoyer
+	 */
 	public void sendMessage(Message message) {
 		// TODO
 		
 		messageToSend = message;
-		
 	}
 	
+	/**
+	 * Retourne le message qui doit être envoyé (null si aucun)
+	 * Utilisé par les threads d'écriture
+	 * @return le message à envoyer
+	 */
 	public Message getMessageToSend() {
 		return messageToSend;
 	}
+	
+	/**
+	 * Permet à aux threads d'écriture d'indiquer que le message a été envoyé
+	 */
+	public void messageSent() {
+		messageToSend = null;
+	}
+	
+	
+	
+	
 	
 	public Message receiveMessage(String message) {
 		// TODO
@@ -122,6 +145,16 @@ public class Controller {
 	}
 	
 	/**
+	 * Deconnecte l'utilisateur et l'annonce � tout le monde
+	 */
+	public void deconnect() {
+		// TODO Gestion de l'erreur
+
+		udp.sendUdpMessage("0 " + user.getID(), ipBroadcast);
+
+	}
+	
+	/**
 	 * R�cup�re les infos d'un nouvelle utilisateur connect� et ajout dans la liste des utilisateurs connect�s
 	 * @param idUser ID de l'utilisateur qui vient de se connecter
 	 */
@@ -141,16 +174,6 @@ public class Controller {
 		//recup info user avec idUser
 		connectedUsers.remove(delUser);
 	}	
-	
-	/**
-	 * Deconnecte l'utilisateur et l'annonce � tout le monde
-	 */
-	public void deconnect() {
-		// TODO Gestion de l'erreur
-
-		udp.sendUdpMessage("0 " + user.getID(), ipBroadcast);
-
-	}
 	
 	/**
 	 * Démarre une conversation

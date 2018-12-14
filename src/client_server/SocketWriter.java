@@ -23,10 +23,13 @@ public class SocketWriter extends Thread {
 			/*Scanner sc = new Scanner(System.in);
 			String msg = sc.nextLine();*/
 			
+			Message messageToSend = controller.getMessageToSend();
+			
 			while(true) {
-				if(content != null) {
-					out.println(content);
+				if(messageToSend != null) {
+					out.println(messageToSend.getContent());
 					System.out.println("Message envoyé");
+					controller.messageSent();
 				}
 				
 				//msg = sc.nextLine();

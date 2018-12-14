@@ -10,7 +10,7 @@ public class Message {
 	private Group receiverGroup;
 	
 	/**
-	 * Créer un message
+	 * Crï¿½er un message
 	 * @param date Date d'envoi du message
 	 * @param content Contenu du message
 	 * @param sender Auteur du message
@@ -22,6 +22,10 @@ public class Message {
 		this.content = content;
 		this.sender = sender;
 		this.receiverGroup = receiverGroup;
+	}
+	
+	public Message(String content) {
+		this.content = content;
 	}
 
 	/**
