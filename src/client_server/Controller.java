@@ -167,7 +167,7 @@ public class Controller {
 	 * @param idUser ID de l'utilisateur qui vient de se connecter
 	 */
 	public void receiveConnection(User receivedUser) {
-		if(receivedUser == null)
+		if(receivedUser == null && receivedUser.getID() != user.getID())
 			return;
 		
 		//recup info user dans la bdd 
