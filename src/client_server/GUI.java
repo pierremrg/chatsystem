@@ -137,7 +137,7 @@ public class GUI extends JFrame{
 	 */
 	public static void main(String[] args) throws SocketException, ClassNotFoundException, SQLException {
 		
-		//new GUI();
+		new GUI();
 		
 		
 		/*Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");

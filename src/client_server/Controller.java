@@ -9,7 +9,9 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 public class Controller {
@@ -40,12 +42,16 @@ public class Controller {
 	/**
 	 * Cree un controller
 	 * @param user utilisateur associe au controller
+	 * @throws SocketException 
 	 */
-	public Controller () {
+	public Controller () throws SocketException {
 		this.udp = new Udp(this);
 		this.ipBroadcast = getBroadcast();
 		
-		this.connectedUsers = null;
+		this.connectedUsers = new ArrayList<User>();
+		this.groups = new ArrayList<Group>();
+		this.messages = new ArrayList<Message>();
+
 		//Recuperer groupe dont l'utilisateur est membre dans la BDD
 		//Recuperer tous les messages de l'utilisateur dans la BDD
 		
@@ -137,11 +143,11 @@ public class Controller {
 
 		
 		// TODO Gerer l'erreur
-		
 		//Annonce � tout le monde la connexion
 		//R�cup ip broadcast
-		//udp.start();
-		//udp.sendUdpMessage("1 " + user.getID(), ipBroadcast);
+		udp.sendUdpMessage("1 " + user.getID(), ipBroadcast);
+		udp.start();
+		
 	}
 	
 	/**
@@ -160,6 +166,7 @@ public class Controller {
 	 */
 	public void receiveConnection(int idUser) {
 		//recup info user dans la bdd 
+		System.out.println("connexion reçu : " +idUser);
 
 		User newUser = null;
 		connectedUsers.add(newUser);
@@ -229,27 +236,43 @@ public class Controller {
 	/**
 	 * R�cup�re l'adresse de broadcast de la machine
 	 * @return adresse de broadcast en String
+	 * @throws SocketException 
 	 */
-	private static InetAddress getBroadcast() {
-		InetAddress local = null;
+	private static InetAddress getBroadcast() throws SocketException {
+		InetAddress local = getIP();
 		NetworkInterface temp;
 		InetAddress broadcast = null;
-		
-		try {
-			local = InetAddress.getLocalHost();
-		} catch (UnknownHostException e1) {
-			e1.printStackTrace();
-			System.out.println("getLocal " + e1.getMessage());
-		}		
 		try {
 			temp = NetworkInterface.getByInetAddress(local);
-			List<InterfaceAddress> addresses = temp.getInterfaceAddresses();			
-			broadcast = addresses.get(0).getBroadcast();
+			
+			List<InterfaceAddress> addresses = temp.getInterfaceAddresses();		
+
+			broadcast = addresses.get(1).getBroadcast();
+
 			return broadcast;				
 		} catch (SocketException e) {
 			e.printStackTrace();
 			System.out.println("getBroadcast " + e.getMessage());
 		}
 		return null;
+	}
+	
+	private static InetAddress getIP() throws SocketException {
+		List<InetAddress> IPList = new ArrayList<>();
+	    Enumeration<NetworkInterface> interfaces 
+	      = NetworkInterface.getNetworkInterfaces();
+	    while (interfaces.hasMoreElements()) {
+	        NetworkInterface networkInterface = interfaces.nextElement();
+	 
+	        if (networkInterface.isLoopback() || !networkInterface.isUp()) {
+	            continue;
+	        }
+	 
+	        networkInterface.getInterfaceAddresses().stream() 
+	          .map(a -> a.getAddress())
+	          .filter(Objects::nonNull)
+	          .forEach(IPList::add);
+	    }
+	    return IPList.get(1);
 	}
 }

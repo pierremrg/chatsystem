@@ -49,6 +49,7 @@ public class Udp extends Thread {
 		
 		try {
 			socket.send(out);
+			System.out.println("message envoye : " + message + " a " + ipAddress.toString());
 		} catch (IOException e) {
 			System.out.println("Erreur socketsend udp");
 			e.printStackTrace();
