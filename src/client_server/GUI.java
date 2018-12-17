@@ -6,8 +6,13 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Scanner;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -150,8 +155,18 @@ public class GUI extends JFrame{
 	 * @throws SocketException 
 	 * @throws ClassNotFoundException 
 	 * @throws SQLException 
+	 * @throws UnknownHostException 
 	 */
-	public static void main(String[] args) throws SocketException, ClassNotFoundException, SQLException {
+	public static void main(String[] args) throws SocketException, ClassNotFoundException, SQLException, UnknownHostException {
+		
+		Map<InetAddress, InetAddress> allIP = Controller.getAllIpAndBroadcast();
+		ArrayList<InetAddress> ipListMachine = new ArrayList<InetAddress>(allIP.keySet());
+		System.out.println(ipListMachine);
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Entrez index ip : ");
+		int choix = sc.nextInt();
+		InetAddress ipMachine = ipListMachine.get(choix);
+		sc.close();		
 		
 		new GUI();
 		
@@ -162,18 +177,13 @@ public class GUI extends JFrame{
 		Statement statement = (Statement) con.createStatement();*/
 		
 		try {
-			controller = new Controller();
+			controller = new Controller(allIP.get(ipMachine));
+			controller.connect("toto", "password", ipMachine);
 			
-			controller.connect("toto", "password");
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		
-		
-		
+		}		
 	}
-	
-
 }
