@@ -5,6 +5,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketException;
@@ -23,8 +25,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
-
-import sun.font.TextRecord;
 	
 public class GUI extends JFrame{
 	
@@ -40,7 +40,8 @@ public class GUI extends JFrame{
 	public GUI() {
 		/* Fenêtre principale */
 		super("Chatsystem");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		//setDefaultCloseOperation(new windowClosingListener());
+		addWindowListener(new windowClosingListener());
 		setSize(new Dimension(700, 400));
 		setLocationRelativeTo(null);
 		
@@ -140,6 +141,30 @@ public class GUI extends JFrame{
 
 		}
 		
+	}
+	
+	public class windowClosingListener implements WindowListener {
+		
+		public void windowClosing(WindowEvent e) {
+			
+			try {
+				controller.deconnect();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			// Fin du programme sans erreur
+			System.exit(0);
+		}
+		
+		public void windowOpened(WindowEvent arg0) {}
+		public void windowClosed(WindowEvent arg0) {}
+		public void windowIconified(WindowEvent arg0) {}
+		public void windowDeiconified(WindowEvent arg0) {}
+		public void windowActivated(WindowEvent arg0) {}
+		public void windowDeactivated(WindowEvent arg0) {}
+
 	}
 	
 	/**
