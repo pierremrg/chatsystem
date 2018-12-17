@@ -312,6 +312,7 @@ public class Controller {
 	private void restartGroup(Group group) throws IOException {
 		
 		group.setStarter(user);
+		group.setOnline(true);
 		
 		User contact = group.getMembers().get(0);
 		
