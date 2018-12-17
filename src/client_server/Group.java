@@ -19,9 +19,13 @@ public class Group implements Serializable {
 	 */
 	public Group(int id, ArrayList<User> members, User starter) {
 		this.id = id;
-		this.members = members;
 		this.starter = starter;
 		this.online = true;
+		
+		this.members = new ArrayList<User>();
+		for(User m : members) {
+			this.members.add(m);
+		}
 	}
 	
 	/**
@@ -38,6 +42,10 @@ public class Group implements Serializable {
 	 */
 	public ArrayList<User> getMembers() {
 		return members;
+	}
+	
+	public void addMember(User member) {
+		members.add(member);
 	}
 	
 	/**
@@ -67,7 +75,7 @@ public class Group implements Serializable {
 	 */
 	public boolean isMember(User member) {
 		for(User m : members) {
-			if(m == member)
+			if(m.getID() == member.getID())
 				return true;
 		}
 		

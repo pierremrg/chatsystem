@@ -97,7 +97,7 @@ public class Controller {
 			
 			// On regarde si le groupe n'est plus actif
 			if(!group.isOnline()) {
-				restartGroup(group, getConnectedUsers());
+				restartGroup(group);
 				// TODO pas tous les connectés !
 			}
 		}
@@ -264,7 +264,8 @@ public class Controller {
 		
 		// Mise à jour des groupes
 		for(Group group : groups) {
-			if(group.updateMember(receivedUser)) {
+			if(group.isMember(receivedUser)) {
+				group.setOnline(false);
 				group.setStarter(user);
 			}
 		}
@@ -308,11 +309,11 @@ public class Controller {
 		return group;
 	}
 	
-	private void restartGroup(Group group, ArrayList<User> members) throws IOException {
+	private void restartGroup(Group group) throws IOException {
 		
 		group.setStarter(user);
 		
-		User contact = members.get(0);
+		User contact = group.getMembers().get(0);
 		
 		Socket socket = new Socket(contact.getIP(), contact.getPort());
 		
