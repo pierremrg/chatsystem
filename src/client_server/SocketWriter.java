@@ -68,9 +68,16 @@ public class SocketWriter extends Thread {
 	public static String encodeMessageToString(Message message) throws IOException {
 		
 		ByteArrayOutputStream bStream = new ByteArrayOutputStream();
-		ObjectOutput oo = new ObjectOutputStream(bStream);
-		oo.writeObject(message);
-		oo.close();
+		ObjectOutput oo;
+
+		try {
+			oo = new ObjectOutputStream(bStream);
+			oo.writeObject(message);
+			oo.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		return Base64.getEncoder().encodeToString(bStream.toByteArray());
 	}

@@ -38,7 +38,7 @@ public class Controller {
 	private InetAddress ipBroadcast;
 	
 	// Utilisé pour envoyer un message
-	private Message messageToSend = null;
+	private volatile Message messageToSend = null;
 	
 	
 	
@@ -255,7 +255,7 @@ public class Controller {
 		
 		// TODO Obtenir l'ID dans la BDD
 		// TODO Gérer l'erreur
-		int idGroup = 1;
+		int idGroup = 0;
 		
 		// Démarre un groupe :
 		// - ID du groupe

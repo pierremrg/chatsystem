@@ -131,6 +131,7 @@ public class GUI extends JFrame{
 			try {
 				// TODO on crée le groupe ici ou on garde que l'ID ? que le nom ?
 				int receiverGroupID = 0;
+				
 				controller.sendMessage(textToSend, receiverGroupID);
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
