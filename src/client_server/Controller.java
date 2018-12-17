@@ -237,7 +237,12 @@ public class Controller {
 			return;
 		
 		//recup info user avec idUser
-		connectedUsers.remove(receivedUser);
+		//connectedUsers.remove(receivedUser);
+		for(User u : connectedUsers) {
+			if(u.equals(receivedUser))
+				connectedUsers.remove(u);
+		}
+		
 	}	
 	
 	/**

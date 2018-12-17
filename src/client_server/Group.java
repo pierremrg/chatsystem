@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 public class Group implements Serializable {
 	
+	private static final long serialVersionUID = 1L;
+	
 	private int id;
 	private ArrayList<User> members;
 	private User starter;
