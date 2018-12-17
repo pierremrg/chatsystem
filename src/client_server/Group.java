@@ -6,15 +6,17 @@ public class Group {
 	
 	private int id;
 	private ArrayList<User> members;
+	private User starter;
 	
 	/**
 	 * Création d'un groupe
 	 * @param id ID du groupe
 	 * @param members Liste des membres du groupe
 	 */
-	public Group(int id, ArrayList<User> members) {
+	public Group(int id, ArrayList<User> members, User starter) {
 		this.id = id;
 		this.members = members;
+		this.starter = starter;
 	}
 	
 	/**
@@ -31,6 +33,14 @@ public class Group {
 	 */
 	public ArrayList<User> getMembers() {
 		return members;
+	}
+	
+	/**
+	 * Retourne l'utilisateur qui a initié la conversation
+	 * @return l'utilisateur qui a initié la conversation
+	 */
+	public User getStarter() {
+		return starter;
 	}
 	
 	/**

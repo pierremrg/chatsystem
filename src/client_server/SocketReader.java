@@ -1,10 +1,13 @@
 package client_server;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.concurrent.ExecutionException;
+import java.util.Base64;
 
 public class SocketReader extends Thread {
 	
@@ -24,13 +27,14 @@ public class SocketReader extends Thread {
 			
 			BufferedReader in_data = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			
-			String data = in_data.readLine();
+			String stringData = in_data.readLine();
 			
-			while(data != null && !data.equals("-1")) {
+			while(stringData != null && !stringData.equals("-1")) {
 //				System.out.println("Message : " + data);
-				controller.receiveMessage("Message : " + data);
+//				controller.receiveMessage("Message : " + stringData);
+				controller.receiveMessage(decodeMessageFromString(stringData));
 
-				data = in_data.readLine();
+				stringData = in_data.readLine();
 			}
 		} catch(SocketException e) {
 			System.out.println("Stop reader");
@@ -46,6 +50,14 @@ public class SocketReader extends Thread {
 			System.out.println("Reader deconnected");	
 		}	
 		
+	}
+	
+	private Message decodeMessageFromString(String stringData) throws ClassNotFoundException, IOException {
+		
+		byte [] data = Base64.getDecoder().decode(stringData);
+		
+		ObjectInputStream iStream = new ObjectInputStream(new ByteArrayInputStream(data));
+		return (Message) iStream.readObject();
 	}
 	
 }

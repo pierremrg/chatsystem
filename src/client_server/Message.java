@@ -1,8 +1,9 @@
 package client_server;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Message {
+public class Message implements Serializable {
 	private int id;
 	private Date date;
 	private String content;
@@ -22,10 +23,6 @@ public class Message {
 		this.content = content;
 		this.sender = sender;
 		this.receiverGroup = receiverGroup;
-	}
-	
-	public Message(String content) {
-		this.content = content;
 	}
 
 	/**

@@ -122,24 +122,16 @@ public class GUI extends JFrame{
 			textField.setText(null);
 			
 			/* Envoi du message */
-			Message message = new Message(textToSend);
-			controller.sendMessage(textToSend);
-/*
-			/*Message message = new Message(textToSend);
-			controller.sendMessage(message);
-			
+			// TODO
 			try {
-				controller.startGroup(controller.getConnectedUsers());
-				
-				controller.sendMessage(textToSend);
-				
+				// TODO on crée le groupe ici ou on garde que l'ID ? que le nom ?
+				int receiverGroupID = 0;
+				controller.sendMessage(textToSend, receiverGroupID);
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-*/
-			
-			
+
 		}
 		
 	}

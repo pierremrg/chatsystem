@@ -9,6 +9,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
@@ -35,7 +36,7 @@ public class Controller {
 	private InetAddress ipBroadcast;
 	
 	// Utilisé pour envoyer un message
-	private String messageToSend = null;
+	private Message messageToSend = null;
 	
 	
 	
@@ -77,11 +78,25 @@ public class Controller {
 	/**
 	 * Permet d'envoyer un message
 	 * @param message le message a envoyer
+	 * @throws IOException 
 	 */
-	public void sendMessage(String message) {
-		// TODO
+	public void sendMessage(String textToSend, int receiverGroupID) throws IOException {
+		// TODO ajout BDD
+
+		/*controller.sendMessage(textToSend);*/
+
+		/*Message message = new Message(textToSend);
+		controller.sendMessage(message);*/
+
+		Group group;
 		
-		messageToSend = message;
+		if(groupIsKnown(receiverGroupID))
+			group = getGroupByID(receiverGroupID);
+		else
+			group = startGroup(getConnectedUsers());
+		
+		messageToSend = new Message(new Date(), textToSend, user, group);
+
 	}
 	
 	/**
@@ -89,7 +104,7 @@ public class Controller {
 	 * Utilisé par les threads d'écriture
 	 * @return le message à envoyer
 	 */
-	public String getMessageToSend() {
+	public Message getMessageToSend() {
 		return messageToSend;
 	}
 	
@@ -104,11 +119,46 @@ public class Controller {
 	
 	
 	
-	public Message receiveMessage(String message) {
-		// TODO
-		System.out.println(message);
+	public Message receiveMessage(Message message) {
+		// TODO ajout BDD
+		
+		// Recoit un message : ajout du groupe si besoin
+		Group group = message.getReceiverGroup();
+		
+		if(!groupIsKnown(group.getID()))
+			groups.add(group);
+		
+		System.out.println(message.getContent());
 		
 		return null;
+	}
+	
+	/**
+	 * Obtient un groupe à partir de son ID
+	 * @param groupID l'ID du groupe a obtenir
+	 * @return le groupe ou null si ce groupe n'existe pas
+	 */
+	private Group getGroupByID(int groupID) {
+		for(Group g : groups) {
+			if(g.getID() == groupID)
+				return g;
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Indique si le groupe est déjà connu par le controller
+	 * @param groupID L'ID du groupe à tester
+	 * @return True si le groupe est déjà dans la liste, False sinon
+	 */
+	private boolean groupIsKnown(int groupID) {
+		for(Group g : groups) {
+			if(g.getID() == groupID)
+				return true;
+		}
+		
+		return false;
 	}
 	
 	public ArrayList<Message> getGroupMessages(Group group){
@@ -127,10 +177,10 @@ public class Controller {
 	public void connect(String username, String password) throws IOException {
 		// TODO Check dans la BDD si info ok
 		// TODO id de l'utilisateur
-		user = new User(2, username, password);
+		user = new User(1, username, password);
 		
 		// TODO Infos sur l'utilisateur
-		user.setIP(InetAddress.getByName("10.1.5.43"));
+		user.setIP(InetAddress.getByName("10.1.5.154"));
 		Random rand = new Random();
 		int portRand = rand.nextInt(65000 - 10000 + 1) + 1000; // Rand(10000,65000)
 		user.setPort(portRand);
@@ -192,9 +242,10 @@ public class Controller {
 	/**
 	 * Démarre une conversation
 	 * @param members Utilisateurs présents dans la conversation
+	 * @return Le groupe créé
 	 * @throws IOException 
 	 */
-	public void startGroup(ArrayList<User> members) throws IOException {
+	public Group startGroup(ArrayList<User> members) throws IOException {
 		
 		// Première version : uniquement deux utilisateurs dans la conversation
 		// TODO Faire pour plusieurs personnes
@@ -205,19 +256,25 @@ public class Controller {
 		// TODO Gérer l'erreur
 		int idGroup = 1;
 		
-		Group group = new Group(idGroup, members);
+		// Démarre un groupe :
+		// - ID du groupe
+		// - Membres du groupe (uniquement deux personnes pour le moment)
+		// - Utilisateur qui a initié la conversation (utile pour savoir qui est client/serveur)
+		Group group = new Group(idGroup, members, user);
 		groups.add(group);
 		
 		// TODO Ajout à la BDD
 		
 		
-		// Création d'un socket client : l'utilisateur peut se connecter aux autres utilisateurs
+		// Création d'un socket client : l'utilisateur se connecte à l'autre utilisateur
 		Socket socket = new Socket(contact.getIP(), contact.getPort());
 		
 		SocketWriter socketWriter = new SocketWriter(socket, this);
 		SocketReader socketReader = new SocketReader(socket, this);
 		socketWriter.start();
 		socketReader.start();
+		
+		return group;
 	}
 	
 	public void createUser(String username, String password) {

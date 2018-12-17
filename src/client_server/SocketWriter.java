@@ -1,7 +1,12 @@
 package client_server;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Base64;
 
 public class SocketWriter extends Thread {
 	
@@ -24,12 +29,12 @@ public class SocketWriter extends Thread {
 			String msg = sc.nextLine();*/
 			
 			//Message messageToSend = controller.getMessageToSend();
-			String messageToSend;
+			Message messageToSend;
 			
 			while(true) {
 				messageToSend = controller.getMessageToSend();
 				if(messageToSend != null) {
-					out.println(messageToSend);
+					out.println(encodeMessageToString(messageToSend));
 					System.out.println("Message envoyé");
 					controller.messageSent();
 				}
@@ -58,5 +63,15 @@ public class SocketWriter extends Thread {
 	
 	public void setContent(String content) {
 		this.content = content;
+	}
+	
+	public static String encodeMessageToString(Message message) throws IOException {
+		
+		ByteArrayOutputStream bStream = new ByteArrayOutputStream();
+		ObjectOutput oo = new ObjectOutputStream(bStream);
+		oo.writeObject(message);
+		oo.close();
+		
+		return Base64.getEncoder().encodeToString(bStream.toByteArray());
 	}
 }
