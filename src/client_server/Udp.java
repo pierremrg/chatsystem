@@ -104,7 +104,7 @@ public class Udp extends Thread {
 			}
 			else if(statutConnexion == 1) {
 				try {
-					if (!Controller.getIP().equals(in.getAddress())) {
+					if (!controller.getUser().getIP().equals(in.getAddress())) {
 						controller.receiveConnection(receivedUser);						
 						sendUdpMessage(createMessage(2, controller.getUser()), in.getAddress());
 					}
