@@ -10,6 +10,7 @@ public class Group implements Serializable {
 	private int id;
 	private ArrayList<User> members;
 	private User starter;
+	private boolean online;
 	
 	/**
 	 * Création d'un groupe
@@ -20,6 +21,7 @@ public class Group implements Serializable {
 		this.id = id;
 		this.members = members;
 		this.starter = starter;
+		this.online = true;
 	}
 	
 	/**
@@ -46,6 +48,18 @@ public class Group implements Serializable {
 		return starter;
 	}
 	
+	public void setStarter(User starter) {
+		this.starter = starter;
+	}
+	
+	public boolean isOnline() {
+		return online;
+	}
+	
+	public void setOnline(boolean online) {
+		this.online = online;
+	}
+	
 	/**
 	 * Teste si un utilisateur est membre de ce groupe
 	 * @param member L'utilisateur à tester
@@ -60,6 +74,17 @@ public class Group implements Serializable {
 		return false;
 	}
 	
+	public boolean updateMember(User newVersionMember) {
+		for(User oldVersionMember : members) {
+			if(oldVersionMember.getID() == newVersionMember.getID()) {
+				members.remove(oldVersionMember);
+				members.add(newVersionMember);
+				return true;
+			}
+		}
+		
+		return false;
+	}
 	
 
 }

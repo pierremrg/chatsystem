@@ -90,10 +90,21 @@ public class Controller {
 
 		Group group;
 		
-		if(groupIsKnown(receiverGroupID))
+		if(groupIsKnown(receiverGroupID)) {
+			
+			// Le groupe est déjà démarré
 			group = getGroupByID(receiverGroupID);
-		else
+			
+			// On regarde si le groupe n'est plus actif
+			if(!group.isOnline()) {
+				restartGroup(group, getConnectedUsers());
+				// TODO pas tous les connectés !
+			}
+		}
+		else {
 			group = startGroup(getConnectedUsers());
+			// TODO pas tous les connectés !
+		}
 		
 		messageToSend = new Message(new Date(), textToSend, user, group);
 
@@ -226,6 +237,10 @@ public class Controller {
 
 		if(!connectedUsers.contains(receivedUser) && receivedUser.getID() != user.getID())
 			connectedUsers.add(receivedUser);
+		
+		// Mise à jour des groupes
+		for(Group group : groups)
+			group.updateMember(receivedUser);
 	}
 	
 	/**
@@ -238,9 +253,20 @@ public class Controller {
 		
 		//recup info user avec idUser
 		//connectedUsers.remove(receivedUser);
+		User userToRemove = null;
 		for(User u : connectedUsers) {
 			if(u.equals(receivedUser))
-				connectedUsers.remove(u);
+				userToRemove = u;
+		}
+		
+		if(userToRemove != null)
+			connectedUsers.remove(userToRemove);
+		
+		// Mise à jour des groupes
+		for(Group group : groups) {
+			if(group.updateMember(receivedUser)) {
+				group.setStarter(user);
+			}
 		}
 		
 	}	
@@ -251,7 +277,7 @@ public class Controller {
 	 * @return Le groupe créé
 	 * @throws IOException 
 	 */
-	public Group startGroup(ArrayList<User> members) throws IOException {
+	private Group startGroup(ArrayList<User> members) throws IOException {
 		
 		// Première version : uniquement deux utilisateurs dans la conversation
 		// TODO Faire pour plusieurs personnes
@@ -271,7 +297,6 @@ public class Controller {
 		
 		// TODO Ajout à la BDD
 		
-		
 		// Création d'un socket client : l'utilisateur se connecte à l'autre utilisateur
 		Socket socket = new Socket(contact.getIP(), contact.getPort());
 		
@@ -281,6 +306,20 @@ public class Controller {
 		socketReader.start();
 		
 		return group;
+	}
+	
+	private void restartGroup(Group group, ArrayList<User> members) throws IOException {
+		
+		group.setStarter(user);
+		
+		User contact = members.get(0);
+		
+		Socket socket = new Socket(contact.getIP(), contact.getPort());
+		
+		SocketWriter socketWriter = new SocketWriter(socket, this);
+		SocketReader socketReader = new SocketReader(socket, this);
+		socketWriter.start();
+		socketReader.start();
 	}
 	
 	public void createUser(String username, String password) {
