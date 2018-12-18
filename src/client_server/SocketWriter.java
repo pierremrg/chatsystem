@@ -11,13 +11,11 @@ import java.util.Base64;
 public class SocketWriter extends Thread {
 	
 	private Socket socket;
-	private String content;
 	private Controller controller;
 	
 	public SocketWriter(Socket socket, Controller controller) {
 		super();
 		this.socket = socket;
-		this.content = null;
 		this.controller = controller;
 	}
 	
@@ -34,6 +32,9 @@ public class SocketWriter extends Thread {
 			while(true) {
 				messageToSend = controller.getMessageToSend();
 				if(messageToSend != null) {
+					if(messageToSend.getFunction() == Message.FUNCTION_STOP)
+						break;
+					
 					out.println(encodeMessageToString(messageToSend));
 					System.out.println("Message envoyé");
 					controller.messageSent();
@@ -60,10 +61,6 @@ public class SocketWriter extends Thread {
 				}
 			}
 		}
-	}
-	
-	public void setContent(String content) {
-		this.content = content;
 	}
 	
 	public static String encodeMessageToString(Message message) throws IOException {

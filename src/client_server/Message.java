@@ -12,6 +12,10 @@ public class Message implements Serializable {
 	private String content;
 	private User sender;
 	private Group receiverGroup;
+	private int function;
+	
+	public static final int FUNCTION_NORMAL = 0;
+	public static final int FUNCTION_STOP = 1;
 	
 	/**
 	 * Cr�er un message
@@ -21,11 +25,12 @@ public class Message implements Serializable {
 	 * @param receiverGroup Destinataire(s) du message 
 	 */
 	
-	public Message(Date date, String content, User sender, Group receiverGroup) {
+	public Message(Date date, String content, User sender, Group receiverGroup, int function) {
 		this.date = date;
 		this.content = content;
 		this.sender = sender;
 		this.receiverGroup = receiverGroup;
+		this.function = function;
 	}
 
 	/**
@@ -58,5 +63,13 @@ public class Message implements Serializable {
 	 */
 	public Group getReceiverGroup() {
 		return receiverGroup;
+	}
+	
+	public int getFunction() {
+		return function;
+	}
+	
+	public void setFunction(int function) {
+		this.function = function;
 	}
 }

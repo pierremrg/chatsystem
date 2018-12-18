@@ -133,7 +133,7 @@ public class GUI extends JFrame{
 				// TODO on crée le groupe ici ou on garde que l'ID ? que le nom ?
 				int receiverGroupID = 0;
 				
-				controller.sendMessage(textToSend, receiverGroupID);
+				controller.sendMessage(textToSend, receiverGroupID, Message.FUNCTION_NORMAL);
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -148,6 +148,7 @@ public class GUI extends JFrame{
 		public void windowClosing(WindowEvent e) {
 			
 			try {
+				controller.sendMessage(null, -1, Message.FUNCTION_NORMAL);
 				controller.deconnect();
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block

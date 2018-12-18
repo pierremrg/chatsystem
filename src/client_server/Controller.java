@@ -80,7 +80,7 @@ public class Controller {
 	 * @param message le message a envoyer
 	 * @throws IOException 
 	 */
-	public void sendMessage(String textToSend, int receiverGroupID) throws IOException {
+	public void sendMessage(String textToSend, int receiverGroupID, int function) throws IOException {
 		// TODO ajout BDD
 
 		/*controller.sendMessage(textToSend);*/
@@ -106,7 +106,7 @@ public class Controller {
 			// TODO pas tous les connectés !
 		}
 		
-		messageToSend = new Message(new Date(), textToSend, user, group);
+		messageToSend = new Message(new Date(), textToSend, user, group, function);
 
 	}
 	
