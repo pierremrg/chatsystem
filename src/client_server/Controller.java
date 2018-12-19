@@ -104,8 +104,13 @@ public class Controller {
 			}
 		}
 		else {
-			group = startGroup(getConnectedUsers());
-			// TODO pas tous les connectés !
+			
+			ArrayList<User> members = new ArrayList<User>();
+			
+			// TODO choisir le bon user
+			members.add(getConnectedUsers().get(0));
+			members.add(user);
+			group = startGroup(members);
 		}
 		
 		messageToSend = new Message(new Date(), textToSend, user, group, function);
@@ -190,7 +195,7 @@ public class Controller {
 	public void connect(String username, String password, InetAddress ip) throws IOException {
 		// TODO Check dans la BDD si info ok
 		// TODO id de l'utilisateur
-		user = new User(2, username, password);
+		user = new User(1, username, password);
 		
 		// TODO Infos sur l'utilisateur
 		user.setIP(ip);
@@ -259,8 +264,10 @@ public class Controller {
 		//connectedUsers.remove(receivedUser);
 		User userToRemove = null;
 		for(User u : connectedUsers) {
-			if(u.equals(receivedUser))
+			if(u.equals(receivedUser)) {
 				userToRemove = u;
+				break;
+			}
 		}
 		
 		if(userToRemove != null)
