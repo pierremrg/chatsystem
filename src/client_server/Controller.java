@@ -145,6 +145,10 @@ public class Controller {
 		
 		if(!groupIsKnown(group.getID()))
 			groups.add(group);
+		else {
+			Group groupToUpdate = getGroupByID(group.getID());
+			groupToUpdate.setOnline(true);
+		}
 		
 		System.out.println(message.getContent());
 		
@@ -325,7 +329,7 @@ public class Controller {
 		group.setStarter(user);
 		group.setOnline(true);
 		
-		User contact = group.getMembers().get(0);
+		User contact = group.getMembers().get(1);
 		
 		Socket socket = new Socket(contact.getIP(), contact.getPort());
 		
