@@ -36,6 +36,12 @@ public class SocketReader extends Thread {
 
 				stringData = in_data.readLine();
 			}
+		} catch (SocketException e) {
+			
+			// Socket déjà fermé par le SocketWriter : pas d'erreur
+			if(!socket.isClosed())
+				System.out.println("Erreur reader...");
+			
 		} catch (Exception e) {
 			System.out.println("Erreur reader...");
 		} finally {			
