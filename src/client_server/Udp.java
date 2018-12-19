@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.io.StreamCorruptedException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -26,7 +27,7 @@ public class Udp extends Thread {
 	 * @param controller associ� � l'UDP
 	 */
 	public Udp(Controller controller) {
-		super();
+		super("UDP");
 		this.controller = controller;
 		
 		try {
@@ -91,6 +92,8 @@ public class Udp extends Thread {
 				statutConnexion = (int) iStream.readInt();
 				receivedUser = (User) iStream.readObject();
 				iStream.close();
+			} catch (StreamCorruptedException e) {
+				// Message pas pour nous
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
