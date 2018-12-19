@@ -266,7 +266,8 @@ public class Controller {
 			group.updateMember(receivedUser);
 		
 		// Mise à jour du GUI
-		gui.updateConnectedUsers();
+		if(gui != null)
+			gui.updateConnectedUsers();
 	}
 	
 	/**
@@ -299,7 +300,8 @@ public class Controller {
 		}
 		
 		// Mise à jour du GUI
-		gui.updateConnectedUsers();
+		if(gui != null)
+			gui.updateConnectedUsers();
 	}	
 	
 	/**
