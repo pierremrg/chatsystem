@@ -20,6 +20,7 @@ public class Udp extends Thread {
 	private Controller controller;
 	private DatagramSocket socket;
 	
+	private static final int IDENT_UDP = 5289803;
 	private static final int PORT = 5003;
 	
 	/**
@@ -47,6 +48,7 @@ public class Udp extends Thread {
 	public byte[] createMessage(int status, User user) throws IOException {
 		ByteArrayOutputStream bStream = new ByteArrayOutputStream();
 		ObjectOutput oo = new ObjectOutputStream(bStream);
+		oo.writeInt(IDENT_UDP);
 		oo.writeInt(status);
 		oo.writeObject(user);
 		oo.close();
@@ -78,6 +80,8 @@ public class Udp extends Thread {
 		DatagramPacket in = new DatagramPacket(buffer, buffer.length);
 		int statutConnexion = -1;
 		User receivedUser = null;
+		int identUdp = -1;
+		
 		while(true) {
 			try {
 				socket.receive(in);
@@ -89,9 +93,34 @@ public class Udp extends Thread {
 			ObjectInputStream iStream;
 			try {
 				iStream = new ObjectInputStream(new ByteArrayInputStream(receivedMessage));
-				statutConnexion = (int) iStream.readInt();
-				receivedUser = (User) iStream.readObject();
-				iStream.close();
+				identUdp = (int) iStream.readInt();
+				
+				if(identUdp == IDENT_UDP) {
+					statutConnexion = (int) iStream.readInt();
+					receivedUser = (User) iStream.readObject();
+					iStream.close();
+					
+					
+					if(statutConnexion == 0) {
+						controller.receiveDeconnection(receivedUser);
+					}
+					else if(statutConnexion == 1) {
+						try {
+							if (!controller.getUser().getIP().equals(in.getAddress())) {
+			 					controller.receiveConnection(receivedUser);						
+								sendUdpMessage(createMessage(2, controller.getUser()), in.getAddress());
+							}
+						} catch (SocketException e) {
+							e.printStackTrace();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					} else if(statutConnexion == 2) {
+						controller.receiveConnection(receivedUser);
+					}
+				}
+				
 			} catch (StreamCorruptedException e) {
 				// Message pas pour nous
 			} catch (IOException e1) {
@@ -102,24 +131,6 @@ public class Udp extends Thread {
 				e.printStackTrace();
 			}
 			
-			if(statutConnexion == 0) {
-				controller.receiveDeconnection(receivedUser);
-			}
-			else if(statutConnexion == 1) {
-				try {
-					if (!controller.getUser().getIP().equals(in.getAddress())) {
-	 					controller.receiveConnection(receivedUser);						
-						sendUdpMessage(createMessage(2, controller.getUser()), in.getAddress());
-					}
-				} catch (SocketException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			} else if(statutConnexion == 2) {
-				controller.receiveConnection(receivedUser);
-			}		
 		}
 	}	
 }
