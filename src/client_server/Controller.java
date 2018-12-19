@@ -87,6 +87,8 @@ public class Controller {
 
 		/*Message message = new Message(textToSend);
 		controller.sendMessage(message);*/
+		
+//		if(function == Message.FUNCTION_STOP &&)
 
 		Group group;
 		
@@ -241,6 +243,8 @@ public class Controller {
 		// Mise à jour des groupes
 		for(Group group : groups)
 			group.updateMember(receivedUser);
+		
+		
 	}
 	
 	/**

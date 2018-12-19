@@ -19,6 +19,9 @@ public class ServerSocketWaiter extends Thread {
 		
 		Socket socket;
 		try {
+			
+			TODO METTRE OUAILLE TROU
+			
 			socket = serverSocket.accept();
 			
 			SocketWriter socketWriter = new SocketWriter(socket, controller);

@@ -36,8 +36,6 @@ public class SocketReader extends Thread {
 
 				stringData = in_data.readLine();
 			}
-		} catch(SocketException e) {
-			System.out.println("Stop reader");
 		} catch (Exception e) {
 			System.out.println("Erreur reader...");
 		} finally {			

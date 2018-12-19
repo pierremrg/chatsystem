@@ -148,7 +148,7 @@ public class GUI extends JFrame{
 		public void windowClosing(WindowEvent e) {
 			
 			try {
-				controller.sendMessage(null, -1, Message.FUNCTION_NORMAL);
+				controller.sendMessage(null, 0, Message.FUNCTION_STOP);
 				controller.deconnect();
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block

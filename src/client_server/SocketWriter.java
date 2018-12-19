@@ -32,7 +32,8 @@ public class SocketWriter extends Thread {
 			while(true) {
 				messageToSend = controller.getMessageToSend();
 				if(messageToSend != null) {
-					if(messageToSend.getFunction() == Message.FUNCTION_STOP)
+					if(messageToSend.getFunction() == Message.FUNCTION_STOP
+							&& messageToSend.getReceiverGroup().getStarter() == controller.getUser())
 						break;
 					
 					out.println(encodeMessageToString(messageToSend));
@@ -48,7 +49,7 @@ public class SocketWriter extends Thread {
 			
 		}
 		catch(Exception e) {
-			System.out.println("Erreur sur le serveur");
+			System.out.println("Erreur sur le writer");
 		}
 		
 		finally {
