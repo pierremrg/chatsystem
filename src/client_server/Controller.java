@@ -75,6 +75,14 @@ public class Controller {
 	public ArrayList<User> getConnectedUsers() {
 		return connectedUsers;
 	}
+	
+	public User findUserByName(String username) {
+		for (User u : connectedUsers) {
+			if (u.getUsername().equals(username))
+				return u;
+		}
+		return null;
+	}
 	/**
 	 * Permet d'envoyer un message
 	 * @param message le message a envoyer
@@ -155,7 +163,7 @@ public class Controller {
 		return null;
 	}
 	
-	/**
+	/**e
 	 * Obtient un groupe à partir de son ID
 	 * @param groupID l'ID du groupe a obtenir
 	 * @return le groupe ou null si ce groupe n'existe pas
@@ -199,7 +207,7 @@ public class Controller {
 	public void connect(String username, String password, InetAddress ip) throws IOException {
 		// TODO Check dans la BDD si info ok
 		// TODO id de l'utilisateur
-		user = new User(1, username, password);
+		user = new User(2, username, password);
 		
 		// TODO Infos sur l'utilisateur
 		user.setIP(ip);
