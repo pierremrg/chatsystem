@@ -14,8 +14,8 @@ public class SocketReader extends Thread {
 	private Socket socket;
 	private Controller controller;
 
-	public SocketReader(Socket socket, Controller controller) {
-		super();
+	public SocketReader(String name, Socket socket, Controller controller) {
+		super(name);
 		this.socket = socket;
 		this.controller = controller;
 	}

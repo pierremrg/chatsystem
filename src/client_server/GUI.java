@@ -154,9 +154,10 @@ public class GUI extends JFrame{
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			
-			// Fin du programme sans erreur
-			System.exit(0);
+			finally {
+				// Fin du programme sans erreur
+				System.exit(0);
+			}
 		}
 		
 		public void windowOpened(WindowEvent arg0) {}

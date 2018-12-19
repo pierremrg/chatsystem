@@ -190,7 +190,7 @@ public class Controller {
 	public void connect(String username, String password, InetAddress ip) throws IOException {
 		// TODO Check dans la BDD si info ok
 		// TODO id de l'utilisateur
-		user = new User(1, username, password);
+		user = new User(2, username, password);
 		
 		// TODO Infos sur l'utilisateur
 		user.setIP(ip);
@@ -305,8 +305,8 @@ public class Controller {
 		// Création d'un socket client : l'utilisateur se connecte à l'autre utilisateur
 		Socket socket = new Socket(contact.getIP(), contact.getPort());
 		
-		SocketWriter socketWriter = new SocketWriter(socket, this);
-		SocketReader socketReader = new SocketReader(socket, this);
+		SocketWriter socketWriter = new SocketWriter("clientSocketWriter",socket, this);
+		SocketReader socketReader = new SocketReader("clientSocketReader", socket, this);
 		socketWriter.start();
 		socketReader.start();
 		
@@ -322,8 +322,8 @@ public class Controller {
 		
 		Socket socket = new Socket(contact.getIP(), contact.getPort());
 		
-		SocketWriter socketWriter = new SocketWriter(socket, this);
-		SocketReader socketReader = new SocketReader(socket, this);
+		SocketWriter socketWriter = new SocketWriter("restartclientSocketWriter",socket, this);
+		SocketReader socketReader = new SocketReader("restartclientSocketReader", socket, this);
 		socketWriter.start();
 		socketReader.start();
 	}

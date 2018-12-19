@@ -13,8 +13,8 @@ public class SocketWriter extends Thread {
 	private Socket socket;
 	private Controller controller;
 	
-	public SocketWriter(Socket socket, Controller controller) {
-		super();
+	public SocketWriter(String name, Socket socket, Controller controller) {
+		super(name);
 		this.socket = socket;
 		this.controller = controller;
 	}
@@ -29,11 +29,10 @@ public class SocketWriter extends Thread {
 			//Message messageToSend = controller.getMessageToSend();
 			Message messageToSend;
 			
-			while(true) {
+			while(!socket.isClosed()) {
 				messageToSend = controller.getMessageToSend();
 				if(messageToSend != null) {
-					if(messageToSend.getFunction() == Message.FUNCTION_STOP
-							&& messageToSend.getReceiverGroup().getStarter() == controller.getUser())
+					if(messageToSend.getFunction() == Message.FUNCTION_STOP)
 						break;
 					
 					out.println(encodeMessageToString(messageToSend));
