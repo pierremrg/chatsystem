@@ -2,7 +2,6 @@ package client_server;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -12,15 +11,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
 
 public class Controller {
 	
 	// Utilisateur associe au controller
 	private User user;
+	
+	// GUI
+	private GUI gui;
 	
 	// Groupes de l'utilisateur
 	private ArrayList<Group> groups;
@@ -49,7 +49,7 @@ public class Controller {
 	 * @throws UnknownHostException 
 	 */
 	public Controller (InetAddress ipBroadcast) throws SocketException, UnknownHostException {
-		this.udp = new Udp(this);		
+		this.udp = new Udp(this);
 		this.connectedUsers = new ArrayList<User>();
 		this.groups = new ArrayList<Group>();
 		this.messages = new ArrayList<Message>();
@@ -58,6 +58,10 @@ public class Controller {
 		//Recuperer groupe dont l'utilisateur est membre dans la BDD
 		//Recuperer tous les messages de l'utilisateur dans la BDD
 		
+	}
+	
+	public void setGUI(GUI gui) {
+		this.gui = gui;
 	}
 	
 	/**
@@ -261,7 +265,8 @@ public class Controller {
 		for(Group group : groups)
 			group.updateMember(receivedUser);
 		
-		
+		// Mise à jour du GUI
+		gui.updateConnectedUsers();
 	}
 	
 	/**
@@ -293,6 +298,8 @@ public class Controller {
 			}
 		}
 		
+		// Mise à jour du GUI
+		gui.updateConnectedUsers();
 	}	
 	
 	/**

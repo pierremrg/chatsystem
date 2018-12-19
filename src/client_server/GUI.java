@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
@@ -90,8 +91,13 @@ public class GUI extends JFrame{
 		
 		/* Liste des utilisateurs */
 		// TODO : à enlever (liste obtenue par le controller)
-		String week[] = {"User1", "User2", "User3", "User4"};
-		usersList = new JList<String>(week);
+		DefaultListModel<String> usernames = new DefaultListModel<String>();
+		ArrayList<User> connectedUsers = controller.getConnectedUsers();
+		
+		for(User u : connectedUsers)
+			usernames.addElement(u.getUsername());
+		
+		usersList = new JList<String>(usernames);
 		usersList.setBorder(BorderFactory.createRaisedBevelBorder());
 		c.fill = GridBagConstraints.BOTH;
 		c.weightx = 0.1;
@@ -169,6 +175,16 @@ public class GUI extends JFrame{
 
 	}
 	
+	public void updateConnectedUsers() {
+		DefaultListModel<String> usernames = new DefaultListModel<String>();
+		ArrayList<User> connectedUsers = controller.getConnectedUsers();
+		
+		for(User u : connectedUsers)
+			usernames.addElement(u.getUsername());
+		
+		usersList.setModel(usernames);
+	}
+	
 	/**
 	 * Fonction principale du programme
 	 * @param args
@@ -188,8 +204,6 @@ public class GUI extends JFrame{
 		InetAddress ipMachine = ipListMachine.get(choix);
 		sc.close();		
 		
-		new GUI();
-		
 		
 		/*Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
 		Connection con = DriverManager.getConnection("jdbc:odbc:MovieCatalog");
@@ -200,6 +214,7 @@ public class GUI extends JFrame{
 			controller = new Controller(allIP.get(ipMachine));
 			controller.connect("toto", "password", ipMachine);
 			
+			controller.setGUI(new GUI());
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
