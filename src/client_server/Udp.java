@@ -76,7 +76,7 @@ public class Udp extends Thread {
 	 * Thread qui �coute en UDP et qui traite les messages suivant le contenu
 	 */
 	public void run() {
-		byte[] buffer = new byte[256];
+		byte[] buffer = new byte[1024];
 		DatagramPacket in = new DatagramPacket(buffer, buffer.length);
 		int statutConnexion = -1;
 		User receivedUser = null;

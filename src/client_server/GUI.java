@@ -17,8 +17,10 @@ import java.util.Map;
 import java.util.Scanner;
 
 import javax.swing.BorderFactory;
+import javax.swing.ComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -113,7 +115,17 @@ public class GUI extends JFrame{
 		add(panel);
 		setVisible(true);
 	}
-
+	
+	public void updateConnectedUsers() {
+		DefaultListModel<String> usernames = new DefaultListModel<String>();
+		ArrayList<User> connectedUsers = controller.getConnectedUsers();
+		
+		for(User u : connectedUsers)
+			usernames.addElement(u.getUsername());
+		
+		usersList.setModel(usernames);
+	}
+	
 	/**
 	 * Listener de l'envoi d'un message
 	 */
@@ -175,16 +187,6 @@ public class GUI extends JFrame{
 
 	}
 	
-	public void updateConnectedUsers() {
-		DefaultListModel<String> usernames = new DefaultListModel<String>();
-		ArrayList<User> connectedUsers = controller.getConnectedUsers();
-		
-		for(User u : connectedUsers)
-			usernames.addElement(u.getUsername());
-		
-		usersList.setModel(usernames);
-	}
-	
 	/**
 	 * Fonction principale du programme
 	 * @param args
@@ -193,16 +195,7 @@ public class GUI extends JFrame{
 	 * @throws SQLException 
 	 * @throws UnknownHostException 
 	 */
-	public static void main(String[] args) throws SocketException, ClassNotFoundException, SQLException, UnknownHostException {
-		
-		Map<InetAddress, InetAddress> allIP = Controller.getAllIpAndBroadcast();
-		ArrayList<InetAddress> ipListMachine = new ArrayList<InetAddress>(allIP.keySet());
-		System.out.println(ipListMachine);
-		Scanner sc = new Scanner(System.in);
-		System.out.println("Entrez index ip : ");
-		int choix = sc.nextInt();
-		InetAddress ipMachine = ipListMachine.get(choix);
-		sc.close();		
+	public static void main(String[] args) throws SocketException, ClassNotFoundException, SQLException, UnknownHostException {	
 		
 		
 		/*Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
@@ -210,15 +203,30 @@ public class GUI extends JFrame{
 		
 		Statement statement = (Statement) con.createStatement();*/
 		
+		Map<InetAddress, InetAddress> allIP = Controller.getAllIpAndBroadcast();
+		InetAddress ipMachine = null;
+		String username = null;
+		String password = null;
+		GUIInfo guiInfo = new GUIInfo(new ArrayList<InetAddress>(allIP.keySet()));
+		
+		while(ipMachine == null || username == null || password == null) {
+			ipMachine = guiInfo.getIPSelected();
+			username = guiInfo.getUsername();
+			password = guiInfo.getPassword();
+		}
+		//Check si username et password existe
+
+		
 		try {
 			controller = new Controller(allIP.get(ipMachine));
-			controller.connect("toto", "password", ipMachine);
+			controller.connect(username, password, ipMachine);
 			
 			controller.setGUI(new GUI());
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}		
+		}
+		
 	}
 }
