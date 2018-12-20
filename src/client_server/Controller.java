@@ -163,7 +163,7 @@ public class Controller {
 			ArrayList<User> members = group.getMembers();
 			User contact;
 			
-			if(members.get(0) == user)
+			if(members.get(0).equals(user))
 				contact = members.get(1);
 			else
 				contact = members.get(0);
@@ -424,7 +424,7 @@ public class Controller {
 		ArrayList<User> members = group.getMembers();
 		User contact;
 		
-		if(members.get(0) == user)
+		if(members.get(0).equals(user))
 			contact = members.get(1);
 		else
 			contact = members.get(0);
