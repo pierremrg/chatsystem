@@ -313,6 +313,11 @@ public class Controller {
 	 * @throws IOException 
 	 */
 	public void deconnect() throws IOException {
+		
+		// Tous les groupes sont maintenant offline
+		for(Group g : groups)
+			g.setOnline(false);
+		
 		// TODO Gestion de l'erreur
 		DataManager.writeAllMessages(messages);
 		DataManager.writeAllGroups(groups);
