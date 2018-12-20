@@ -42,7 +42,6 @@ public class Controller {
 	private volatile Message messageToSend = null;
 	
 	
-	
 	/**
 	 * Cree un controller
 	 * @param user utilisateur associe au controller
@@ -399,7 +398,8 @@ public class Controller {
 		
 		// TODO Obtenir l'ID dans la BDD
 		// TODO Gérer l'erreur
-		int idGroup = 0;
+		Random rand = new Random();
+		int idGroup = rand.nextInt(999999999); // Rand()
 		
 		// Démarre un groupe :
 		// - ID du groupe
