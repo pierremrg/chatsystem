@@ -17,6 +17,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 
@@ -29,7 +30,7 @@ public class GUIInfo extends JFrame{
 	private ArrayList<InetAddress> ipListMachine;
 	private volatile InetAddress IPSelected = null;
 	private JTextField usernameField;
-	private JTextField passwordField;
+	private JPasswordField passwordField;
 	private volatile String username = null;
 	private volatile String password = null;
 	
@@ -58,6 +59,7 @@ public class GUIInfo extends JFrame{
 		usernameField = new JTextField("username");
 		usernameField.addKeyListener(new KeyAdapter());
 		usernameField.addFocusListener(new FocusListener("username"));
+		usernameField.addActionListener(new ConnectListener());
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx = 0.5;
 		c.gridx = 0;
@@ -65,8 +67,9 @@ public class GUIInfo extends JFrame{
 		c.gridwidth = 1;
 		infoPanel.add(usernameField, c);
 		
-		passwordField = new JTextField("password");
+		passwordField = new JPasswordField("password");
 		passwordField.addFocusListener(new FocusListener("password"));
+		passwordField.addActionListener(new ConnectListener());
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx = 0.5;
 		c.gridx = 1;
@@ -120,7 +123,6 @@ public class GUIInfo extends JFrame{
 	public class ConnectListener implements ActionListener{
 		
 		public void actionPerformed(ActionEvent e) {			
-			while(!e.getActionCommand().equals("CONNECT"));
 			setIPSelected((InetAddress) iPList.getSelectedItem());
 			setUsername(usernameField.getText());
 			setPassword(passwordField.getText());
