@@ -26,6 +26,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import javafx.collections.ListChangeListener;
 	
 public class GUI extends JFrame{
 	
@@ -67,7 +71,7 @@ public class GUI extends JFrame{
 		textField = new JTextField();
 		textField.addActionListener(new sendMessageListener());
 		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 0.8;
+		c.weightx = 0.6;
 		c.gridx = 1;
 		c.gridy = 1;
 		panel.add(textField, c);
@@ -97,10 +101,16 @@ public class GUI extends JFrame{
 		for(User u : connectedUsers)
 			usernames.addElement(u.getUsername());
 		
+		// TODO a supprimer
+		/*usernames.addElement("jean");
+		usernames.addElement("truc");*/
+		
 		usersList = new JList<String>(usernames);
 		usersList.setBorder(BorderFactory.createRaisedBevelBorder());
+		usersList.setPreferredSize(new Dimension(50,0));
+		usersList.addListSelectionListener(new groupListSelectionChange());
 		c.fill = GridBagConstraints.BOTH;
-		c.weightx = 0.1;
+		c.weightx = 0.2;
 		c.weighty = 1;
 		c.gridx = 0;
 		c.gridy = 0;
@@ -154,8 +164,8 @@ public class GUI extends JFrame{
 		public void windowClosing(WindowEvent e) {
 			
 			try {
-				controller.sendMessage(null, 0, Message.FUNCTION_STOP);
 				controller.deconnect();
+				//controller.sendMessage(null, 0, Message.FUNCTION_STOP);
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -175,6 +185,41 @@ public class GUI extends JFrame{
 
 	}
 	
+	public class groupListSelectionChange implements ListSelectionListener {
+
+		public void valueChanged(ListSelectionEvent e) {
+			
+			if(!e.getValueIsAdjusting()) {
+			
+				Group selectedGroup = controller.getGroupByName(usersList.getSelectedValue());
+				
+				if(selectedGroup != null) {
+					ArrayList<Message> groupMessages = controller.getGroupMessages(selectedGroup);
+					
+					String history = "";
+					
+					
+					for(Message m : groupMessages)
+						history += m.getContent() + "\n";
+						
+					
+					if(history.equals(null))
+						messagesArea.setText(null);
+					else
+						messagesArea.setText(history);
+				
+				}
+				else {
+					// TODO erreur
+					System.out.println("Erreur groupe inexistant");
+				}
+				
+			}
+			
+		}
+
+	}
+	
 	public void updateConnectedUsers() {
 		DefaultListModel<String> usernames = new DefaultListModel<String>();
 		ArrayList<User> connectedUsers = controller.getConnectedUsers();
@@ -183,6 +228,12 @@ public class GUI extends JFrame{
 			usernames.addElement(u.getUsername());
 		
 		usersList.setModel(usernames);
+	}
+	
+	public void updateMessages() {
+		
+		
+		
 	}
 	
 	/**
@@ -200,9 +251,10 @@ public class GUI extends JFrame{
 		System.out.println(ipListMachine);
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Entrez index ip : ");
-		int choix = sc.nextInt();
+		//int choix = sc.nextInt();
+		int choix = 0;
 		InetAddress ipMachine = ipListMachine.get(choix);
-		sc.close();		
+		sc.close();
 		
 		
 		/*Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");

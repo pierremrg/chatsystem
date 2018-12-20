@@ -94,5 +94,28 @@ public class Group implements Serializable {
 		return false;
 	}
 	
+	/**
+	 * Renvoie le nom d'un groupe vu par un utilisateur en particulier
+	 * Le nom correspond au nom du contact distant
+	 * @param user L'utilisateur qui veut obtenir le nom
+	 * @return Le nom du groupe vu par l'utilisateur demandeur
+	 */
+	public String getGroupNameForUser(User user) {
+	
+		if(members.get(0).equals(user))
+			return members.get(1).getUsername();
+		else
+			return members.get(0).getUsername();
+		
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof Group))
+			return false;
+		
+		Group g = (Group) obj;
+		return g.id == id;
+	}
 
 }

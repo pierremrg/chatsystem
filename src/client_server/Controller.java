@@ -1,5 +1,6 @@
 package client_server;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -58,6 +59,55 @@ public class Controller {
 		//Recuperer groupe dont l'utilisateur est membre dans la BDD
 		//Recuperer tous les messages de l'utilisateur dans la BDD
 		
+		
+		try {
+			messages = DataManager.readAllMessages();
+			groups = DataManager.readAllGroups();
+			
+			// TODO traitement des groupes
+			
+			/*for(Group g : groups) {
+				System.out.println(g.getID());
+			}
+			
+			for(Message m : messages) {
+				if(m.getReceiverGroup() != null) {
+					System.out.println("Group " + m.getReceiverGroup().getID());
+					
+					if(!groups.contains(m.getReceiverGroup()))
+						groups.add(m.getReceiverGroup());
+				}
+					
+				else
+					System.out.println("no group");
+			}*/
+			
+			//testSaveMessages();
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	// TODO a supprimer
+	public void testSaveMessages() {
+		user = new User(1, "toto", "password");
+		ArrayList<User> members0 = new ArrayList<User>();
+		members0.add(new User(5, "truc", "bidule"));
+		members0.add(user);
+		
+		ArrayList<User> members1 = new ArrayList<User>();
+		members1.add(user);
+		members1.add(new User(10, "jean", "jacques"));
+		
+		Group group0 = new Group(0, members0, user);
+		Group group1 = new Group(1, members1, user);
+		
+		messages.add(new Message(new Date(), "coucou", user, group0, Message.FUNCTION_NORMAL));
+		messages.add(new Message(new Date(), "coucou2", user, group0, Message.FUNCTION_NORMAL));
+		messages.add(new Message(new Date(), "coucou3", user, group1, Message.FUNCTION_NORMAL));
 	}
 	
 	public void setGUI(GUI gui) {
@@ -109,8 +159,18 @@ public class Controller {
 			// Le groupe est déjà démarré
 			group = getGroupByID(receiverGroupID);
 			
+			
+			ArrayList<User> members = group.getMembers();
+			User contact;
+			
+			if(members.get(0) == user)
+				contact = members.get(1);
+			else
+				contact = members.get(0);
+			
 			// On regarde si le groupe n'est plus actif
-			if(!group.isOnline()) {
+			// TODO Throws erreur pas connecté
+			if(!group.isOnline() && connectedUsers.contains(contact)) {
 				restartGroup(group);
 				// TODO pas tous les connectés !
 			}
@@ -120,12 +180,14 @@ public class Controller {
 			ArrayList<User> members = new ArrayList<User>();
 			
 			// TODO choisir le bon user
+			// TODO vérifier si connectedUsers est pas vide
 			members.add(getConnectedUsers().get(0));
 			members.add(user);
 			group = startGroup(members);
 		}
 		
 		messageToSend = new Message(new Date(), textToSend, user, group, function);
+		messages.add(messageToSend);
 
 	}
 	
@@ -149,7 +211,7 @@ public class Controller {
 	
 	
 	
-	public Message receiveMessage(Message message) {
+	public void receiveMessage(Message message) {
 		// TODO ajout BDD
 		
 		// Recoit un message : ajout du groupe si besoin
@@ -164,17 +226,33 @@ public class Controller {
 		
 		System.out.println(message.getContent());
 		
-		return null;
+		messages.add(message);
+		
+		gui.updateMessages();
 	}
 	
 	/**e
 	 * Obtient un groupe à partir de son ID
-	 * @param groupID l'ID du groupe a obtenir
-	 * @return le groupe ou null si ce groupe n'existe pas
+	 * @param groupID L'ID du groupe a obtenir
+	 * @return Le groupe ou null si ce groupe n'existe pas
 	 */
 	private Group getGroupByID(int groupID) {
 		for(Group g : groups) {
 			if(g.getID() == groupID)
+				return g;
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Obtient un groupe a partir de son nom, vu par un certain utilisateur
+	 * @param groupName Le nom du groupe vu par l'utilisateur
+	 * @return Le groupe ou null si ce groupe n'existe pas
+	 */
+	public Group getGroupByName(String groupName) {
+		for(Group g : groups) {
+			if(g.getGroupNameForUser(user).equals(groupName))
 				return g;
 		}
 		
@@ -195,12 +273,6 @@ public class Controller {
 		return false;
 	}
 	
-	public ArrayList<Message> getGroupMessages(Group group){
-		// TODO
-		
-		return null;
-	}
-	
 	/**
 	 * Connection de l'utilisateur au service et envoi un message � tout le monde pour annoncer sa connection
 	 * @param username Username de l'utilisateur
@@ -211,7 +283,7 @@ public class Controller {
 	public void connect(String username, String password, InetAddress ip) throws IOException {
 		// TODO Check dans la BDD si info ok
 		// TODO id de l'utilisateur
-		user = new User(2, username, password);
+		user = new User(1, username, password);
 		
 		// TODO Infos sur l'utilisateur
 		user.setIP(ip);
@@ -242,7 +314,10 @@ public class Controller {
 	 */
 	public void deconnect() throws IOException {
 		// TODO Gestion de l'erreur
+		DataManager.writeAllMessages(messages);
+		DataManager.writeAllGroups(groups);
 
+		// TODO Gestion de l'erreur
 		udp.sendUdpMessage(udp.createMessage(0, getUser()), ipBroadcast);
 
 	}
@@ -346,7 +421,13 @@ public class Controller {
 		group.setStarter(user);
 		group.setOnline(true);
 		
-		User contact = group.getMembers().get(1);
+		ArrayList<User> members = group.getMembers();
+		User contact;
+		
+		if(members.get(0) == user)
+			contact = members.get(1);
+		else
+			contact = members.get(0);
 		
 		Socket socket = new Socket(contact.getIP(), contact.getPort());
 		
@@ -355,6 +436,27 @@ public class Controller {
 		socketWriter.start();
 		socketReader.start();
 	}
+
+	/**
+	 * Retourne la liste des messages d'un groupe donné
+	 * @param group Le groupe dont les messages sont recherchés
+	 * @return La liste des message du groupe indiqué
+	 */
+	public ArrayList<Message> getGroupMessages(Group group){
+		
+		ArrayList<Message> groupMessages = new ArrayList<Message>();
+		
+		for(Message m : messages) {
+			if(m.getReceiverGroup().equals(group))
+				groupMessages.add(m);
+		}
+		
+		return groupMessages;
+	}
+	
+	
+	
+	
 	
 	public void createUser(String username, String password) {
 		// TODO Check si username pas pris
