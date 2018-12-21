@@ -16,17 +16,20 @@ import java.util.Map;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 
-public class GUIInfo extends JFrame{
+public class GUIConnect extends JFrame{
 	
-	private JPanel infoPanel;
+	private JPanel connectPanel;
 	private JComboBox iPList;
 	private JButton connectButton;
 	private JButton createUserButton;
+	private JLabel usernameLabel;
+	private JLabel passwordLabel;
 	private ArrayList<InetAddress> ipListMachine;
 	private volatile InetAddress IPSelected = null;
 	private JTextField usernameField;
@@ -35,63 +38,62 @@ public class GUIInfo extends JFrame{
 	private volatile String password = null;
 	
 	
-	public GUIInfo(ArrayList<InetAddress> allIPMachine) throws SocketException {
-		super("Connection");
+	public GUIConnect(ArrayList<InetAddress> allIPMachine) throws SocketException {
+		super("Connexion");
 		this.ipListMachine = allIPMachine;
 		
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setSize(400, 125);
+		setSize(400, 160);
 		setLocationRelativeTo(null);
 		
-		infoPanel = new JPanel();
-		infoPanel.setLayout(new GridBagLayout());
+		connectPanel = new JPanel();
+		connectPanel.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
-		
-		iPList = new JComboBox(ipListMachine.toArray());
-		c.fill = GridBagConstraints.BOTH;
+		c.fill = GridBagConstraints.HORIZONTAL;
 		c.insets = new Insets(3,3,3,3);
+		
+		iPList = new JComboBox(ipListMachine.toArray());		
 		c.weightx = 1;
 		c.gridx = 0;
 		c.gridy = 0;
 		c.gridwidth = 2;
-		infoPanel.add(iPList, c);
+		connectPanel.add(iPList, c);
 		
-		usernameField = new JTextField("username");
-		usernameField.addKeyListener(new KeyAdapter());
-		usernameField.addFocusListener(new FocusListener("username"));
-		usernameField.addActionListener(new ConnectListener());
-		c.fill = GridBagConstraints.HORIZONTAL;
+		usernameLabel = new JLabel("Login (max 20 caractères) : ");
 		c.weightx = 0.5;
-		c.gridx = 0;
 		c.gridy = 1;
 		c.gridwidth = 1;
-		infoPanel.add(usernameField, c);
+		connectPanel.add(usernameLabel, c);
 		
-		passwordField = new JPasswordField("password");
-		passwordField.addFocusListener(new FocusListener("password"));
-		passwordField.addActionListener(new ConnectListener());
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 0.5;
+		usernameField = new JTextField("Login");
+		usernameField.addKeyListener(new KeyAdapter());
+		usernameField.addFocusListener(new FocusListener("Login"));
+		usernameField.addActionListener(new ConnectListener());
+		c.gridy = 2;
+		connectPanel.add(usernameField, c);
+		
+		connectButton = new JButton("CONNEXION");
+		connectButton.addActionListener(new ConnectListener());
+		c.gridy = 3;		
+		connectPanel.add(connectButton, c);
+		
+		passwordLabel = new JLabel("Mot de passe : ");
 		c.gridx = 1;
 		c.gridy = 1;
-		infoPanel.add(passwordField, c);
+		connectPanel.add(passwordLabel, c);
 		
-		connectButton = new JButton("CONNECT");
-		connectButton.addActionListener(new ConnectListener());
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 0.5;
-		c.gridx = 0;
-		c.gridy = 2;		
-		infoPanel.add(connectButton, c);
-		
-		createUserButton = new JButton("CREATE USER");
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 0.5;
-		c.gridx = 1;
+		passwordField = new JPasswordField("Mot de passe");
+		passwordField.addFocusListener(new FocusListener("Mot de passe"));
+		passwordField.addActionListener(new ConnectListener());
 		c.gridy = 2;
-		infoPanel.add(createUserButton, c);
+		connectPanel.add(passwordField, c);
 		
-		add(infoPanel);
+		createUserButton = new JButton("CREER UTILISATEUR");
+		createUserButton.addActionListener(new CreateUserListener());
+		c.gridy = 3;
+		connectPanel.add(createUserButton, c);
+		
+		add(connectPanel);
 		
 		setVisible(true);
 	}
@@ -116,8 +118,8 @@ public class GUIInfo extends JFrame{
 		return password;
 	}
 
-	public void setPassword(String password) {
-		this.password = password;
+	public void setPassword(String pass) {
+		this.password = pass;
 	}
 
 	public class ConnectListener implements ActionListener{
@@ -129,6 +131,14 @@ public class GUIInfo extends JFrame{
 			setVisible(false);
 		}
 	}	
+	
+	public class CreateUserListener implements ActionListener{
+		
+		public void actionPerformed(ActionEvent e) {
+			setEnabled(false);
+			new GUICreateUser();			
+		}
+	}
 	
 	public class FocusListener implements java.awt.event.FocusListener {
 		private String placeHolder;
