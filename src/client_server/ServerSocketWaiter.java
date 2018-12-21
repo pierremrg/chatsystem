@@ -23,11 +23,14 @@ public class ServerSocketWaiter extends Thread {
 			
 			while(true) {
 				socket = serverSocket.accept();
-				
-				SocketWriter socketWriter = new SocketWriter("ServerSocketWriter", socket, controller);
 				SocketReader socketReader = new SocketReader("ServerSocketRead", socket, controller);
-				socketWriter.start();
 				socketReader.start();
+				
+				while (socketReader.getGroup() == null);
+				
+				SocketWriter socketWriter = new SocketWriter("ServerSocketWriter", socket, controller, socketReader.getGroup());
+				socketWriter.start();
+				
 				
 				System.out.println("Server started");
 			}

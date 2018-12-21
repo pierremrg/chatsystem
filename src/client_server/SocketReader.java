@@ -13,6 +13,7 @@ public class SocketReader extends Thread {
 	
 	private Socket socket;
 	private Controller controller;
+	private volatile Group group = null;
 
 	public SocketReader(String name, Socket socket, Controller controller) {
 		super(name);
@@ -23,6 +24,7 @@ public class SocketReader extends Thread {
 	public void run() {
 		
 		try {
+			Message message = null;
 			System.out.println("SocketReader connected...");
 			
 			BufferedReader in_data = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -32,7 +34,11 @@ public class SocketReader extends Thread {
 			while(stringData != null && !stringData.equals("-1")) {
 //				System.out.println("Message : " + data);
 //				controller.receiveMessage("Message : " + stringData);
-				controller.receiveMessage(decodeMessageFromString(stringData));
+				message = decodeMessageFromString(stringData);
+				if (group == null)
+					group = message.getReceiverGroup();
+				
+				controller.receiveMessage(message);
 
 				stringData = in_data.readLine();
 			}
@@ -56,6 +62,10 @@ public class SocketReader extends Thread {
 		
 	}
 	
+	public Group getGroup() {
+		return group;
+	}
+
 	private Message decodeMessageFromString(String stringData) throws ClassNotFoundException, IOException {
 		
 		byte [] data = Base64.getDecoder().decode(stringData);

@@ -12,11 +12,13 @@ public class SocketWriter extends Thread {
 	
 	private Socket socket;
 	private Controller controller;
+	private Group group;
 	
-	public SocketWriter(String name, Socket socket, Controller controller) {
+	public SocketWriter(String name, Socket socket, Controller controller, Group group) {
 		super(name);
 		this.socket = socket;
 		this.controller = controller;
+		this.group = group;
 	}
 	
 	public void run() {
@@ -35,9 +37,11 @@ public class SocketWriter extends Thread {
 					if(messageToSend.getFunction() == Message.FUNCTION_STOP)
 						break;
 					
-					out.println(encodeMessageToString(messageToSend));
-					System.out.println("Message envoyé");
-					controller.messageSent();
+					if(group.equals(messageToSend.getReceiverGroup())) {					
+						out.println(encodeMessageToString(messageToSend));
+						System.out.println("Message envoyé");
+						controller.messageSent();
+					}
 				}
 				
 				//msg = sc.nextLine();

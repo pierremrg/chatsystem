@@ -20,7 +20,7 @@ import java.util.Random;
 public class Controller {
 	
 	// TODO supprimer
-	private static final int USER_ID = 1;
+	private static final int USER_ID = 3;
 	
 	// Utilisateur associe au controller
 	private User user;
@@ -183,7 +183,7 @@ public class Controller {
 			
 			// TODO choisir le bon user
 			// TODO vérifier si connectedUsers est pas vide
-			members.add(getConnectedUsers().get(0));
+			members.add(findUserByName(receiverGroupNameForUser));
 			members.add(user);
 			group = startGroup(members);
 		}
@@ -419,7 +419,7 @@ public class Controller {
 		// Création d'un socket client : l'utilisateur se connecte à l'autre utilisateur
 		Socket socket = new Socket(contact.getIP(), contact.getPort());
 		
-		SocketWriter socketWriter = new SocketWriter("clientSocketWriter",socket, this);
+		SocketWriter socketWriter = new SocketWriter("clientSocketWriter",socket, this, group);
 		SocketReader socketReader = new SocketReader("clientSocketReader", socket, this);
 		socketWriter.start();
 		socketReader.start();
@@ -442,7 +442,7 @@ public class Controller {
 		
 		Socket socket = new Socket(contact.getIP(), contact.getPort());
 		
-		SocketWriter socketWriter = new SocketWriter("restartclientSocketWriter",socket, this);
+		SocketWriter socketWriter = new SocketWriter("restartclientSocketWriter",socket, this, group);
 		SocketReader socketReader = new SocketReader("restartclientSocketReader", socket, this);
 		socketWriter.start();
 		socketReader.start();

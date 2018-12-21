@@ -133,6 +133,9 @@ public class GUI extends JFrame{
 		for(User u : connectedUsers)
 			usernames.addElement(u.getUsername());
 		
+		/*usernames.addElement("jean");
+		usernames.addElement("truc");*/
+		
 		usersList.setModel(usernames);
 	}
 	
