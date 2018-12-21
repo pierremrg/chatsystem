@@ -183,8 +183,10 @@ public class Controller {
 			group = startGroup(members);
 		}
 		
-		messageToSend = new Message(new Date(), textToSend, user, group, function);
-		messages.add(messageToSend);
+		Message message = new Message(new Date(), textToSend, user, group, function);
+		messageToSend = message;
+		
+		messages.add(message);
 
 	}
 	
