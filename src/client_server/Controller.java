@@ -17,6 +17,9 @@ import java.util.Random;
 
 public class Controller {
 	
+	// TODO supprimer
+	private static final int USER_ID = 1;
+	
 	// Utilisateur associe au controller
 	private User user;
 	
@@ -282,7 +285,7 @@ public class Controller {
 	public void connect(String username, String password, InetAddress ip) throws IOException {
 		// TODO Check dans la BDD si info ok
 		// TODO id de l'utilisateur
-		user = new User(1, username, password);
+		user = new User(USER_ID, username, password);
 		
 		// TODO Infos sur l'utilisateur
 		user.setIP(ip);
