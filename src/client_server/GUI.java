@@ -122,8 +122,8 @@ public class GUI extends JFrame{
 		//ArrayList<Group> startedGroups = new ArrayList<Group>();
 		
 		// TODO vide au début ?
-		for(Group g : startedGroups)
-			groupnames.addElement(g.getGroupNameForUser(controller.getUser()));
+		/*for(Group g : startedGroups)
+			groupnames.addElement(g.getGroupNameForUser(controller.getUser()));*/
 		
 		groupList = new JList<String>(groupnames);
 		//groupList.setBorder(BorderFactory.createRaisedBevelBorder());
@@ -158,8 +158,8 @@ public class GUI extends JFrame{
 		//ArrayList<User> connectedUsers = new ArrayList<User>();
 		
 		// TODO vide au début ?
-		for(User u : connectedUsers)
-			usernames.addElement(u.getUsername());
+		/*for(User u : connectedUsers)
+			usernames.addElement(u.getUsername());*/
 		
 		connectedUsersList = new JList<String>(usernames);
 		//connectedUsersList.setBorder(BorderFactory.createRaisedBevelBorder());
@@ -244,7 +244,7 @@ public class GUI extends JFrame{
 			// TODO
 			try {
 				// TODO on crée le groupe ici ou on garde que l'ID ? que le nom ?
-				String groupName = getRealGroupName(groupList.getSelectedValue());
+				String groupName = getRealGroupName(connectedUsersList.getSelectedValue());
 
 				controller.sendMessage(textToSend, groupName, Message.FUNCTION_NORMAL);
 			
@@ -381,8 +381,9 @@ public class GUI extends JFrame{
 		groupList.setModel(groupNames);
 		
 		
+		Group selectedGroup = controller.getGroupByName(getRealGroupName(updatedGroupName));
 		
-		/*if(selectedGroup != null) {
+		if(selectedGroup != null) {
 			ArrayList<Message> groupMessages = controller.getGroupMessages(selectedGroup);
 			
 			String history = "";
@@ -401,7 +402,7 @@ public class GUI extends JFrame{
 		else {
 			// TODO erreur
 			System.out.println("Erreur groupe inexistant");
-		}*/
+		}
 		
 	}
 	
