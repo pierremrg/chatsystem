@@ -141,7 +141,7 @@ public class Controller {
 	 * @param message le message a envoyer
 	 * @throws IOException 
 	 */
-	public void sendMessage(String textToSend, int receiverGroupID, int function) throws IOException {
+	public void sendMessage(String textToSend, String receiverGroupNameForUser, int function) throws IOException {
 		// TODO ajout BDD
 
 		/*controller.sendMessage(textToSend);*/
@@ -151,14 +151,12 @@ public class Controller {
 		
 //		if(function == Message.FUNCTION_STOP &&)
 
-		Group group;
+		Group group = getGroupByName(receiverGroupNameForUser);
 		
-		if(groupIsKnown(receiverGroupID)) {
+		// Si le groupe est déjà dans la liste des groupes de l'utilisateur
+		if(group != null) {
 			
-			// Le groupe est déjà démarré
-			group = getGroupByID(receiverGroupID);
-			
-			
+			// Le groupe a déjà été démarré
 			ArrayList<User> members = group.getMembers();
 			User contact;
 			
