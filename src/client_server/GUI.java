@@ -117,15 +117,15 @@ public class GUI extends JFrame{
 		// TODO a supprimer
 		/*usernames.addElement("jean");
 		usernames.addElement("truc");*/
-		DefaultListModel<String> groupnames = new DefaultListModel<String>();
-		ArrayList<Group> startedGroups = controller.getGroups();
+		/*DefaultListModel<String> groupnames = new DefaultListModel<String>();
+		ArrayList<Group> startedGroups = controller.getGroups();*/
 		//ArrayList<Group> startedGroups = new ArrayList<Group>();
 		
 		// TODO vide au début ?
 		/*for(Group g : startedGroups)
 			groupnames.addElement(g.getGroupNameForUser(controller.getUser()));*/
 		
-		groupList = new JList<String>(groupnames);
+		groupList = new JList<String>();
 		//groupList.setBorder(BorderFactory.createRaisedBevelBorder());
 		groupList.setPreferredSize(new Dimension(40,0));
 		groupList.addListSelectionListener(new groupListSelectionChange());
@@ -354,7 +354,8 @@ public class GUI extends JFrame{
 	
 	public void updateConnectedUsers() {
 		DefaultListModel<String> usernames = new DefaultListModel<String>();
-		ArrayList<User> connectedUsers = controller.getConnectedUsers();
+		ArrayList<User> connectedUsers;
+		connectedUsers = controller.getConnectedUsers();
 		
 		for(User u : connectedUsers)
 			usernames.addElement(u.getUsername());
@@ -435,9 +436,9 @@ public class GUI extends JFrame{
 		
 		try {
 			controller = new Controller(allIP.get(ipMachine));
+			controller.setGUI(new GUI());
 			controller.connect(id, username, ipMachine);
 			
-			controller.setGUI(new GUI());
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

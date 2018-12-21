@@ -19,14 +19,11 @@ import java.util.Random;
 
 public class Controller {
 	
-	// TODO supprimer
-	private static final int USER_ID = 2;
-	
 	// Utilisateur associe au controller
 	private User user;
 	
 	// GUI
-	private GUI gui;
+	private volatile GUI gui;
 	
 	// Groupes de l'utilisateur
 	private ArrayList<Group> groups;
@@ -35,7 +32,7 @@ public class Controller {
 	private ArrayList<Message> messages;
 	
 	// Liste des utilisateurs connectes
-	private ArrayList<User> connectedUsers;
+	private volatile ArrayList<User> connectedUsers;
 	
 	// Service UDP utilise pour le broadcast (connexion, deconnexion)
 	private Udp udp;
