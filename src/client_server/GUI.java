@@ -251,12 +251,12 @@ public class GUI extends JFrame{
 		InetAddress ipMachine = null;
 		String username = null;
 		String password = null;
-		GUIInfo guiInfo = new GUIInfo(new ArrayList<InetAddress>(allIP.keySet()));
+		GUIConnect guiConnect = new GUIConnect(new ArrayList<InetAddress>(allIP.keySet()));
 		
 		while(ipMachine == null || username == null || password == null) {
-			ipMachine = guiInfo.getIPSelected();
-			username = guiInfo.getUsername();
-			password = guiInfo.getPassword();
+			ipMachine = guiConnect.getIPSelected();
+			username = guiConnect.getUsername();
+			password = guiConnect.getPassword();
 		}
 		//Check si username et password existe
 
