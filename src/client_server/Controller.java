@@ -109,6 +109,9 @@ public class Controller {
 		Group group0 = new Group(0, members0, user);
 		Group group1 = new Group(1, members1, user);
 		
+		groups.add(group0);
+		groups.add(group1);
+		
 		messages.add(new Message(new Date(), "coucou", user, group0, Message.FUNCTION_NORMAL));
 		messages.add(new Message(new Date(), "coucou2", user, group0, Message.FUNCTION_NORMAL));
 		messages.add(new Message(new Date(), "coucou3", user, group1, Message.FUNCTION_NORMAL));
@@ -124,6 +127,10 @@ public class Controller {
 	 */
 	public User getUser() {
 		return user;
+	}
+	
+	public ArrayList<Group> getGroups() {
+		return groups;
 	}
 
 	/**
@@ -232,7 +239,7 @@ public class Controller {
 		
 		messages.add(message);
 		
-		gui.updateMessages();
+		gui.updateMessages(group);
 	}
 	
 	/**e
