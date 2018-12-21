@@ -1,5 +1,6 @@
 package client_server;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -8,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -35,15 +38,16 @@ public class GUIConnect extends JFrame{
 	private JTextField usernameField;
 	private JPasswordField passwordField;
 	private volatile String username = null;
-	private volatile String password = null;
-	
+	private volatile int id = -1;
+	private volatile boolean statusConnexion = false;
 	
 	public GUIConnect(ArrayList<InetAddress> allIPMachine) throws SocketException {
 		super("Connexion");
 		this.ipListMachine = allIPMachine;
 		
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setSize(400, 160);
+		setSize(new Dimension(400, 160));
+		setResizable(false);
 		setLocationRelativeTo(null);
 		
 		connectPanel = new JPanel();
@@ -59,15 +63,14 @@ public class GUIConnect extends JFrame{
 		c.gridwidth = 2;
 		connectPanel.add(iPList, c);
 		
-		usernameLabel = new JLabel("Login (max 20 caractères) : ");
+		usernameLabel = new JLabel("Login (max 20 caracteres) : ");
 		c.weightx = 0.5;
 		c.gridy = 1;
 		c.gridwidth = 1;
 		connectPanel.add(usernameLabel, c);
 		
-		usernameField = new JTextField("Login");
+		usernameField = new JTextField();
 		usernameField.addKeyListener(new KeyAdapter());
-		usernameField.addFocusListener(new FocusListener("Login"));
 		usernameField.addActionListener(new ConnectListener());
 		c.gridy = 2;
 		connectPanel.add(usernameField, c);
@@ -82,14 +85,13 @@ public class GUIConnect extends JFrame{
 		c.gridy = 1;
 		connectPanel.add(passwordLabel, c);
 		
-		passwordField = new JPasswordField("Mot de passe");
-		passwordField.addFocusListener(new FocusListener("Mot de passe"));
+		passwordField = new JPasswordField();
 		passwordField.addActionListener(new ConnectListener());
 		c.gridy = 2;
 		connectPanel.add(passwordField, c);
 		
 		createUserButton = new JButton("CREER UTILISATEUR");
-		createUserButton.addActionListener(new CreateUserListener());
+		createUserButton.addActionListener(new CreateUserListener(this));
 		c.gridy = 3;
 		connectPanel.add(createUserButton, c);
 		
@@ -113,48 +115,59 @@ public class GUIConnect extends JFrame{
 	public void setUsername(String username) {
 		this.username = username;
 	}
-
-	public String getPassword() {
-		return password;
+	
+	
+	public int getId() {
+		return id;
 	}
 
-	public void setPassword(String pass) {
-		this.password = pass;
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public boolean getStatusConnexion() {
+		return statusConnexion;
+	}
+
+	public void setStatusConnexion(boolean statusConnexion) {
+		this.statusConnexion = statusConnexion;
 	}
 
 	public class ConnectListener implements ActionListener{
 		
 		public void actionPerformed(ActionEvent e) {			
-			setIPSelected((InetAddress) iPList.getSelectedItem());
-			setUsername(usernameField.getText());
-			setPassword(passwordField.getText());
-			setVisible(false);
+			String username = usernameField.getText();
+			char[] password = passwordField.getPassword();
+			int id = -1;
+			try {
+				if((id = DataManager.checkUser(username, password)) != -1) {
+					setId(id);
+					setUsername(username);
+					setIPSelected((InetAddress) iPList.getSelectedItem());
+					setStatusConnexion(true);
+					setVisible(false);				
+				}
+				else {
+					JOptionPane.showMessageDialog(null, "Erreur connexion", "Erreur", JOptionPane.ERROR_MESSAGE);
+				}
+			} catch (ClassNotFoundException | IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		}
 	}	
 	
 	public class CreateUserListener implements ActionListener{
+		private GUIConnect guiConnect;
+		
+		public CreateUserListener (GUIConnect guiConnect) {
+			super();
+			this.guiConnect = guiConnect;
+		}
 		
 		public void actionPerformed(ActionEvent e) {
 			setEnabled(false);
-			new GUICreateUser();			
-		}
-	}
-	
-	public class FocusListener implements java.awt.event.FocusListener {
-		private String placeHolder;
-		
-		public FocusListener(String placeHolder) {
-			this.placeHolder = placeHolder;
-		}
-		
-		public void focusGained(FocusEvent e) {
-			if (((JTextField) e.getComponent()).getText().equals(placeHolder))
-				((JTextField) e.getComponent()).setText("");
-		}
-		
-		public void focusLost(FocusEvent e) {
-			if (((JTextField) e.getComponent()).getText().equals(""))
-				((JTextField) e.getComponent()).setText(placeHolder);
+			new GUICreateUser(guiConnect);
 		}
 	}
 	
