@@ -84,7 +84,7 @@ public class Group implements Serializable {
 	
 	public boolean updateMember(User newVersionMember) {
 		for(User oldVersionMember : members) {
-			if(oldVersionMember.getID() == newVersionMember.getID()) {
+			if(oldVersionMember.equals(newVersionMember)) {
 				members.remove(oldVersionMember);
 				members.add(newVersionMember);
 				return true;
