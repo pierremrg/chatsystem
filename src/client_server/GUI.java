@@ -421,22 +421,20 @@ public class GUI extends JFrame{
 		Statement statement = (Statement) con.createStatement();*/
 		
 		Map<InetAddress, InetAddress> allIP = Controller.getAllIpAndBroadcast();
-		InetAddress ipMachine = null;
-		String username = null;
-		String password = null;
+		InetAddress ipMachine;
+		String username ;
+		int id;
 		GUIConnect guiConnect = new GUIConnect(new ArrayList<InetAddress>(allIP.keySet()));
 		
-		while(ipMachine == null || username == null || password == null) {
-			ipMachine = guiConnect.getIPSelected();
-			username = guiConnect.getUsername();
-			password = guiConnect.getPassword();
-		}
-		// TODO Check si username et password existe
+		while(guiConnect.getStatusConnexion() == false);		
+		ipMachine = guiConnect.getIPSelected();
+		username = guiConnect.getUsername();
+		id = guiConnect.getId();
 
 		
 		try {
 			controller = new Controller(allIP.get(ipMachine));
-			controller.connect(username, password, ipMachine);
+			controller.connect(id, username, ipMachine);
 			
 			controller.setGUI(new GUI());
 			

@@ -20,7 +20,7 @@ import java.util.Random;
 public class Controller {
 	
 	// TODO supprimer
-	private static final int USER_ID = 3;
+	private static final int USER_ID = 2;
 	
 	// Utilisateur associe au controller
 	private User user;
@@ -97,14 +97,14 @@ public class Controller {
 	
 	// TODO a supprimer
 	public void testSaveMessages() {
-		user = new User(1, "toto", "password");
+		user = new User(1, "toto");
 		ArrayList<User> members0 = new ArrayList<User>();
-		members0.add(new User(5, "truc", "bidule"));
+		members0.add(new User(5, "truc"));
 		members0.add(user);
 		
 		ArrayList<User> members1 = new ArrayList<User>();
 		members1.add(user);
-		members1.add(new User(10, "jean", "jacques"));
+		members1.add(new User(10, "jean"));
 		
 		Group group0 = new Group(0, members0, user);
 		Group group1 = new Group(1, members1, user);
@@ -291,10 +291,10 @@ public class Controller {
 	 * @return 0 si connexion �choue, 1 si OK
 	 * @throws IOException 
 	 */
-	public void connect(String username, String password, InetAddress ip) throws IOException {
+	public void connect(int id, String username, InetAddress ip) throws IOException {
 		// TODO Check dans la BDD si info ok
 		// TODO id de l'utilisateur
-		user = new User(USER_ID, username, password);
+		user = new User(id, username);
 
 		
 		// TODO Infos sur l'utilisateur
@@ -472,28 +472,11 @@ public class Controller {
 		return groupMessages;
 	}
 	
-	
-	
-	
-	
-	public void createUser(String username, String password) {
-		// TODO Check si username pas pris
-		// TODO Gestion erreur
-		
-		// TODO Récupérer ID BDD
-		int idUser = 1;
-		user = new User(username, password);
-
-		// TODO Ajout à la BDD
-	}
-	
 	public void editUser(String username, String password) {
 		// TODO Check si username pas pris
 		// TODO Gestion erreur
-		
-		user.setUsername(username);
-		user.setPassword(password);
 		// TODO Update user BDD
+		//TODO update user controller
 	}
 	
 	/**

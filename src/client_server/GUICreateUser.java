@@ -1,46 +1,61 @@
 package client_server;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.io.IOException;
 import java.net.InetAddress;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+
+import com.sun.scenario.effect.AbstractShadow.ShadowMode;
+
+import client_server.GUI.windowClosingListener;
 
 public class GUICreateUser extends JFrame {
 	
 	private JPanel createUserPanel;
 	private JLabel usernameLabel;
 	private JLabel passwordLabel;
-	private JLabel confirmPassword;
+	private JLabel confirmPasswordLabel;
 	private JTextField usernameField;
 	private JPasswordField passwordField;
 	private JPasswordField confirmPasswordField;
 	private JButton createUserButton;
+	private GUIConnect guiConnect;
 	
-	public GUICreateUser () {
-		super("Créer utilisateur");
+	public GUICreateUser (GUIConnect guiConnect) {
+		super("Creer utilisateur");
+		addWindowListener(new windowClosingListener());
+		this.guiConnect = guiConnect;
 		
 		setDefaultCloseOperation(HIDE_ON_CLOSE);
-		setSize(300, 160);
-		setLocationRelativeTo(null);
 		setAlwaysOnTop(true);
+		setSize(new Dimension(400, 160));
+		setResizable(false);
+		setLocationRelativeTo(null);
 		
 		createUserPanel = new JPanel();
 		createUserPanel.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(3,3,3,3);
-		c.fill = GridBagConstraints.HORIZONTAL;
+		c.fill = GridBagConstraints.BOTH;
 		
-		usernameLabel = new JLabel("Login (max 20 caractères) :");
-		c.weightx = 0.5;
+		usernameLabel = new JLabel("Login (max 20 caracteres) :");
+		c.weightx = 0.1;
 		c.gridwidth = 1;
 		c.gridx = 0;
 		c.gridy = 0;
@@ -50,11 +65,13 @@ public class GUICreateUser extends JFrame {
 		c.gridy = 1;
 		createUserPanel.add(passwordLabel, c);
 		
-		confirmPassword = new JLabel("Confirmez mot de passe : ");
+		confirmPasswordLabel = new JLabel("Confirmez mot de passe : ");
 		c.gridy = 2;
-		createUserPanel.add(confirmPassword, c);
+		createUserPanel.add(confirmPasswordLabel, c);
 		
 		usernameField = new JTextField();
+		usernameField.addKeyListener(new KeyAdapter());
+		c.weightx = 0.9;
 		c.gridx = 1;
 		c.gridy = 0;
 		createUserPanel.add(usernameField, c);
@@ -68,7 +85,7 @@ public class GUICreateUser extends JFrame {
 		createUserPanel.add(confirmPasswordField, c);
 		
 		createUserButton = new JButton("CREER UTILISATEUR");
-		createUserButton.addActionListener(new CreateUserListener());
+		createUserButton.addActionListener(new CreateUserListener(this.guiConnect));
 		c.weightx = 1;
 		c.gridwidth = 2;
 		c.gridx = 0;
@@ -78,12 +95,73 @@ public class GUICreateUser extends JFrame {
 		add(createUserPanel);
 		setVisible(true);
 		
-	}
-	
+	}	
+
 	public class CreateUserListener implements ActionListener{
+		private GUIConnect guiConnect;
+
+		
+		public CreateUserListener(GUIConnect guiConnect) {
+			super();
+			this.guiConnect = guiConnect;
+		}
 		
 		public void actionPerformed(ActionEvent e) {			
-			setVisible(false);
+			//TODO check username pas deja utilise
+			String username = usernameField.getText();
+			char[] password = passwordField.getPassword();
+			char[] confirmPassword = confirmPasswordField.getPassword();
+			
+			if (password.length != 0 && username.length() != 0 && confirmPassword.length != 0) {
+				if(DataManager.charactereEquals(password, confirmPassword)) {
+					try {
+						DataManager.createUser(username, password);
+						setVisible(false);
+						guiConnect.setEnabled(true);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}					
+				} else
+				{
+					JOptionPane.showMessageDialog(null, "Mot de passe incorrect", "Erreur", JOptionPane.ERROR_MESSAGE);
+					passwordField.setText("");
+					confirmPasswordField.setText("");
+				}
+			} else {
+				JOptionPane.showMessageDialog(null, "Champs vides", "Erreur", JOptionPane.ERROR_MESSAGE);
+			}
 		}
-	}	
+		
+		
+	}
+	
+	public class KeyAdapter implements KeyListener {
+		
+		public void keyTyped(KeyEvent e) {
+			if(usernameField.getText().length() >= 20)
+				e.consume();
+		}
+
+		@Override
+		public void keyPressed(KeyEvent e) {}
+
+		@Override
+		public void keyReleased(KeyEvent e) {}
+	}
+	
+	public class windowClosingListener implements WindowListener {
+		
+		public void windowClosing(WindowEvent e) {
+			guiConnect.setEnabled(true);
+		}
+		
+		public void windowOpened(WindowEvent arg0) {}
+		public void windowClosed(WindowEvent arg0) {}
+		public void windowIconified(WindowEvent arg0) {}
+		public void windowDeiconified(WindowEvent arg0) {}
+		public void windowActivated(WindowEvent arg0) {}
+		public void windowDeactivated(WindowEvent arg0) {}
+
+	}
 }

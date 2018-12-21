@@ -9,7 +9,6 @@ public class User implements Serializable{
 
 	private int id;
 	private String username; // TODO : crypter ?
-	private String password;
 	private InetAddress ip;
 	private int port;
 	
@@ -19,10 +18,9 @@ public class User implements Serializable{
 	 * @param username Le username de l'utilisateur
 	 * @param password Le password de l'utilisateur
 	 */
-	public User(int id, String username, String password) {
+	public User(int id, String username) {
 		this.id = id;
 		this.username = username;
-		this.password = password;
 	}
 
 	/**
@@ -30,9 +28,8 @@ public class User implements Serializable{
 	 * @param username Le username de l'utilisateur
 	 * @param password Le password de l'utilisateur
 	 */
-	public User(String username, String password) {
+	public User(String username) {
 		this.username = username;
-		this.password = password;
 	}
 	
 	/**
@@ -57,22 +54,6 @@ public class User implements Serializable{
 	 */
 	public void setUsername(String username) {
 		this.username = username;
-	}
-	
-	/**
-	 * Retourne le mot de passe de l'utilisateur
-	 * @return le mot de passe de l'utilisateur
-	 */
-	public String getPassword() {
-		return password;
-	}
-
-	/**
-	 * Modifie le password de l'utilisateur
-	 * @param password Le nouveau password
-	 */
-	public void setPassword(String password) {
-		this.password = password;
 	}
 
 	/**
