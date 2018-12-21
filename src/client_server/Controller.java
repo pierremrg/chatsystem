@@ -2,7 +2,9 @@ package client_server;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -282,7 +284,7 @@ public class Controller {
 	public void connect(String username, String password, InetAddress ip) throws IOException {
 		// TODO Check dans la BDD si info ok
 		// TODO id de l'utilisateur
-		user = new User(1, username, password);
+		user = new User(2, username, password);
 		
 		// TODO Infos sur l'utilisateur
 		user.setIP(ip);
@@ -495,8 +497,12 @@ public class Controller {
 	        NetworkInterface networkInterface = interfaces.nextElement();	 
 	        if (networkInterface.isLoopback() || !networkInterface.isUp()) {
 	            continue;
-	        }	        
-	        networkInterface.getInterfaceAddresses().stream().forEach(a -> listIP.put(a.getAddress(), a.getBroadcast()));
+	        }	       
+	        
+	        for (InterfaceAddress a : networkInterface.getInterfaceAddresses()) {
+	        	if (a.getAddress() instanceof Inet4Address)
+	        		listIP.put(a.getAddress(), a.getBroadcast());
+	        }
 	    }
 	    return listIP;
 	}
