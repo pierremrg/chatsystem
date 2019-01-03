@@ -35,6 +35,10 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 	
+/**
+ * Fenetre principale du programme
+ *
+ */
 public class GUI extends JFrame{
 	
 	private static Controller controller;
@@ -139,7 +143,7 @@ public class GUI extends JFrame{
 		c.gridwidth = 1;
 		panel.add(groupList, c);
 		
-		labelGroups = new JLabel("Conversations démarrées", SwingConstants.CENTER);
+		labelGroups = new JLabel("Conversations demarrees", SwingConstants.CENTER);
 		Font font = labelGroups.getFont();
 		labelGroups.setFont(new Font(font.getName(), Font.PLAIN, 11));
 		c.fill = GridBagConstraints.BOTH;
@@ -152,7 +156,7 @@ public class GUI extends JFrame{
 		panel.add(labelGroups, c);
 		
 		
-		/* Liste de tous les utilisateurs connectés */
+		/* Liste de tous les utilisateurs connectes */
 		DefaultListModel<String> usernames = new DefaultListModel<String>();
 		ArrayList<User> connectedUsers = controller.getConnectedUsers();
 		//ArrayList<User> connectedUsers = new ArrayList<User>();
@@ -173,7 +177,7 @@ public class GUI extends JFrame{
 		c.gridwidth = 1;
 		panel.add(connectedUsersList, c);
 		
-		labelConnectedUsers = new JLabel("Utilisateurs connectés", SwingConstants.CENTER);
+		labelConnectedUsers = new JLabel("Utilisateurs connectes", SwingConstants.CENTER);
 		font = labelConnectedUsers.getFont();
 		labelConnectedUsers.setFont(new Font(font.getName(), Font.PLAIN, 11));
 		c.weightx = 0.1;
@@ -416,6 +420,8 @@ public class GUI extends JFrame{
 
 
 	public static void main(String[] args) throws SocketException, ClassNotFoundException, SQLException, UnknownHostException {	
+		
+		System.out.println("Main started");
 		
 		/*Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
 		Connection con = DriverManager.getConnection("jdbc:odbc:MovieCatalog");

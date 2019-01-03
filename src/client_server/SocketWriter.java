@@ -8,12 +8,24 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Base64;
 
+/**
+ * Permet d'ecrire des messages a destination d'un groupe
+ *
+ */
 public class SocketWriter extends Thread {
 	
 	private Socket socket;
 	private Controller controller;
 	private Group group;
 	
+	/**
+	 * Cree le SocketWriter (thread)
+	 * @param name Le nom du thread
+	 * @param socket Le socket a utiliser
+	 * @param controller Le controller de l'application
+	 * @param group Le groupe associe a ce SocketWriter
+	 * @see Message
+	 */
 	public SocketWriter(String name, Socket socket, Controller controller, Group group) {
 		super(name);
 		this.socket = socket;
@@ -22,36 +34,40 @@ public class SocketWriter extends Thread {
 	}
 	
 	public void run() {
+		
 		try {
+		
 			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 			
-			/*Scanner sc = new Scanner(System.in);
-			String msg = sc.nextLine();*/
-			
-			//Message messageToSend = controller.getMessageToSend();
 			Message messageToSend;
 			
+			// TODO : impossible qu'il soit ferme, si ?
 			while(!socket.isClosed()) {
+				
+				// On recupere le message a envoyer
 				messageToSend = controller.getMessageToSend();
+				
 				if(messageToSend != null) {
+
+					// On regarde si le message est un message de fin de conversation (deconnexion)
 					if(messageToSend.getFunction() == Message.FUNCTION_STOP)
 						break;
 					
+					// On envoie le message s'il est bien destine a ce groupe
 					if(group.equals(messageToSend.getReceiverGroup())) {					
-						out.println(encodeMessageToString(messageToSend));
-						System.out.println("Message envoyé");
+						out.println(encodeMessageToString(messageToSend)); // TODO a supprimer
+						System.out.println("Message envoyé"); // TODO a supprimer
 						controller.messageSent();
 					}
+					
 				}
 				
-				//msg = sc.nextLine();
 			}
 			
-			/*out.println(msg);
-			sc.close();*/
 			
 		}
 		catch(Exception e) {
+			// TODO gerer erreurs dans controller + GUI
 			System.out.println("Erreur sur le writer");
 		}
 		
@@ -67,7 +83,13 @@ public class SocketWriter extends Thread {
 		}
 	}
 	
-	public static String encodeMessageToString(Message message) throws IOException {
+	/**
+	 * Permet d'encoder un message sous forme de chaine de caracteres
+	 * @param message Le Message a encoder
+	 * @return Le Message encode sous forme de chaine de caracteres
+	 * @throws IOException
+	 */
+	private static String encodeMessageToString(Message message) throws IOException {
 		
 		ByteArrayOutputStream bStream = new ByteArrayOutputStream();
 		ObjectOutput oo;

@@ -3,11 +3,15 @@ package client_server;
 import java.io.Serializable;
 import java.util.Date;
 
+/**
+ * Represente un message envoye entre deux utilisateurs
+ *
+ */
 public class Message implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private int id;
+	private int id; // TODO a supprimer ?
 	private Date date;
 	private String content;
 	private User sender;
@@ -18,13 +22,13 @@ public class Message implements Serializable {
 	public static final int FUNCTION_STOP = 1;
 	
 	/**
-	 * Cr�er un message
+	 * Cree un message
 	 * @param date Date d'envoi du message
 	 * @param content Contenu du message
 	 * @param sender Auteur du message
-	 * @param receiverGroup Destinataire(s) du message 
+	 * @param receiverGroup Groupe destinataire du message 
+	 * @param function Fonction du message
 	 */
-	
 	public Message(Date date, String content, User sender, Group receiverGroup, int function) {
 		this.date = date;
 		this.content = content;
@@ -35,7 +39,7 @@ public class Message implements Serializable {
 
 	/**
 	 * Retourne la date du message
-	 * @return date
+	 * @return La Date du message
 	 */
 	public Date getDate() {
 		return date;
@@ -43,7 +47,7 @@ public class Message implements Serializable {
 
 	/**
 	 * Retourne le contenu du message
-	 * @return content
+	 * @return Le contenu du message
 	 */
 	public String getContent() {
 		return content;
@@ -51,25 +55,26 @@ public class Message implements Serializable {
 
 	/**
 	 * Retourne l'auteur du message
-	 * @return sender
+	 * @return L'auteur du message
 	 */
 	public User getSender() {
 		return sender;
 	}
 
 	/**
-	 * Retourne le/les destinataire(s)
-	 * @return receiverGroup
+	 * Retourne le groupe destinataire
+	 * @return Le groupe destinataire
 	 */
 	public Group getReceiverGroup() {
 		return receiverGroup;
 	}
 	
+	/**
+	 * Retourne la fonction du message
+	 * @return La fonction du message
+	 */
 	public int getFunction() {
 		return function;
 	}
 	
-	public void setFunction(int function) {
-		this.function = function;
-	}
 }

@@ -3,6 +3,10 @@ package client_server;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+/**
+ * Represente une conversation entre deux utilisateurs ou plus
+ *
+ */
 public class Group implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
@@ -13,7 +17,7 @@ public class Group implements Serializable {
 	private boolean online;
 	
 	/**
-	 * Création d'un groupe
+	 * Creation d'un groupe
 	 * @param id ID du groupe
 	 * @param members Liste des membres du groupe
 	 */
@@ -23,14 +27,14 @@ public class Group implements Serializable {
 		this.online = true;
 		
 		this.members = new ArrayList<User>();
-		for(User m : members) {
+		for(User m : members)
 			this.members.add(m);
-		}
+		
 	}
 	
 	/**
 	 * Retourne l'ID du groupe
-	 * @return l'ID du groupe
+	 * @return L'ID du groupe
 	 */
 	public int getID() {
 		return id;
@@ -38,39 +42,47 @@ public class Group implements Serializable {
 	
 	/**
 	 * Retourne les membres du groupe
-	 * @return les membres du groupe
+	 * @return Les membres du groupe
 	 */
 	public ArrayList<User> getMembers() {
 		return members;
 	}
 	
-	public void addMember(User member) {
-		members.add(member);
-	}
-	
 	/**
-	 * Retourne l'utilisateur qui a initié la conversation
-	 * @return l'utilisateur qui a initié la conversation
+	 * Retourne l'utilisateur qui a initie la conversation
+	 * @return l'utilisateur qui a initie la conversation
 	 */
 	public User getStarter() {
 		return starter;
 	}
 	
+	/**
+	 * Indique l'utilisateur qui a initie la conversation
+	 * @param starter L'utilisateur qui a initie la conversation
+	 */
 	public void setStarter(User starter) {
 		this.starter = starter;
 	}
 	
+	/**
+	 * Retourne True si le groupe est en ligne
+	 * @return True si le groupe est en ligne
+	 */
 	public boolean isOnline() {
 		return online;
 	}
 	
+	/**
+	 * Indique que le groupe est en ligne ou non
+	 * @param online Si le groupe est en ligne ou non
+	 */
 	public void setOnline(boolean online) {
 		this.online = online;
 	}
 	
 	/**
-	 * Teste si un utilisateur est membre de ce groupe
-	 * @param member L'utilisateur à tester
+	 * Retourne True si un utilisateur est membre de ce groupe
+	 * @param member L'utilisateur a tester
 	 * @return True si l'utilisateur est dans le groupe, False sinon
 	 */
 	public boolean isMember(User member) {
@@ -82,21 +94,23 @@ public class Group implements Serializable {
 		return false;
 	}
 	
-	public boolean updateMember(User newVersionMember) {
+	/**
+	 * Permet de mettre � jour les informations sur un membre du groupe
+	 * @param newVersionMember La nouvelle version de l'utilisateur
+	 */
+	public void updateMember(User newVersionMember) {
 		for(User oldVersionMember : members) {
 			if(oldVersionMember.equals(newVersionMember)) {
 				members.remove(oldVersionMember);
 				members.add(newVersionMember);
-				return true;
 			}
 		}
-		
-		return false;
 	}
 	
 	/**
 	 * Renvoie le nom d'un groupe vu par un utilisateur en particulier
-	 * Le nom correspond au nom du contact distant
+	 * Dans une conversation � deux, le nom correspond au nom du contact distant
+	 * Utilise pour faire le lien avec ce qui est affiche dans le GUI
 	 * @param user L'utilisateur qui veut obtenir le nom
 	 * @return Le nom du groupe vu par l'utilisateur demandeur
 	 */

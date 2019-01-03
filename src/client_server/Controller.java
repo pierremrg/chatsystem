@@ -1,6 +1,5 @@
 package client_server;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -17,13 +16,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+/**
+ * Controller de l'application
+ *
+ */
 public class Controller {
 	
 	// Utilisateur associe au controller
 	private User user;
 	
 	// GUI
-	private volatile GUI gui;
+	private volatile GUI gui; // TODO Pourquoi volatile ?
 	
 	// Groupes de l'utilisateur
 	private ArrayList<Group> groups;
@@ -37,10 +40,10 @@ public class Controller {
 	// Service UDP utilise pour le broadcast (connexion, deconnexion)
 	private Udp udp;
 	
-	// Adresse IP de broadcast du réseau
+	// Adresse IP de broadcast du reseau
 	private InetAddress ipBroadcast;
 	
-	// Utilisé pour envoyer un message
+	// Utilise pour envoyer un message
 	private volatile Message messageToSend = null;
 	
 	
@@ -56,17 +59,12 @@ public class Controller {
 		this.groups = new ArrayList<Group>();
 		this.messages = new ArrayList<Message>();
 		this.ipBroadcast = ipBroadcast;
-
-		//Recuperer groupe dont l'utilisateur est membre dans la BDD
-		//Recuperer tous les messages de l'utilisateur dans la BDD
-		
 		
 		try {
 			messages = DataManager.readAllMessages();
 			groups = DataManager.readAllGroups();
 			
-			// TODO traitement des groupes
-			
+			/* Tests pour verifier le bon fonctionnement de la sauvegarde des donnees, TODO a supprimer */
 			/*for(Group g : groups) {
 				System.out.println(g.getID());
 			}
@@ -86,22 +84,25 @@ public class Controller {
 			//testSaveMessages();
 			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			// TODO Gerer erreur dans GUI
 			e.printStackTrace();
 		}
 		
 	}
 	
-	// TODO a supprimer
+	/**
+	 * Tests pour la sauvegarde de donnees
+	 * TODO a supprimer
+	 */
 	public void testSaveMessages() {
-		user = new User(1, "toto");
+		user = new User(1, "toto", null);
 		ArrayList<User> members0 = new ArrayList<User>();
-		members0.add(new User(5, "truc"));
+		members0.add(new User(5, "truc", null));
 		members0.add(user);
 		
 		ArrayList<User> members1 = new ArrayList<User>();
 		members1.add(user);
-		members1.add(new User(10, "jean"));
+		members1.add(new User(10, "jean", null));
 		
 		Group group0 = new Group(0, members0, user);
 		Group group1 = new Group(1, members1, user);
@@ -114,30 +115,46 @@ public class Controller {
 		messages.add(new Message(new Date(), "coucou3", user, group1, Message.FUNCTION_NORMAL));
 	}
 	
+	
+	/**
+	 * Associe un GUI au controller
+	 * @param gui Le GUI a associer
+	 */
 	public void setGUI(GUI gui) {
 		this.gui = gui;
 	}
 	
 	/**
-	 * Retourne l'utilisateur du controlleur
+	 * Retourne l'utilisateur associe au controlleur
 	 * @return User
 	 */
 	public User getUser() {
 		return user;
 	}
 	
+	/**
+	 * Retourne la liste des groupes de l'utilisateur
+	 * @return La liste des groupes de l'utilisateur
+	 */
 	public ArrayList<Group> getGroups() {
 		return groups;
 	}
 
 	/**
 	 * Retourne la liste des utilisateurs connectes
-	 * @return la liste des utilisateurs connectes
+	 * @return La liste des utilisateurs connectes
 	 */
 	public ArrayList<User> getConnectedUsers() {
 		return connectedUsers;
 	}
 	
+	
+	
+	/**
+	 * Retourne un utilisateur trouve par son pseudo
+	 * @param username Le pseudo de l'utilisateur a trouver
+	 * @return L'utilisateur trouve, ou null si aucun utilisateur avec ce pseudo n'existe
+	 */
 	public User findUserByName(String username) {
 		for (User u : connectedUsers) {
 			if (u.getUsername().equals(username))
@@ -145,28 +162,27 @@ public class Controller {
 		}
 		return null;
 	}
+	
 	/**
 	 * Permet d'envoyer un message
-	 * @param message le message a envoyer
-	 * @throws IOException 
+	 * @param textToSend Le contenu du message � envoyer
+	 * @param receiverGroupNameForUser Le groupe a qui envoyer le message
+	 * 		Le nom de groupe est different selon l'utilisateur
+	 * @param function La fonction du message
+	 * @see Message.java
+	 * @throws IOException
 	 */
 	public void sendMessage(String textToSend, String receiverGroupNameForUser, int function) throws IOException {
-		// TODO ajout BDD
-
-		/*controller.sendMessage(textToSend);*/
-
-		/*Message message = new Message(textToSend);
-		controller.sendMessage(message);*/
 		
-//		if(function == Message.FUNCTION_STOP &&)
-
 		Group group = getGroupByName(receiverGroupNameForUser);
 		
-		// Si le groupe est déjà dans la liste des groupes de l'utilisateur
+		// Si le groupe est deja dans la liste des groupes de l'utilisateur
 		if(group != null) {
 			
-			// Le groupe a déjà été démarré
+			// On recupere la lsite des membres du groupe
 			ArrayList<User> members = group.getMembers();
+			
+			// Pour le moment, on fait des conversations entre deux personnes uniquement
 			User contact;
 			
 			if(members.get(0).equals(user))
@@ -174,73 +190,77 @@ public class Controller {
 			else
 				contact = members.get(0);
 			
-			// On regarde si le groupe n'est plus actif
-			// TODO Throws erreur pas connecté
-			if(!group.isOnline() && connectedUsers.contains(contact)) {
+			// Si le groupe n'etait plus actif (groupe hors ligne), on le redemarre
+			// TODO Besoin de tester si user en ligne ? Logiquement, si le groupe est en ligne le contact aussi
+			// TODO Throws erreur pas connecte
+			if(!group.isOnline() && connectedUsers.contains(contact))
 				restartGroup(group);
-				// TODO pas tous les connectés !
-			}
+				
 		}
 		else {
 			
+			// Creation d'un nouveau groupe si le groupe n'existe pas
 			ArrayList<User> members = new ArrayList<User>();
-			
-			// TODO choisir le bon user
-			// TODO vérifier si connectedUsers est pas vide
 			members.add(findUserByName(receiverGroupNameForUser));
 			members.add(user);
 			group = startGroup(members);
+
 		}
 		
+		// Envoi du message
 		Message message = new Message(new Date(), textToSend, user, group, function);
 		messageToSend = message;
 		
+		// Enregsitrement du message
 		messages.add(message);
 
 	}
 	
 	/**
-	 * Retourne le message qui doit être envoyé (null si aucun)
-	 * Utilisé par les threads d'écriture
-	 * @return le message à envoyer
+	 * Retourne le message qui doit etre envoye (null si aucun)
+	 * Utilise par les threads d'ecriture
+	 * @return le message a envoyer
+	 * @see SocketWriter
 	 */
 	public Message getMessageToSend() {
 		return messageToSend;
 	}
 	
 	/**
-	 * Permet à aux threads d'écriture d'indiquer que le message a été envoyé
+	 * Permet a aux threads d'ecriture d'indiquer que le message a ete envoye
+	 * @see SocketWriter
 	 */
 	public void messageSent() {
 		messageToSend = null;
 	}
 	
-	
-	
-	
-	
+	/**
+	 * Indique au controller que l'utilisateur a recu un message
+	 * @param message Le message recu
+	 */
 	public void receiveMessage(Message message) {
-		// TODO ajout BDD
 		
-		// Recoit un message : ajout du groupe si besoin
+		// Ajout du groupe si le groupe n'est pas connu par l'utilisateur (nouvelle conversation)
 		Group group = message.getReceiverGroup();
 		
-		if(!groupIsKnown(group.getID()))
+		if(!groupIsKnown(group))
 			groups.add(group);
 		else {
+			// Si le groupe est connu, on l'indique en ligne
 			Group groupToUpdate = getGroupByID(group.getID());
 			groupToUpdate.setOnline(true);
 		}
 		
+		// TODO affichage a faire correctement
 		System.out.println(message.getContent());
-		
-		messages.add(message);
-		
 		gui.updateMessages(group);
+		
+		// Enregistrement du message recu
+		messages.add(message);
 	}
 	
-	/**e
-	 * Obtient un groupe à partir de son ID
+	/**
+	 * Obtient un groupe a partir de son ID
 	 * @param groupID L'ID du groupe a obtenir
 	 * @return Le groupe ou null si ce groupe n'existe pas
 	 */
@@ -268,13 +288,13 @@ public class Controller {
 	}
 	
 	/**
-	 * Indique si le groupe est déjà connu par le controller
-	 * @param groupID L'ID du groupe à tester
-	 * @return True si le groupe est déjà dans la liste, False sinon
+	 * Indique si le groupe est deja connu par le controller
+	 * @param group Le groupe a tester
+	 * @return True si le groupe est deja dans la liste, False sinon
 	 */
-	private boolean groupIsKnown(int groupID) {
+	private boolean groupIsKnown(Group group) {
 		for(Group g : groups) {
-			if(g.getID() == groupID)
+			if(g.equals(group))
 				return true;
 		}
 		
@@ -282,48 +302,44 @@ public class Controller {
 	}
 	
 	/**
-	 * Connection de l'utilisateur au service et envoi un message � tout le monde pour annoncer sa connection
-	 * @param username Username de l'utilisateur
-	 * @param password Mot de passe de l'utilisateur
-	 * @return 0 si connexion �choue, 1 si OK
-	 * @throws IOException 
+	 * Connexion de l'utilisateur au service et envoi d'un message a tout le monde pour indiquer sa presence (via UDP)
+	 * @param id L'ID de l'utilisateur
+	 * @param username L'username de l'utilisateur
+	 * @param ip L'IP de l'utilisateur
+	 * @throws IOException
+	 * @see ServerSocketWaiter
 	 */
 	public void connect(int id, String username, InetAddress ip) throws IOException {
-		// TODO Check dans la BDD si info ok
-		// TODO id de l'utilisateur
-		user = new User(id, username);
 
+		// Les verifications sur les identifiants de l'utilisateur sont faites avant
+
+		// Cr�ation de l'utilisateur associe au controller
+		user = new User(id, username, ip);
 		
-		// TODO Infos sur l'utilisateur
-		user.setIP(ip);
-
+		// On associe un port random a ce nouvel utilisateur
 		Random rand = new Random();
 		int portRand = rand.nextInt(65000 - 10000 + 1) + 1000; // Rand(10000,65000)
 		user.setPort(portRand);
 		
-		
-		// Démarrage du serveur : l'utilisateur peut être sollicité pour une conversation
-		int serverPort = user.getPort(); // Port du serveur = celui associé à l'utilisateur
+		// On demarre un serveur d'ecoute : l'utilisateur peut etre sollicite pour une conversation
+		int serverPort = user.getPort(); // Port du serveur = celui associe a l'utilisateur
 		ServerSocket serverSocket = new ServerSocket(serverPort);
 		ServerSocketWaiter serverSocketWaiter = new ServerSocketWaiter(serverSocket, this);
 		serverSocketWaiter.start();
 
-		
-		// TODO Gerer l'erreur
-		//Annonce � tout le monde la connexion
-		//R�cup ip broadcast
-		
+		// Demarrage du service UDP et envoi du message de presence
 		udp.start();
 		udp.sendUdpMessage(udp.createMessage(1, getUser()), ipBroadcast);
+		// TODO : constantes a utiliser
 	}
 	
 	/**
-	 * Deconnecte l'utilisateur et l'annonce � tout le monde
+	 * Deconnecte l'utilisateur et l'annonce a tout le monde
 	 * @throws IOException 
 	 */
 	public void deconnect() throws IOException {
 		
-		// Tous les groupes sont maintenant offline
+		// Tous les groupes de l'utilisateur sont maintenant offline
 		for(Group g : groups)
 			g.setOnline(false);
 		
@@ -332,44 +348,48 @@ public class Controller {
 		DataManager.writeAllGroups(groups);
 
 		// TODO Gestion de l'erreur
+		// TODO Constantes a utiliser
 		udp.sendUdpMessage(udp.createMessage(0, getUser()), ipBroadcast);
 
 	}
-	
+
 	/**
-	 * R�cup�re les infos d'un nouvelle utilisateur connect� et ajout dans la liste des utilisateurs connect�s
-	 * @param idUser ID de l'utilisateur qui vient de se connecter
+	 * Recoit les informations d'un utilisateur qui vient de se connecter
+	 * @param receivedUser
 	 */
 	public void receiveConnection(User receivedUser) {
+		
 		if(receivedUser == null)
 			return;
-		
-		//recup info user dans la bdd 
+
+		// TODO Affichage dans le GUI
 		System.out.println("connexion reçu! iduser=" +receivedUser.getID());
 
-		if(!connectedUsers.contains(receivedUser) && receivedUser.getID() != user.getID())
+		// On verifie qu'on ne re�oit pas sa propre annonce et qu'on ne conna�t pas deja l'utilisateur
+		if(!connectedUsers.contains(receivedUser) && receivedUser.equals(user))
 			connectedUsers.add(receivedUser);
 		
-		// Mise à jour des groupes
+		// Mise a jour des groupes avec les nouvelles informations de l'utilisateur connecte
 		for(Group group : groups)
 			group.updateMember(receivedUser);
 		
-		// Mise à jour du GUI
+		// Mise a jour du GUI
 		if(gui != null)
 			gui.updateConnectedUsers();
 	}
 	
 	/**
-	 * Retire de la liste l'utilisateur qui vient de se d�connecter
-	 * @param idUser ID de l'utilisateur qui se d�connecte
+	 * Recoit la deconexion d'un utilisateur
+	 * @param receivedUser L'utilisateur qui vient de se deconnecter
 	 */
 	public void receiveDeconnection(User receivedUser) {
+
 		if(receivedUser == null)
 			return;
 		
-		//recup info user avec idUser
-		//connectedUsers.remove(receivedUser);
+		// Suppression de l'utilisateur dans la liste des connectes
 		User userToRemove = null;
+
 		for(User u : connectedUsers) {
 			if(u.equals(receivedUser)) {
 				userToRemove = u;
@@ -380,7 +400,7 @@ public class Controller {
 		if(userToRemove != null)
 			connectedUsers.remove(userToRemove);
 		
-		// Mise à jour des groupes
+		// Mise a jour des groupes (groupe passe en mode inactif)
 		for(Group group : groups) {
 			if(group.isMember(receivedUser)) {
 				group.setOnline(false);
@@ -388,39 +408,38 @@ public class Controller {
 			}
 		}
 		
-		// Mise à jour du GUI
+		// Mise a jour du GUI
 		if(gui != null)
 			gui.updateConnectedUsers();
 	}	
 	
 	/**
-	 * Démarre une conversation
-	 * @param members Utilisateurs présents dans la conversation
-	 * @return Le groupe créé
-	 * @throws IOException 
+	 * Demarre une nouvelle conversation
+	 * @param members Utilisateurs presents dans la conversation
+	 * @return Le groupe cree
+	 * @throws IOException
+	 * @see SocketWriter SocketReader
 	 */
 	private Group startGroup(ArrayList<User> members) throws IOException {
 		
-		// Première version : uniquement deux utilisateurs dans la conversation
-		// TODO Faire pour plusieurs personnes
+		// Premiere version : uniquement deux utilisateurs dans la conversation
+		// TODO Faire pour plusieurs personnes ?
 		User contact = members.get(0);
+
 		
-		
-		// TODO Obtenir l'ID dans la BDD
-		// TODO Gérer l'erreur
+		// TODO Gerer numero de groupe minimum ? + gerer l'erreur
 		Random rand = new Random();
 		int idGroup = rand.nextInt(999999999); // Rand()
 		
-		// Démarre un groupe :
+		// Demarrage d'un groupe :
 		// - ID du groupe
 		// - Membres du groupe (uniquement deux personnes pour le moment)
-		// - Utilisateur qui a initié la conversation (utile pour savoir qui est client/serveur)
+		// - Utilisateur qui a initie la conversation (utile pour savoir qui est client/serveur)
 		Group group = new Group(idGroup, members, user);
 		groups.add(group);
 		
-		// TODO Ajout à la BDD
 		
-		// Création d'un socket client : l'utilisateur se connecte à l'autre utilisateur
+		// Creation d'un socket client : l'utilisateur se connecte a l'utilisateur distant
 		Socket socket = new Socket(contact.getIP(), contact.getPort());
 		
 		SocketWriter socketWriter = new SocketWriter("clientSocketWriter",socket, this, group);
@@ -431,8 +450,15 @@ public class Controller {
 		return group;
 	}
 	
+	/**
+	 * Permet de reprendre une conversation deja existante
+	 * @param group Le groupe a redemarrer
+	 * @throws IOException
+	 * @see SocketWriter SocketReader
+	 */
 	private void restartGroup(Group group) throws IOException {
 		
+		// On passe le groupe est mode actif
 		group.setStarter(user);
 		group.setOnline(true);
 		
@@ -444,6 +470,7 @@ public class Controller {
 		else
 			contact = members.get(0);
 		
+		// On recree un socket client : l'utilisateur se reconnecte a l'utilisateur distant
 		Socket socket = new Socket(contact.getIP(), contact.getPort());
 		
 		SocketWriter socketWriter = new SocketWriter("restartclientSocketWriter",socket, this, group);
@@ -453,9 +480,9 @@ public class Controller {
 	}
 
 	/**
-	 * Retourne la liste des messages d'un groupe donné
-	 * @param group Le groupe dont les messages sont recherchés
-	 * @return La liste des message du groupe indiqué
+	 * Retourne la liste des messages d'un groupe donne
+	 * @param group Le groupe dont les messages sont recherches
+	 * @return La liste des message du groupe indique
 	 */
 	public ArrayList<Message> getGroupMessages(Group group){
 		
@@ -469,6 +496,7 @@ public class Controller {
 		return groupMessages;
 	}
 	
+	// TODO
 	public void editUser(String username, String password) {
 		// TODO Check si username pas pris
 		// TODO Gestion erreur
@@ -477,24 +505,29 @@ public class Controller {
 	}
 	
 	/**
-	 * R�cup�re toutes les adresses IP de la machine et les adresses de broadcast associ�es
-	 * @return Map<InetAddress, InetAddress> 
+	 * Recupere toutes les adresses IP de la machine et les adresses de broadcast associees
+	 * @return Map<InetAddress, InetAddress> Une table contenant les associations @IP <> @broadcast de la machine
 	 * @throws SocketException
 	 */
 	public static Map<InetAddress, InetAddress> getAllIpAndBroadcast() throws SocketException {
+		
 		Map<InetAddress, InetAddress> listIP = new HashMap<>();
-	    Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-	    while (interfaces.hasMoreElements()) {
-	        NetworkInterface networkInterface = interfaces.nextElement();	 
-	        if (networkInterface.isLoopback() || !networkInterface.isUp()) {
-	            continue;
-	        }	       
-	        
-	        for (InterfaceAddress a : networkInterface.getInterfaceAddresses()) {
-	        	if (a.getAddress() instanceof Inet4Address)
-	        		listIP.put(a.getAddress(), a.getBroadcast());
-	        }
-	    }
-	    return listIP;
+		Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+		
+		while (interfaces.hasMoreElements()) {
+		
+			NetworkInterface networkInterface = interfaces.nextElement();
+			if (networkInterface.isLoopback() || !networkInterface.isUp())
+				continue;
+
+			for (InterfaceAddress a : networkInterface.getInterfaceAddresses()) {
+				if (a.getAddress() instanceof Inet4Address)
+					listIP.put(a.getAddress(), a.getBroadcast());
+			}
+			
+		}
+		
+		return listIP;
 	}
+	
 }

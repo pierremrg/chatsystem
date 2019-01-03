@@ -10,27 +10,35 @@ import java.io.StreamCorruptedException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.InterfaceAddress;
-import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.util.List;
 
 public class Udp extends Thread {
 	private Controller controller;
 	private DatagramSocket socket;
 	
+	// Header des paquets UDP utilises par l'application
+	// Permet de ne pas traiter les paquets d'une autre application
 	private static final int IDENT_UDP = 5289803;
-	private static final int PORT = 5003;
+	
+	// Port utilise par notre service UDP
+	private static final int PORT = 5003; // TODO : autre ?
+	
+	// Constantes de statut de connexion
+	private static final int NO_STATUS = -1;
+	private static final int STATUS_DECONNEXION = 0;
+	private static final int STATUS_CONNEXION = 1;
+	private static final int STATUS_CONNEXION_RESPONSE = 2;
 	
 	/**
-	 * Creer un Udp
-	 * @param controller associ� � l'UDP
+	 * Creer un service UDP (thread)
+	 * @param controller Controller associe a l'UDP
 	 */
 	public Udp(Controller controller) {
+		
 		super("UDP");
 		this.controller = controller;
 		
+		// TODO : gerer erreurs ensemble + lier au controller + GUI
 		try {
 			this.socket = new DatagramSocket(PORT);
 		} catch (SocketException e) {
@@ -45,27 +53,39 @@ public class Udp extends Thread {
 		}
 	}
 	
+	/**
+	 * Cree un message UDP
+	 * @param status Information envoyee par le message (connexion, deconnexion, etc.)
+	 * @param user L'utilisateur qui envoie ce message
+	 * @return Le message UDP sous forme de bytes
+	 * @throws IOException
+	 */
 	public byte[] createMessage(int status, User user) throws IOException {
+		
 		ByteArrayOutputStream bStream = new ByteArrayOutputStream();
 		ObjectOutput oo = new ObjectOutputStream(bStream);
+		
 		oo.writeInt(IDENT_UDP);
 		oo.writeInt(status);
 		oo.writeObject(user);
 		oo.close();
+		
 		return bStream.toByteArray();
 	}
 	
 	/**
-	 * Envoie d'un message UDP
-	 * @param message � envoyer
-	 * @param ip o� envoyer le message
+	 * Envoie un message UDP
+	 * @param message Message a envoyer
+	 * @param ipAdresse Adresse IP a laquelle envoyer le message
 	 */
 	public void sendUdpMessage(byte[] message, InetAddress ipAddress) {
+		
 		DatagramPacket out = new DatagramPacket(message, message.length, ipAddress, PORT);
 		
+		// TODO : gerer erreur controller + GUI
 		try {
 			socket.send(out);
-			System.out.println("message UDP envoye : " + message + " a " + ipAddress.toString());
+			System.out.println("message UDP envoye : " + message + " a " + ipAddress.toString()); // TODO : a supprimer
 		} catch (IOException e) {
 			System.out.println("Erreur socketsend udp");
 			e.printStackTrace();
@@ -73,50 +93,68 @@ public class Udp extends Thread {
 	}
 	
 	/**
-	 * Thread qui �coute en UDP et qui traite les messages suivant le contenu
+	 * Thread qui ecoute en UDP et qui traite les messages suivant le contenu
 	 */
 	public void run() {
+		
 		byte[] buffer = new byte[1024];
 		DatagramPacket in = new DatagramPacket(buffer, buffer.length);
-		int statutConnexion = -1;
+		
+		int statutConnexion = NO_STATUS;
 		User receivedUser = null;
 		int identUdp = -1;
 		
 		while(true) {
+			
+			// TODO fusionner les erreurs + les gerer dans le controller + GUI
 			try {
 				socket.receive(in);
 			} catch (IOException e) {
 				System.out.println("Erreur socket");
 				e.printStackTrace();
 			}
+			
+			// Reception des donnees
 			byte[] receivedMessage = in.getData();
 			ObjectInputStream iStream;
+			
 			try {
+				
 				iStream = new ObjectInputStream(new ByteArrayInputStream(receivedMessage));
 				identUdp = (int) iStream.readInt();
 				
+				// On verifie qu'on doit traiter le paquet
 				if(identUdp == IDENT_UDP) {
+					
 					statutConnexion = (int) iStream.readInt();
 					receivedUser = (User) iStream.readObject();
 					iStream.close();
 					
-					
-					if(statutConnexion == 0) {
+					// Traitement du message recu
+					if(statutConnexion == STATUS_DECONNEXION) {
 						controller.receiveDeconnection(receivedUser);
 					}
-					else if(statutConnexion == 1) {
+					
+					else if(statutConnexion == STATUS_CONNEXION) {
+					
 						try {
+							
+							// TODO on peut pas supprimer ce if ? Vu qu'on teste l'header du paquet UDP
 							if (!controller.getUser().getIP().equals(in.getAddress())) {
-			 					controller.receiveConnection(receivedUser);						
-								sendUdpMessage(createMessage(2, controller.getUser()), in.getAddress());
+			 				
+								controller.receiveConnection(receivedUser);						
+								sendUdpMessage(createMessage(STATUS_CONNEXION_RESPONSE, controller.getUser()), in.getAddress());
+							
 							}
+							
 						} catch (SocketException e) {
 							e.printStackTrace();
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-					} else if(statutConnexion == 2) {
+						
+					} else if(statutConnexion == STATUS_CONNEXION_RESPONSE) {
 						controller.receiveConnection(receivedUser);
 					}
 				}

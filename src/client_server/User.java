@@ -3,6 +3,10 @@ package client_server;
 import java.io.Serializable;
 import java.net.InetAddress;
 
+/**
+ * Represente un utilisateur de l'application
+ *
+ */
 public class User implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
@@ -13,23 +17,15 @@ public class User implements Serializable{
 	private int port;
 	
 	/**
-	 * Crée un utilisateur
+	 * Cree un utilisateur
 	 * @param id ID de l'utilisateur
 	 * @param username Le username de l'utilisateur
-	 * @param password Le password de l'utilisateur
+	 * @param ip L'adresse IP de l'utilisateur
 	 */
-	public User(int id, String username) {
+	public User(int id, String username, InetAddress ip) {
 		this.id = id;
 		this.username = username;
-	}
-
-	/**
-	 * Crée un utilisateur
-	 * @param username Le username de l'utilisateur
-	 * @param password Le password de l'utilisateur
-	 */
-	public User(String username) {
-		this.username = username;
+		this.ip = ip;
 	}
 	
 	/**
@@ -63,14 +59,6 @@ public class User implements Serializable{
 	public InetAddress getIP() {
 		return ip;
 	}
-	
-	/**
-	 * Modifie l'IP de l'utilisateur
-	 * @param ip l'IP de l'utilisateur
-	 */
-	public void setIP(InetAddress ip) {
-		this.ip = ip;
-	}
 
 	/**
 	 * Retourne le port de l'utilisateur
@@ -81,8 +69,8 @@ public class User implements Serializable{
 	}
 	
 	/**
-	 * Modifie le port associé à l'utilisateur
-	 * @param port Port associé à l'utilisateur
+	 * Modifie le port associe a�l'utilisateur
+	 * @param port Port associe a l'utilisateur
 	 */
 	public void setPort(int port) {
 		this.port = port;
