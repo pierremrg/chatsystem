@@ -16,6 +16,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ import java.util.Map;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -48,7 +50,8 @@ public class GUI extends JFrame{
 	private JPanel panel; // Panel principal
 	private JButton sendButton; // Bouton Envoyer 
 	private JTextField textField; // Zone de texte
-	private JTextArea messagesArea; // Zone des messages
+	//private JTextArea messagesArea; // Zone des messages
+	private JEditorPane messagesArea;
 	private JScrollPane scrollMessageArea;
 	private static JList<String> groupList; // Liste des groupes déjà démarrés
 	private JList<String> connectedUsersList; // Liste des utilisateurs connectés
@@ -100,7 +103,11 @@ public class GUI extends JFrame{
 		
 		
 		/* Zone des messages */
-		messagesArea = new JTextArea();
+		//messagesArea = new JTextArea();
+		messagesArea = new JEditorPane();
+		messagesArea.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+		messagesArea.setFont(textField.getFont());
+		messagesArea.setContentType("text/html");
 		messagesArea.setEditable(false);
 		
 		scrollMessageArea = new JScrollPane(messagesArea);
@@ -437,7 +444,7 @@ public class GUI extends JFrame{
 		
 		if(selectedIndex >= 0) {
 			groupList.setSelectedIndex(selectedIndex);
-			displayMessages(updatedGroup);
+			//displayMessages(updatedGroup);
 		}
 			
 		
@@ -480,8 +487,27 @@ public class GUI extends JFrame{
 			String history = "";
 			
 			
-			for(Message m : groupMessages)
-				history += m.getContent() + "\n";
+			for(Message m : groupMessages) {
+				String username, date, content = "";
+				
+				// Message envoye par moi
+				if(m.getSender().equals(controller.getUser())) {
+					username = "Moi";
+					content = "<span style=\"color:blue;\">" + content + "</span>";
+				}
+					
+				// Message envoye par l'autre utilisateur
+				else
+					username = m.getSender().getUsername();
+				
+				// Date
+				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+				date = dateFormat.format(m.getDate());
+				date = "<span style=\"font-size:0.8em;\">(" + date + ")</span>";
+				
+				history += date + " <strong>" + username + "</strong> : " + m.getContent() + "<br/>";
+			}
+				
 				
 			
 			if(history.equals(null))
