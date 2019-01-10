@@ -2,6 +2,7 @@ package client_server;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
@@ -160,6 +161,8 @@ public class Udp extends Thread {
 				}
 				
 			} catch (StreamCorruptedException e) {
+				// Message pas pour nous
+			} catch (EOFException e) {
 				// Message pas pour nous
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block

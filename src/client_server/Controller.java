@@ -165,7 +165,7 @@ public class Controller {
 	
 	/**
 	 * Permet d'envoyer un message
-	 * @param textToSend Le contenu du message à envoyer
+	 * @param textToSend Le contenu du message ï¿½ envoyer
 	 * @param receiverGroupNameForUser Le groupe a qui envoyer le message
 	 * 		Le nom de groupe est different selon l'utilisateur
 	 * @param function La fonction du message
@@ -251,12 +251,13 @@ public class Controller {
 			groupToUpdate.setOnline(true);
 		}
 		
-		// TODO affichage a faire correctement
-		System.out.println(message.getContent());
-		gui.updateMessages(group);
-		
 		// Enregistrement du message recu
 		messages.add(message);
+		
+		// TODO affichage a faire correctement
+		System.out.println(message.getContent());
+		gui.setGroupNoRead(group);
+		
 	}
 	
 	/**
@@ -313,7 +314,7 @@ public class Controller {
 
 		// Les verifications sur les identifiants de l'utilisateur sont faites avant
 
-		// Création de l'utilisateur associe au controller
+		// Crï¿½ation de l'utilisateur associe au controller
 		user = new User(id, username, ip);
 		
 		// On associe un port random a ce nouvel utilisateur
@@ -365,7 +366,7 @@ public class Controller {
 		// TODO Affichage dans le GUI
 		System.out.println("connexion reÃ§u! iduser=" +receivedUser.getID());
 
-		// On verifie qu'on ne reçoit pas sa propre annonce et qu'on ne connaît pas deja l'utilisateur
+		// On verifie qu'on ne reï¿½oit pas sa propre annonce et qu'on ne connaï¿½t pas deja l'utilisateur
 		if(!connectedUsers.contains(receivedUser) && receivedUser.equals(user))
 			connectedUsers.add(receivedUser);
 		

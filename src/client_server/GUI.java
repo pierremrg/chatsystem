@@ -17,6 +17,8 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.DefaultListModel;
@@ -29,7 +31,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
-import javax.swing.ListModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
@@ -42,6 +43,7 @@ import javax.swing.event.ListSelectionListener;
 public class GUI extends JFrame{
 	
 	private static Controller controller;
+	private Map<Integer, Boolean> newMessageGroups = new HashMap<Integer, Boolean>();
 	
 	private JPanel panel; // Panel principal
 	private JButton sendButton; // Bouton Envoyer 
@@ -53,7 +55,7 @@ public class GUI extends JFrame{
 	private JLabel labelGroups; // Label "Conversations démarrées"
 	private JLabel labelConnectedUsers; // Label "Utilisateurs connectés"
 	
-	private static final String NEW_MESSAGE_INDICATOR = "• ";
+	private static final String NEW_MESSAGE_INDICATOR = "- ";
 	
 	
 	public GUI() {
@@ -120,16 +122,21 @@ public class GUI extends JFrame{
 		
 		// TODO a supprimer
 		/*usernames.addElement("jean");
-		usernames.addElement("truc");*/
-		/*DefaultListModel<String> groupnames = new DefaultListModel<String>();
-		ArrayList<Group> startedGroups = controller.getGroups();*/
+		usernames.addElement("truc");
+		DefaultListModel<String> groupnames = new DefaultListModel<String>();
+		ArrayList<Group> startedGroups = controller.getGroups();
 		//ArrayList<Group> startedGroups = new ArrayList<Group>();
 		
 		// TODO vide au début ?
-		/*for(Group g : startedGroups)
+		for(Group g : startedGroups)
 			groupnames.addElement(g.getGroupNameForUser(controller.getUser()));*/
 		
+		DefaultListModel<String> groupnames = new DefaultListModel<String>();
+		groupnames.addElement("jean");
+		groupnames.addElement("truc");
+		
 		groupList = new JList<String>();
+		groupList.setModel(groupnames);
 		//groupList.setBorder(BorderFactory.createRaisedBevelBorder());
 		groupList.setPreferredSize(new Dimension(40,0));
 		groupList.addListSelectionListener(new groupListSelectionChange());
@@ -209,7 +216,13 @@ public class GUI extends JFrame{
 	        //if (index % 2 == 0) setBackground(Color.RED);
 	        //else setBackground(Color.BLUE);
 	        
-	        if(list.getModel().getElementAt(index).toString().startsWith(NEW_MESSAGE_INDICATOR))
+	        //if(list.getModel().getElementAt(index).toString().startsWith(NEW_MESSAGE_INDICATOR))
+	        String groupName = list.getModel().getElementAt(index).toString();
+	        Group selectedGroup = controller.getGroupByName(groupName);
+	        
+	        if(selectedGroup != null &&
+	        	newMessageGroups.containsKey(selectedGroup.getID()) && newMessageGroups.get(selectedGroup.getID()))
+	        	
 	        	setFont(getFont().deriveFont(Font.BOLD));
 	        else
 	        	setFont(getFont().deriveFont(Font.PLAIN));
@@ -232,7 +245,14 @@ public class GUI extends JFrame{
 		
 		public void actionPerformed(ActionEvent e) {
 			
-			String textToSend = textField.getText();
+			ArrayList<User> members0 = new ArrayList<User>();
+			members0.add(new User(5, "truc", null));
+			
+			Group group0 = new Group(0, members0, members0.get(0));
+			
+			controller.receiveMessage(new Message(new Date(), "coucou", members0.get(0), group0, Message.FUNCTION_NORMAL));
+			
+			/*String textToSend = textField.getText();
 			
 			String history = messagesArea.getText();
 			String newText = "Moi >> " + textToSend;
@@ -246,7 +266,7 @@ public class GUI extends JFrame{
 			
 			/* Envoi du message */
 			// TODO
-			try {
+			/*try {
 				// TODO on crée le groupe ici ou on garde que l'ID ? que le nom ?
 				String groupName = getRealGroupName(connectedUsersList.getSelectedValue());
 
@@ -255,7 +275,7 @@ public class GUI extends JFrame{
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}
+			}*/
 
 		}
 		
@@ -293,53 +313,72 @@ public class GUI extends JFrame{
 
 		public void valueChanged(ListSelectionEvent e) {
 			
-			if(refreshNumber < 2 && !e.getValueIsAdjusting()) {
-				refreshNumber++;
-			
+			if(!e.getValueIsAdjusting()) {
+				
 				// Mise à jour des noms des groupes
-				String selectedGroupName = getRealGroupName(groupList.getSelectedValue());
+				Group selectedGroup = controller.getGroupByName(groupList.getSelectedValue());
 				
-				DefaultListModel<String> groupNames = new DefaultListModel<String>();
+				displayMessages(selectedGroup);
 				
-				for(int i=0; i<groupList.getModel().getSize(); i++) {
-					if(!getRealGroupName(groupList.getModel().getElementAt(i)).equals(selectedGroupName))
-						groupNames.addElement(groupList.getModel().getElementAt(i));
-					else
-						groupNames.addElement(selectedGroupName);
-				}
-				
-				int selectedIndex = groupList.getSelectedIndex();
-				groupList.setModel(groupNames);
-				groupList.setSelectedIndex(selectedIndex);
-				
-				
-				
-				Group selectedGroup = controller.getGroupByName(getRealGroupName(selectedGroupName));
-				
-				if(selectedGroup != null) {
-					ArrayList<Message> groupMessages = controller.getGroupMessages(selectedGroup);
-					
-					String history = "";
-					
-					
-					for(Message m : groupMessages)
-						history += m.getContent() + "\n";
-						
-					
-					if(history.equals(null))
-						messagesArea.setText(null);
-					else
-						messagesArea.setText(history);
-				
-				}
-				else {
-					// TODO erreur
-					//System.out.println("Erreur groupe inexistant");
-				}
+				if(selectedGroup != null)
+					newMessageGroups.put(selectedGroup.getID(), false);
 				
 			}
-			else
-				refreshNumber = 0;
+			
+//			if(refreshNumber < 2 && !e.getValueIsAdjusting()) {
+//				//System.out.println("Group changed " + refreshNumber);
+//				refreshNumber++;
+//			
+//				// Mise à jour des noms des groupes
+//				String selectedGroupName = getRealGroupName(groupList.getSelectedValue());
+//				
+//				DefaultListModel<String> groupNames = new DefaultListModel<String>();
+//				
+//				for(int i=0; i<groupList.getModel().getSize(); i++) {
+//					
+//					String realGroupName = getRealGroupName(groupList.getModel().getElementAt(i));
+//					groupNames.addElement(realGroupName);
+//					
+//					/*if(!realGroupName.equals(selectedGroupName))
+//						groupNames.addElement(realGroupName);
+//					else
+//						groupNames.addElement(selectedGroupName);*/
+//				}
+//				
+//				int selectedIndex = groupList.getSelectedIndex();
+//				groupList.setModel(groupNames);
+//				groupList.setSelectedIndex(selectedIndex);
+//				
+//				
+//				
+//				Group selectedGroup = controller.getGroupByName(getRealGroupName(selectedGroupName));
+//				
+//				displayMessages(selectedGroup);
+//				
+//				/*if(selectedGroup != null) {
+//					ArrayList<Message> groupMessages = controller.getGroupMessages(selectedGroup);
+//					
+//					String history = "";
+//					
+//					
+//					for(Message m : groupMessages)
+//						history += m.getContent() + "\n";
+//						
+//					
+//					if(history.equals(null))
+//						messagesArea.setText(null);
+//					else
+//						messagesArea.setText(history);
+//				
+//				}
+//				else {
+//					// TODO erreur
+//					//System.out.println("Erreur groupe inexistant");
+//				}*/
+//				
+//			}
+//			else
+//				refreshNumber = 0;
 
 			
 		}
@@ -355,7 +394,9 @@ public class GUI extends JFrame{
 		
 	}
 	
-	
+	/**
+	 * Met a jour la liste des utilisateurs connectes (GUI)
+	 */
 	public void updateConnectedUsers() {
 		DefaultListModel<String> usernames = new DefaultListModel<String>();
 		ArrayList<User> connectedUsers;
@@ -370,23 +411,68 @@ public class GUI extends JFrame{
 		connectedUsersList.setModel(usernames);
 	}
 	
-	
-	public void updateMessages(Group updatedGroup) {
+	/**
+	 * Met a jour les noms de la liste des groupes (GUI)
+	 * @param updatedGroup Le groupe recevant un nouveau message (null si c'est un clic de l'utilisateur)
+	 */
+	public void setGroupNoRead(Group updatedGroup) {
 		
-		String updatedGroupName = updatedGroup.getGroupNameForUser(controller.getUser());
+		//if(!existReadGroup(updatedGroup))
+		newMessageGroups.put(updatedGroup.getID(), true);
 		
 		DefaultListModel<String> groupNames = new DefaultListModel<String>();
-		groupNames.addElement(NEW_MESSAGE_INDICATOR + updatedGroupName);
+		
+		String selectedGroupName = groupList.getSelectedValue();
+		int selectedIndex = -1;
 		
 		for(int i=0; i<groupList.getModel().getSize(); i++) {
-			if(!getRealGroupName(groupList.getModel().getElementAt(i)).equals(updatedGroupName))
-				groupNames.addElement(groupList.getModel().getElementAt(i));
+			String groupName = groupList.getModel().getElementAt(i);
+			groupNames.addElement(groupName);
+			
+			if(groupName.equals(selectedGroupName))
+				selectedIndex = i;
 		}
 		
 		groupList.setModel(groupNames);
 		
+		if(selectedIndex >= 0) {
+			groupList.setSelectedIndex(selectedIndex);
+			displayMessages(updatedGroup);
+		}
+			
 		
-		Group selectedGroup = controller.getGroupByName(getRealGroupName(updatedGroupName));
+		
+		
+		
+		// Nom du groupe dans la liste (pour cet utilisateur)
+		/*String updatedGroupName = updatedGroup.getGroupNameForUser(controller.getUser());
+		
+		
+		String selectedGroupName = groupList.getSelectedValue();
+		int selectedIndex = 0;
+		
+		// Liste des groupes a afficher
+		DefaultListModel<String> groupNames = new DefaultListModel<String>();
+		
+		// On met en evidence le groupe avec le nouveau message (indicateur + 1ere place)
+		groupNames.addElement(NEW_MESSAGE_INDICATOR + updatedGroupName);
+		
+		for(int i=0; i<groupList.getModel().getSize(); i++) {
+			String realGroupName = getRealGroupName(groupList.getModel().getElementAt(i));
+			
+			if(!realGroupName.equals(updatedGroupName))
+				groupNames.addElement(realGroupName);
+			
+			if(realGroupName.equals(selectedGroupName))
+				selectedIndex = i;
+		}
+		
+		groupList.setModel(groupNames);*/
+		//groupList.setSelectedIndex(selectedIndex);
+		
+	}
+	
+	private void displayMessages(Group selectedGroup) {
 		
 		if(selectedGroup != null) {
 			ArrayList<Message> groupMessages = controller.getGroupMessages(selectedGroup);
@@ -406,17 +492,18 @@ public class GUI extends JFrame{
 		}
 		else {
 			// TODO erreur
-			System.out.println("Erreur groupe inexistant");
+			messagesArea.setText(null);
+			//System.out.println("Erreur groupe inexistant");
 		}
 		
 	}
 	
-	private static String getRealGroupName(String groupName) {
-		if(groupName != null && groupName.startsWith(NEW_MESSAGE_INDICATOR))
-			return groupName.substring(2);
-		else
-			return groupName;
-	}
+//	private static String getRealGroupName(String groupName) {
+//		if(groupName != null && groupName.startsWith(NEW_MESSAGE_INDICATOR))
+//			return groupName.substring(NEW_MESSAGE_INDICATOR.length());
+//		else
+//			return groupName;
+//	}
 
 
 	public static void main(String[] args) throws SocketException, ClassNotFoundException, SQLException, UnknownHostException {	
