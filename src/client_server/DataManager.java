@@ -8,7 +8,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -151,8 +154,9 @@ public class DataManager {
 	 * @param username Username de l'utilisateur
 	 * @param password Password de l'utilisateur
 	 * @throws IOException
+	 * @throws NoSuchAlgorithmException 
 	 */
-	public static void createUser(String username, char[] password) throws IOException {
+	public static void createUser(String username, char[] password) throws IOException, NoSuchAlgorithmException {
 		
 		// TODO Gestion erreur
 		
@@ -171,8 +175,15 @@ public class DataManager {
 		
 		out.writeInt(id);
 		out.writeObject(username);
-		// TODO : Chiffrer le mot de passe
-		out.writeObject(password);
+		
+		// Chiffrement du mot de passe avec MD5
+		byte[] passwordBytes = new byte[password.length];
+		for (int i = 0; i < passwordBytes.length; i++)
+			passwordBytes[i] = (byte) password[i];
+		
+		MessageDigest md = MessageDigest.getInstance("MD5");
+		byte[] passwordHashed = md.digest(passwordBytes);
+		out.writeObject(passwordHashed);
 		
 		out.close();
 		file.close();
@@ -185,8 +196,9 @@ public class DataManager {
 	 * @return L'ID de l'utilisateur si les donnees sont correctes, -1 sinon
 	 * @throws IOException
 	 * @throws ClassNotFoundException
+	 * @throws NoSuchAlgorithmException 
 	 */
-	public static int checkUser(String username, char[] password) throws IOException, ClassNotFoundException {
+	public static int checkUser(String username, char[] passwordEnter) throws IOException, ClassNotFoundException, NoSuchAlgorithmException {
 
 		File groupsFile = new File(PATH_USER);
 
@@ -197,9 +209,16 @@ public class DataManager {
 
 			int id = (int) in.readInt();
 			String usernameFile = (String) in.readObject();
-			char[] passwordFile = (char[]) in.readObject();
+			byte[] passwordFileHashed = (byte[]) in.readObject();
+			
+			byte[] passwordEnterBytes = new byte[passwordEnter.length];
+			for (int i = 0; i < passwordEnterBytes.length; i++)
+				passwordEnterBytes[i] = (byte) passwordEnter[i];
+			
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			byte[] passwordEnterHashed = md.digest(passwordEnterBytes);
 
-			if (usernameFile.equals(username) && charArrayEquals(passwordFile, password)) {
+			if (usernameFile.equals(username) && Arrays.equals(passwordFileHashed, passwordEnterHashed)) {
 				in.close();
 				return id;
 			}
@@ -209,27 +228,4 @@ public class DataManager {
 		
 		return -1;
 	}
-	
-	/**
-	 * Permet de voir si deux tableaux de caracteres sont egaux
-	 * @param char1 Tableau 1
-	 * @param char2 Tableau 2
-	 * @return True si egaux, False sinon
-	 */
-	// TODO Ailleurs ? Override charArray ?
-	public static boolean charArrayEquals(char[] char1, char[] char2) {
-		if (char1.length != char2.length)
-			return false;
-		
-		else {
-			
-			for(int i = 0; i < char1.length; i++) {
-				if (char1[i] != char2[i])
-					return false;
-			}
-			
-		}
-		
-		return true;
-	}		
 }

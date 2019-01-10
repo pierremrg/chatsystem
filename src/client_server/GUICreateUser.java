@@ -11,6 +11,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -19,6 +21,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+
+import client_server.GUIConnect.ConnectListener;
 
 /**
  * Fenetre de creation de l'utilisateur
@@ -72,16 +76,19 @@ public class GUICreateUser extends JFrame {
 
 		usernameField = new JTextField();
 		usernameField.addKeyListener(new KeyAdapter());
+		usernameField.addActionListener(new CreateUserListener(this.guiConnect));
 		c.weightx = 0.9;
 		c.gridx = 1;
 		c.gridy = 0;
 		createUserPanel.add(usernameField, c);
 
 		passwordField = new JPasswordField();
+		passwordField.addActionListener(new CreateUserListener(this.guiConnect));
 		c.gridy = 1;
 		createUserPanel.add(passwordField, c);
 
 		confirmPasswordField = new JPasswordField();
+		confirmPasswordField.addActionListener(new CreateUserListener(this.guiConnect));
 		c.gridy = 2;
 		createUserPanel.add(confirmPasswordField, c);
 
@@ -118,7 +125,7 @@ public class GUICreateUser extends JFrame {
 			char[] confirmPassword = confirmPasswordField.getPassword();
 
 			if (password.length != 0 && username.length() != 0 && confirmPassword.length != 0) {
-				if (DataManager.charArrayEquals(password, confirmPassword)) {
+				if (Arrays.equals(password, confirmPassword)) {
 					try {
 						DataManager.createUser(username, password);
 						setVisible(false);
@@ -126,14 +133,19 @@ public class GUICreateUser extends JFrame {
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
+					} catch (NoSuchAlgorithmException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
 					}
 				} else {
 					// TODO Gerer les erreurs ailleurs ?
+					setAlwaysOnTop(false);
 					JOptionPane.showMessageDialog(null, "Mot de passe incorrect", "Erreur", JOptionPane.ERROR_MESSAGE);
 					passwordField.setText("");
 					confirmPasswordField.setText("");
 				}
 			} else {
+				setAlwaysOnTop(false);
 				JOptionPane.showMessageDialog(null, "Champs vides", "Erreur", JOptionPane.ERROR_MESSAGE);
 			}
 		}
