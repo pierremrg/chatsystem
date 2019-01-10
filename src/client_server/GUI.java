@@ -141,9 +141,9 @@ public class GUI extends JFrame{
 			groupnames.addElement(g.getGroupNameForUser(controller.getUser()));*/
 		
 		DefaultListModel<String> groupnames = new DefaultListModel<String>();
-		groupnames.addElement("jean");
+		/*groupnames.addElement("jean");
 		groupnames.addElement("truc");
-		groupnames.addElement("titi");
+		groupnames.addElement("titi");*/
 		
 		groupList = new JList<String>();
 		groupList.setModel(groupnames);
@@ -178,8 +178,8 @@ public class GUI extends JFrame{
 		//ArrayList<User> connectedUsers = controller.getConnectedUsers();
 		//ArrayList<User> connectedUsers = new ArrayList<User>();
 		
-		usernames.addElement("jean");
-		usernames.addElement("truc");
+		/*usernames.addElement("jean");
+		usernames.addElement("truc");*/
 		
 		// TODO vide au début ?
 		/*for(User u : connectedUsers)
@@ -258,16 +258,16 @@ public class GUI extends JFrame{
 		
 		public void actionPerformed(ActionEvent e) {
 			
-			ArrayList<User> members0 = new ArrayList<User>();
+			/*ArrayList<User> members0 = new ArrayList<User>();
 			members0.add(new User(5, "truc", null));
 			
 			Group group0 = new Group(0, members0, members0.get(0));
 			
-			controller.receiveMessage(new Message(new Date(), "coucou", members0.get(0), group0, Message.FUNCTION_NORMAL));
+			controller.receiveMessage(new Message(new Date(), "coucou", members0.get(0), group0, Message.FUNCTION_NORMAL));*/
 			
-			/*String textToSend = textField.getText();
+			String textToSend = textField.getText();
 			
-			String history = messagesArea.getText();
+			/*String history = messagesArea.getText();
 			String newText = "Moi >> " + textToSend;
 			
 			if(history.equals(""))
@@ -275,20 +275,22 @@ public class GUI extends JFrame{
 			else
 				messagesArea.setText(history + "\n" + newText);
 			
-			textField.setText(null);
+			textField.setText(null);*/
 			
 			/* Envoi du message */
 			// TODO
-			/*try {
+			try {
 				// TODO on crée le groupe ici ou on garde que l'ID ? que le nom ?
-				String groupName = getRealGroupName(connectedUsersList.getSelectedValue());
+				String groupName = connectedUsersList.getSelectedValue();
 
 				controller.sendMessage(textToSend, groupName, Message.FUNCTION_NORMAL);
+				
+				displayMessages(controller.getGroupByName(groupName));
 			
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}*/
+			}
 
 		}
 		
