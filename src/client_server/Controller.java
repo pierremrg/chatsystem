@@ -283,6 +283,7 @@ public class Controller {
 	 */
 	public Group getGroupByName(String groupName) {
 		for(Group g : groups) {
+			
 			if(g.getGroupNameForUser(user).equals(groupName))
 				return g;
 		}

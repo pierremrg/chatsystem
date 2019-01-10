@@ -80,7 +80,7 @@ public class GUI extends JFrame{
 		/* Bouton Envoyer */
 		sendButton = new JButton("Envoyer");
 		sendButton.addActionListener(new sendMessageListener());
-		sendButton.setEnabled(false);
+		//sendButton.setEnabled(false);
 		c.fill = GridBagConstraints.BOTH;
 		c.weightx = 0.2;
 		c.gridx = 3;
@@ -141,9 +141,9 @@ public class GUI extends JFrame{
 			groupnames.addElement(g.getGroupNameForUser(controller.getUser()));*/
 		
 		DefaultListModel<String> groupnames = new DefaultListModel<String>();
-		/*groupnames.addElement("jean");
+		groupnames.addElement("jean");
 		groupnames.addElement("truc");
-		groupnames.addElement("titi");*/
+		groupnames.addElement("titi");
 		
 		groupList = new JList<String>();
 		groupList.setModel(groupnames);
@@ -258,14 +258,14 @@ public class GUI extends JFrame{
 		
 		public void actionPerformed(ActionEvent e) {
 			
-			/*ArrayList<User> members0 = new ArrayList<User>();
+			ArrayList<User> members0 = new ArrayList<User>();
 			members0.add(new User(5, "truc", null));
 			
 			Group group0 = new Group(0, members0, members0.get(0));
 			
-			controller.receiveMessage(new Message(new Date(), "coucou", members0.get(0), group0, Message.FUNCTION_NORMAL));*/
+			controller.receiveMessage(new Message(new Date(), "coucou3", members0.get(0), group0, Message.FUNCTION_NORMAL));
 			
-			String textToSend = textField.getText();
+			/*String textToSend = textField.getText();
 			textField.setText(null);
 			
 			/*String history = messagesArea.getText();
@@ -276,9 +276,9 @@ public class GUI extends JFrame{
 			else
 				messagesArea.setText(history + "\n" + newText);
 			
-			textField.setText(null);*/
+			textField.setText(null);*
 			
-			/* Envoi du message */
+			/* Envoi du message *
 			// TODO
 			try {
 				// TODO on crée le groupe ici ou on garde que l'ID ? que le nom ?
@@ -291,7 +291,7 @@ public class GUI extends JFrame{
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}
+			}*/
 
 		}
 		
@@ -346,7 +346,7 @@ public class GUI extends JFrame{
 				if (inList == false) {
 					connectedUsersList.clearSelection();
 					textField.setEditable(false);		
-					sendButton.setEnabled(false);
+					//sendButton.setEnabled(false);
 				}
 					
 				
@@ -544,28 +544,46 @@ public class GUI extends JFrame{
 		if(selectedGroup != null) {
 			ArrayList<Message> groupMessages = controller.getGroupMessages(selectedGroup);
 			
-			String history = "";
+			String history = "<style type='text/css'>"
+					+ ".message-sent{margin:3px 5px 3px 50px;padding:0 5px 5px 5px;background:#FF8075;color:white;font-size:14pt;}"
+					+ ".message-received{margin:3px 50px 3px 5px;padding:0 5px 5px 5px;background:#eeeeee;color:black;font-size:14pt;}"
+					+ ".date-sent{font-size:11pt;color:white;}"
+					+ ".date-received{font-size:11pt;color:black;}"
+					+ ".user-sent{font-size:11pt;color:#888888;margin:3px 0 0 55px;}"
+					+ ".user-received{font-size:11pt;color:#888888;margin:3px 0 0 10px;}"
+					+ "</style>";
 			
+			// Utilise pour ne pas repeter le nom de l'utilisateur si plusieurs messages consecutifs
+			User prevSender = null;
 			
 			for(Message m : groupMessages) {
-				String username, date, content = "";
+				String username, date, content = m.getContent();
+				
+				// Format de la date
+				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+				date = dateFormat.format(m.getDate());
 				
 				// Message envoye par moi
 				if(m.getSender().equals(controller.getUser())) {
-					username = "Moi";
-					content = "<span style=\"color:blue;\">" + content + "</span>";
+					username = "<div class='user-sent'>Moi</div>";
+					date = "<span class='date-sent'>" + date + "</span>";
+					content = "<div class='message-sent'>" + date + "<br>" + content + "</div>";
 				}
-					
 				// Message envoye par l'autre utilisateur
+				else {
+					username = "<div class='user-received'>" + m.getSender().getUsername() + "</div>";
+					date = "<span class='date-received'>" + date + "</span>";
+					content = "<div class='message-received'>" + date + "<br>" + content + "</div>";
+				}
+				
+				if(m.getSender().equals(prevSender))
+					history += content;
 				else
-					username = m.getSender().getUsername();
+					history += username + content;
 				
-				// Date
-				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-				date = dateFormat.format(m.getDate());
-				date = "<span style=\"font-size:0.8em;\">(" + date + ")</span>";
+				prevSender = m.getSender();
 				
-				history += date + " <strong>" + username + "</strong> : " + m.getContent() + "<br/>";
+				//history += date + " <strong>" + username + "</strong> : " + content + "<br/>";
 			}
 				
 				
