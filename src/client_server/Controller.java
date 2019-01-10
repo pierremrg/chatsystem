@@ -243,8 +243,10 @@ public class Controller {
 		// Ajout du groupe si le groupe n'est pas connu par l'utilisateur (nouvelle conversation)
 		Group group = message.getReceiverGroup();
 		
-		if(!groupIsKnown(group))
+		if(!groupIsKnown(group)) {
 			groups.add(group);
+			gui.addGroup(group);
+		}
 		else {
 			// Si le groupe est connu, on l'indique en ligne
 			Group groupToUpdate = getGroupByID(group.getID());
@@ -257,7 +259,6 @@ public class Controller {
 		// TODO affichage a faire correctement
 		System.out.println(message.getContent());
 		gui.setGroupNoRead(group);
-		gui.addGroup(group);
 		
 	}
 	
