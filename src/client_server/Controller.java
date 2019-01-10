@@ -257,6 +257,7 @@ public class Controller {
 		// TODO affichage a faire correctement
 		System.out.println(message.getContent());
 		gui.setGroupNoRead(group);
+		gui.addGroup(group);
 		
 	}
 	
@@ -367,7 +368,7 @@ public class Controller {
 		System.out.println("connexion reçu! iduser=" +receivedUser.getID());
 
 		// On verifie qu'on ne re�oit pas sa propre annonce et qu'on ne conna�t pas deja l'utilisateur
-		if(!connectedUsers.contains(receivedUser) && receivedUser.equals(user))
+		if(!connectedUsers.contains(receivedUser) && !receivedUser.equals(user))
 			connectedUsers.add(receivedUser);
 		
 		// Mise a jour des groupes avec les nouvelles informations de l'utilisateur connecte
@@ -447,6 +448,8 @@ public class Controller {
 		SocketReader socketReader = new SocketReader("clientSocketReader", socket, this);
 		socketWriter.start();
 		socketReader.start();
+		
+		gui.addGroup(group);
 		
 		return group;
 	}

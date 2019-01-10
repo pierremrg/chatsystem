@@ -266,6 +266,7 @@ public class GUI extends JFrame{
 			controller.receiveMessage(new Message(new Date(), "coucou", members0.get(0), group0, Message.FUNCTION_NORMAL));*/
 			
 			String textToSend = textField.getText();
+			textField.setText(null);
 			
 			/*String history = messagesArea.getText();
 			String newText = "Moi >> " + textToSend;
@@ -511,6 +512,30 @@ public class GUI extends JFrame{
 		
 		groupList.setModel(groupNames);*/
 		//groupList.setSelectedIndex(selectedIndex);
+		
+	}
+	
+	public void addGroup(Group group) {
+		
+		DefaultListModel<String> groupNames = new DefaultListModel<String>();
+		
+		String selectedGroupName = groupList.getSelectedValue();
+		int selectedIndex = -1;
+		
+		for(int i=0; i<groupList.getModel().getSize(); i++) {
+			String groupName = groupList.getModel().getElementAt(i);
+			groupNames.addElement(groupName);
+			
+			if(groupName.equals(selectedGroupName))
+				selectedIndex = i;
+		}
+		
+		groupNames.addElement(group.getGroupNameForUser(controller.getUser()));
+		
+		groupList.setModel(groupNames);
+		
+		if(selectedIndex >= 0)
+			groupList.setSelectedIndex(selectedIndex);
 		
 	}
 	
