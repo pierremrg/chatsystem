@@ -77,6 +77,7 @@ public class GUI extends JFrame{
 		/* Bouton Envoyer */
 		sendButton = new JButton("Envoyer");
 		sendButton.addActionListener(new sendMessageListener());
+		sendButton.setEnabled(false);
 		c.fill = GridBagConstraints.BOTH;
 		c.weightx = 0.2;
 		c.gridx = 3;
@@ -90,6 +91,7 @@ public class GUI extends JFrame{
 		textField = new JTextField();
 		textField.addActionListener(new sendMessageListener());
 		textField.setBorder(null);
+		textField.setEditable(false);
 		c.fill = GridBagConstraints.BOTH;
 		c.weightx = 0.6;
 		c.gridx = 1;
@@ -134,6 +136,7 @@ public class GUI extends JFrame{
 		DefaultListModel<String> groupnames = new DefaultListModel<String>();
 		groupnames.addElement("jean");
 		groupnames.addElement("truc");
+		groupnames.addElement("titi");
 		
 		groupList = new JList<String>();
 		groupList.setModel(groupnames);
@@ -165,8 +168,11 @@ public class GUI extends JFrame{
 		
 		/* Liste de tous les utilisateurs connectes */
 		DefaultListModel<String> usernames = new DefaultListModel<String>();
-		ArrayList<User> connectedUsers = controller.getConnectedUsers();
+		//ArrayList<User> connectedUsers = controller.getConnectedUsers();
 		//ArrayList<User> connectedUsers = new ArrayList<User>();
+		
+		usernames.addElement("jean");
+		usernames.addElement("truc");
 		
 		// TODO vide au début ?
 		/*for(User u : connectedUsers)
@@ -318,6 +324,23 @@ public class GUI extends JFrame{
 				// Mise à jour des noms des groupes
 				Group selectedGroup = controller.getGroupByName(groupList.getSelectedValue());
 				
+				int index;
+				boolean inList = false;
+				for (index = 0; index < connectedUsersList.getModel().getSize(); index++) {
+					String username = connectedUsersList.getModel().getElementAt(index);
+					if (username.equals(groupList.getSelectedValue())) {
+						connectedUsersList.setSelectedIndex(index);
+						inList = true;
+					}
+				}
+				if (inList == false) {
+					connectedUsersList.clearSelection();
+					textField.setEditable(false);		
+					sendButton.setEnabled(false);
+				}
+					
+				
+				
 				displayMessages(selectedGroup);
 				
 				if(selectedGroup != null)
@@ -388,7 +411,17 @@ public class GUI extends JFrame{
 	public class connectedUsersListSelectionChange implements ListSelectionListener {
 
 		public void valueChanged(ListSelectionEvent e) {
-			// TODO Auto-generated method stub
+			if(!e.getValueIsAdjusting()) {				
+				int index;
+				for(index = 0; index < groupList.getModel().getSize(); index ++) {
+					String username = groupList.getModel().getElementAt(index);
+					if (username.equals(connectedUsersList.getSelectedValue())){
+						groupList.setSelectedIndex(index);
+					}
+				}
+				textField.setEditable(true);
+				sendButton.setEnabled(true);			
+			}
 			
 		}
 		
