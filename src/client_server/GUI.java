@@ -182,8 +182,8 @@ public class GUI extends JFrame{
 		//ArrayList<User> connectedUsers = controller.getConnectedUsers();
 		//ArrayList<User> connectedUsers = new ArrayList<User>();
 		
-		usernames.addElement("jean");
-		usernames.addElement("truc");
+		/*usernames.addElement("jean");
+		usernames.addElement("truc");*/
 		
 		// TODO vide au début ?
 		/*for(User u : connectedUsers)
