@@ -98,17 +98,21 @@ public class Group implements Serializable {
 	 * Permet de mettre a jour les informations sur un membre du groupe
 	 * @param newVersionMember La nouvelle version de l'utilisateur
 	 */
-	public void updateMember(User newVersionMember) {
+	public boolean updateMember(User newVersionMember) {
+		boolean hasChanged = false;
 		ArrayList<User> newMembers = new ArrayList<User>(members);
 		
 		for(User oldVersionMember : members) {
 			if(oldVersionMember.equals(newVersionMember)) {
 				newMembers.remove(oldVersionMember);
 				newMembers.add(newVersionMember);
+				hasChanged = true;
 			}
 		}
 		
 		members = newMembers;
+		
+		return hasChanged;
 	}
 	
 	/**
