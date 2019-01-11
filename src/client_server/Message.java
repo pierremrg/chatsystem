@@ -1,6 +1,7 @@
 package client_server;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -75,6 +76,17 @@ public class Message implements Serializable {
 	 */
 	public int getFunction() {
 		return function;
+	}
+	
+	/**
+	 * Permet de mettre a jour les informations sur le sender
+	 * @param newVersionSender La nouvelle version du sender
+	 */
+	public void updateSender(User newVersionSender) {
+
+		if(sender.equals(newVersionSender))
+			sender = newVersionSender;
+		
 	}
 	
 }

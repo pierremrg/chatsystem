@@ -543,10 +543,13 @@ public class Controller {
 			}
 		}
 		
-		
 		// Mise a jour des groupes avec les nouvelles informations de l'utilisateur
 		for(Group group : groups)
 			group.updateMember(receivedUser);
+		
+		// Mise a jour des messages avec les nouvelles informations de l'utilisateur
+		for(Message m : messages)
+			m.updateSender(receivedUser);
 		
 		
 		// Mise a jour du GUI
