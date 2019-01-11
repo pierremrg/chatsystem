@@ -521,6 +521,21 @@ public class GUI extends JFrame{
 		
 	}
 	
+	public void selectGroupInList(Group selectedGroup) {
+		String selectedGroupName = selectedGroup.getGroupNameForUser(controller.getUser());
+		int selectedIndex = -1;
+		
+		for(int i=0; i<groupList.getModel().getSize(); i++) {
+			String groupName = groupList.getModel().getElementAt(i);
+			
+			if(groupName.equals(selectedGroupName))
+				selectedIndex = i;
+		}
+		
+		if(selectedIndex >= 0)
+			groupList.setSelectedIndex(selectedIndex);
+	}
+	
 	public void addGroup(Group group) {
 		
 		DefaultListModel<String> groupNames = new DefaultListModel<String>();

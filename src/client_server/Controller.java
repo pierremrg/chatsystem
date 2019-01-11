@@ -335,6 +335,12 @@ public class Controller {
 		udp.start();
 		udp.sendUdpMessage(udp.createMessage(1, getUser()), ipBroadcast);
 		// TODO : constantes a utiliser
+		
+		// Ajout des groupes au GUI
+		for(Group g : groups) {
+			gui.addGroup(g);
+		}
+		
 	}
 	
 	/**
@@ -451,7 +457,9 @@ public class Controller {
 		socketWriter.start();
 		socketReader.start();
 		
+		// Mise a jour de la liste des groupes dans le GUI
 		gui.addGroup(group);
+		gui.selectGroupInList(group);
 		
 		return group;
 	}
