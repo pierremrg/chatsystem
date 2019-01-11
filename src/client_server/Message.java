@@ -86,6 +86,8 @@ public class Message implements Serializable {
 
 		if(sender.equals(newVersionSender))
 			sender = newVersionSender;
+		else
+			receiverGroup.updateMember(newVersionSender);
 		
 	}
 	
