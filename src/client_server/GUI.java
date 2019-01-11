@@ -264,19 +264,12 @@ public class GUI extends JFrame{
 		
 		public void actionPerformed(ActionEvent e) {
 			
-			try {
-				controller.editUsername("boby");
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			
-			/*ArrayList<User> members0 = new ArrayList<User>();
+			ArrayList<User> members0 = new ArrayList<User>();
 			members0.add(new User(5, "truc", null));
 			
 			Group group0 = new Group(0, members0, members0.get(0));
 			
-			controller.receiveMessage(new Message(new Date(), "coucou", members0.get(0), group0, Message.FUNCTION_NORMAL));*/
+			controller.receiveMessage(new Message(new Date(), "coucou", members0.get(0), group0, Message.FUNCTION_NORMAL));
 			
 			/*String textToSend = textField.getText();
 			textField.setText(null);
