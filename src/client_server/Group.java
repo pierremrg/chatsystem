@@ -95,7 +95,7 @@ public class Group implements Serializable {
 	}
 	
 	/**
-	 * Permet de mettre � jour les informations sur un membre du groupe
+	 * Permet de mettre a jour les informations sur un membre du groupe
 	 * @param newVersionMember La nouvelle version de l'utilisateur
 	 */
 	public void updateMember(User newVersionMember) {

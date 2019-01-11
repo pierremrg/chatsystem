@@ -333,7 +333,7 @@ public class Controller {
 
 		// Demarrage du service UDP et envoi du message de presence
 		udp.start();
-		udp.sendUdpMessage(udp.createMessage(1, getUser()), ipBroadcast);
+		udp.sendUdpMessage(udp.createMessage(Udp.STATUS_CONNEXION, getUser()), ipBroadcast);
 		// TODO : constantes a utiliser
 		
 		// Ajout des groupes au GUI
@@ -359,7 +359,7 @@ public class Controller {
 
 		// TODO Gestion de l'erreur
 		// TODO Constantes a utiliser
-		udp.sendUdpMessage(udp.createMessage(0, getUser()), ipBroadcast);
+		udp.sendUdpMessage(udp.createMessage(Udp.STATUS_DECONNEXION, getUser()), ipBroadcast);
 
 	}
 
@@ -511,11 +511,48 @@ public class Controller {
 	}
 	
 	// TODO
-	public void editUser(String username, String password) {
+	public void editUsername(String newUsername) throws IOException {
 		// TODO Check si username pas pris
 		// TODO Gestion erreur
 		// TODO Update user BDD
 		//TODO update user controller
+		
+		user.setUsername(newUsername);
+		
+		udp.sendUdpMessage(udp.createMessage(Udp.STATUS_USERNAME_CHANGED, user), ipBroadcast);
+		
+	}
+	
+	public void editPassword(String oldPassword, String newPassword) {
+		
+		
+		
+	}
+	
+	public void receiveUsernameChanged(User receivedUser) {
+		
+		String oldUsername = "";
+
+		// Mise a jour de l'utilisateur concerne
+		for(User u : connectedUsers) {
+			if(u.equals(receivedUser)) {
+				oldUsername = u.getUsername();
+				connectedUsers.remove(u);
+				connectedUsers.add(u);
+				break;
+			}
+		}
+		
+		
+		// Mise a jour des groupes avec les nouvelles informations de l'utilisateur
+		for(Group group : groups)
+			group.updateMember(receivedUser);
+		
+		
+		// Mise a jour du GUI
+		gui.replaceUsernameInList(oldUsername, receivedUser.getUsername());
+		
+		
 	}
 	
 	/**

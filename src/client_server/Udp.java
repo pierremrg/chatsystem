@@ -25,10 +25,11 @@ public class Udp extends Thread {
 	private static final int PORT = 5003; // TODO : autre ?
 	
 	// Constantes de statut de connexion
-	private static final int NO_STATUS = -1;
-	private static final int STATUS_DECONNEXION = 0;
-	private static final int STATUS_CONNEXION = 1;
-	private static final int STATUS_CONNEXION_RESPONSE = 2;
+	public static final int NO_STATUS = -1;
+	public static final int STATUS_DECONNEXION = 0;
+	public static final int STATUS_CONNEXION = 1;
+	public static final int STATUS_CONNEXION_RESPONSE = 2;
+	public static final int STATUS_USERNAME_CHANGED = 3;
 	
 	/**
 	 * Creer un service UDP (thread)
@@ -101,63 +102,55 @@ public class Udp extends Thread {
 		byte[] buffer = new byte[1024];
 		DatagramPacket in = new DatagramPacket(buffer, buffer.length);
 		
-		int statutConnexion = NO_STATUS;
+		int status = NO_STATUS;
 		User receivedUser = null;
 		int identUdp = -1;
 		
 		while(true) {
 			
-			// TODO fusionner les erreurs + les gerer dans le controller + GUI
+			// TODO gerer erreurs dans controller + GUI
 			try {
 				socket.receive(in);
-			} catch (IOException e) {
-				System.out.println("Erreur socket");
-				e.printStackTrace();
-			}
 			
-			// Reception des donnees
-			byte[] receivedMessage = in.getData();
-			ObjectInputStream iStream;
-			
-			try {
+				// Reception des donnees
+				byte[] receivedMessage = in.getData();
+				ObjectInputStream iStream;
 				
 				iStream = new ObjectInputStream(new ByteArrayInputStream(receivedMessage));
 				identUdp = (int) iStream.readInt();
 				
 				// On verifie qu'on doit traiter le paquet
-				if(identUdp == IDENT_UDP) {
-					
-					statutConnexion = (int) iStream.readInt();
-					receivedUser = (User) iStream.readObject();
-					iStream.close();
-					
-					// Traitement du message recu
-					if(statutConnexion == STATUS_DECONNEXION) {
+				if(identUdp != IDENT_UDP)
+					continue;
+				
+				// Recuperation des informations du message
+				status = (int) iStream.readInt();
+				receivedUser = (User) iStream.readObject();
+				iStream.close();
+				
+				// Traitement du message recu
+				switch (status) {
+				
+					case STATUS_DECONNEXION:
 						controller.receiveDeconnection(receivedUser);
-					}
-					
-					else if(statutConnexion == STATUS_CONNEXION) {
-					
-						try {
-							
-							// TODO on peut pas supprimer ce if ? Vu qu'on teste l'header du paquet UDP
-							if (!controller.getUser().getIP().equals(in.getAddress())) {
+						break;
+				
+					case STATUS_CONNEXION:
+						if (!controller.getUser().getIP().equals(in.getAddress())) {
 			 				
-								controller.receiveConnection(receivedUser);						
-								sendUdpMessage(createMessage(STATUS_CONNEXION_RESPONSE, controller.getUser()), in.getAddress());
-							
-							}
-							
-						} catch (SocketException e) {
-							e.printStackTrace();
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
+							controller.receiveConnection(receivedUser);
+							sendUdpMessage(createMessage(STATUS_CONNEXION_RESPONSE, controller.getUser()), in.getAddress());
 						
-					} else if(statutConnexion == STATUS_CONNEXION_RESPONSE) {
+						}
+						break;
+						
+					case STATUS_CONNEXION_RESPONSE:
 						controller.receiveConnection(receivedUser);
-					}
+						break;
+						
+					case STATUS_USERNAME_CHANGED:
+						
+						
 				}
 				
 			} catch (StreamCorruptedException e) {

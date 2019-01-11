@@ -264,6 +264,13 @@ public class GUI extends JFrame{
 		
 		public void actionPerformed(ActionEvent e) {
 			
+			try {
+				controller.editUsername("boby");
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
 			/*ArrayList<User> members0 = new ArrayList<User>();
 			members0.add(new User(5, "truc", null));
 			
@@ -271,20 +278,10 @@ public class GUI extends JFrame{
 			
 			controller.receiveMessage(new Message(new Date(), "coucou", members0.get(0), group0, Message.FUNCTION_NORMAL));*/
 			
-			String textToSend = textField.getText();
+			/*String textToSend = textField.getText();
 			textField.setText(null);
 			
-			/*String history = messagesArea.getText();
-			String newText = "Moi >> " + textToSend;
-			
-			if(history.equals(""))
-				messagesArea.setText(newText);
-			else
-				messagesArea.setText(history + "\n" + newText);
-			
-			textField.setText(null);*
-			
-			/* Envoi du message */
+			/* Envoi du message *
 			// TODO
 			try {
 				// TODO on crée le groupe ici ou on garde que l'ID ? que le nom ?
@@ -297,7 +294,7 @@ public class GUI extends JFrame{
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}
+			}*/
 
 		}
 		
@@ -352,7 +349,7 @@ public class GUI extends JFrame{
 				if (inList == false) {
 					connectedUsersList.clearSelection();
 					textField.setEditable(false);		
-					//sendButton.setEnabled(false);
+					sendButton.setEnabled(false);
 				}
 					
 				
@@ -534,6 +531,48 @@ public class GUI extends JFrame{
 		
 		if(selectedIndex >= 0)
 			groupList.setSelectedIndex(selectedIndex);
+	}
+	
+	public void replaceUsernameInList(String oldUsername, String newUsername) {
+		
+		// Remplacement dans la liste des groupes
+		int selectedIndex = groupList.getSelectedIndex();
+		DefaultListModel<String> groupNames = new DefaultListModel<String>();
+		
+		for(int i=0; i<groupList.getModel().getSize(); i++) {
+			String groupName = groupList.getModel().getElementAt(i);
+			
+			if(groupName.equals(oldUsername))
+				groupNames.addElement(newUsername);
+			else
+				groupNames.addElement(oldUsername);
+		}
+		
+		groupList.setModel(groupNames);
+		
+		if(selectedIndex >= 0)
+			groupList.setSelectedIndex(selectedIndex);
+		
+		
+		
+		// Remplacement dans la liste des utilisateurs connectes
+		selectedIndex = connectedUsersList.getSelectedIndex();
+		DefaultListModel<String> usernames = new DefaultListModel<String>();
+		
+		for(int i=0; i<connectedUsersList.getModel().getSize(); i++) {
+			String username = connectedUsersList.getModel().getElementAt(i);
+			
+			if(username.equals(oldUsername))
+				groupNames.addElement(newUsername);
+			else
+				groupNames.addElement(oldUsername);
+		}
+		
+		connectedUsersList.setModel(groupNames);
+		
+		if(selectedIndex >= 0)
+			connectedUsersList.setSelectedIndex(selectedIndex);
+		
 	}
 	
 	public void addGroup(Group group) {
