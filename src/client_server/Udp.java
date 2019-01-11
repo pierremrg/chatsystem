@@ -149,7 +149,8 @@ public class Udp extends Thread {
 						break;
 						
 					case STATUS_USERNAME_CHANGED:
-						controller.receiveUsernameChanged(receivedUser);
+						if (!controller.getUser().getIP().equals(in.getAddress()))
+							controller.receiveUsernameChanged(receivedUser);
 						
 				}
 				

@@ -305,6 +305,10 @@ public class GUI extends JFrame{
 			controller.receiveMessage(new Message(new Date(), "coucou", members0.get(0), group0, Message.FUNCTION_NORMAL));*/
 			
 			String textToSend = textField.getText();
+			
+			if(textToSend.equals(""))
+				return;
+			
 			textField.setText(null);
 			
 			/* Envoi du message */
@@ -353,8 +357,6 @@ public class GUI extends JFrame{
 	}
 	
 	public class groupListSelectionChange implements ListSelectionListener {
-		
-		private int refreshNumber = 0;
 
 		public void valueChanged(ListSelectionEvent e) {
 			
@@ -377,7 +379,6 @@ public class GUI extends JFrame{
 					textField.setEditable(false);		
 					sendButton.setEnabled(false);
 				}
-					
 				
 				
 				displayMessages(selectedGroup);
@@ -589,12 +590,12 @@ public class GUI extends JFrame{
 			String username = connectedUsersList.getModel().getElementAt(i);
 			
 			if(username.equals(oldUsername))
-				groupNames.addElement(newUsername);
+				usernames.addElement(newUsername);
 			else
-				groupNames.addElement(oldUsername);
+				usernames.addElement(oldUsername);
 		}
 		
-		connectedUsersList.setModel(groupNames);
+		connectedUsersList.setModel(usernames);
 		
 		if(selectedIndex >= 0)
 			connectedUsersList.setSelectedIndex(selectedIndex);
