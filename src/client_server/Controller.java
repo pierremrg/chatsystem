@@ -523,7 +523,7 @@ public class Controller {
 		
 	}
 	
-	public void editPassword(String oldPassword, String newPassword) {
+	public void editPassword(char[] oldPassword, char[] newPassword) {
 		
 		
 		
