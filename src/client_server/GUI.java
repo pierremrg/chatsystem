@@ -57,11 +57,12 @@ public class GUI extends JFrame{
 	private JList<String> connectedUsersList; // Liste des utilisateurs connectés
 	private JLabel labelGroups; // Label "Conversations démarrées"
 	private JLabel labelConnectedUsers; // Label "Utilisateurs connectés"
+	private JButton userButton; //Bouton info profil
 	
 	private static final String NEW_MESSAGE_INDICATOR = "- ";
 	
 	
-	public GUI() {
+	public GUI(String username) {
 		/* Fenêtre principale */
 		super("Chatsystem");
 		//setDefaultCloseOperation(new windowClosingListener());
@@ -84,7 +85,7 @@ public class GUI extends JFrame{
 		c.fill = GridBagConstraints.BOTH;
 		c.weightx = 0.2;
 		c.gridx = 3;
-		c.gridy = 2;
+		c.gridy = 3;
 		c.gridwidth = 1;
 		c.gridheight = 1;
 		panel.add(sendButton, c);
@@ -98,7 +99,7 @@ public class GUI extends JFrame{
 		c.fill = GridBagConstraints.BOTH;
 		c.weightx = 0.6;
 		c.gridx = 1;
-		c.gridy = 2;
+		c.gridy = 3;
 		c.gridwidth = 2;
 		c.gridheight = 1;
 		panel.add(textField, c);
@@ -122,7 +123,7 @@ public class GUI extends JFrame{
 		c.gridx = 1;
 		c.gridy = 0;
 		c.gridwidth = 2;
-		c.gridheight = 2;
+		c.gridheight = 3;
 		panel.add(scrollMessageArea, c);
 		
 		
@@ -156,7 +157,7 @@ public class GUI extends JFrame{
 		c.weighty = 1;
 		c.gridx = 0;
 		c.gridy = 1;
-		c.gridheight = 2;
+		c.gridheight = 3;
 		c.gridwidth = 1;
 		panel.add(groupList, c);
 		
@@ -178,21 +179,31 @@ public class GUI extends JFrame{
 		//ArrayList<User> connectedUsers = controller.getConnectedUsers();
 		//ArrayList<User> connectedUsers = new ArrayList<User>();
 		
-		/*usernames.addElement("jean");
-		usernames.addElement("truc");*/
+		usernames.addElement("jean");
+		usernames.addElement("truc");
 		
 		// TODO vide au début ?
 		/*for(User u : connectedUsers)
 			usernames.addElement(u.getUsername());*/
+		
+		userButton = new JButton(username);
+		userButton.addActionListener(new modifUserListener(this));
+		c.fill = GridBagConstraints.BOTH;
+		c.weightx = 0.2;
+		c.gridx = 3;
+		c.gridy = 0;
+		c.gridwidth = 1;
+		c.gridheight = 1;
+		panel.add(userButton, c);
 		
 		connectedUsersList = new JList<String>(usernames);
 		//connectedUsersList.setBorder(BorderFactory.createRaisedBevelBorder());
 		connectedUsersList.setPreferredSize(new Dimension(40,0));
 		connectedUsersList.addListSelectionListener(new connectedUsersListSelectionChange());
 		c.weightx = 0.1;
-		c.weighty = 1;
+		c.weighty = 2;
 		c.gridx = 3;
-		c.gridy = 1;
+		c.gridy = 2;
 		c.gridheight = 1;
 		c.gridwidth = 1;
 		panel.add(connectedUsersList, c);
@@ -203,7 +214,7 @@ public class GUI extends JFrame{
 		c.weightx = 0.1;
 		c.weighty = 0.01;
 		c.gridx = 3;
-		c.gridy = 0;
+		c.gridy = 1;
 		c.gridwidth = 1;
 		c.gridheight = 1;
 		panel.add(labelConnectedUsers, c);
@@ -250,6 +261,19 @@ public class GUI extends JFrame{
 	    }
 	}
 
+	public class modifUserListener implements ActionListener {
+		private GUI gui;
+		
+		public modifUserListener(GUI gui) {
+			super();
+			this.gui = gui;
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			setEnabled(false);
+			new GUIModifUser(gui);			
+		}
+	}
 	
 	/**
 	 * Listener de l'envoi d'un message
@@ -633,7 +657,7 @@ public class GUI extends JFrame{
 		
 		try {
 			controller = new Controller(allIP.get(ipMachine));
-			controller.setGUI(new GUI());
+			controller.setGUI(new GUI(username));
 			controller.connect(id, username, ipMachine);
 			
 			
