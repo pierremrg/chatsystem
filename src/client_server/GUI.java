@@ -277,8 +277,16 @@ public class GUI extends JFrame{
 		}
 		
 		public void actionPerformed(ActionEvent e) {
-			setEnabled(false);
-			new GUIModifUser(gui);			
+
+			try {
+				controller.editUsername("boby");
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+//			setEnabled(false);
+//			new GUIModifUser(gui);			
 		}
 	}
 	
