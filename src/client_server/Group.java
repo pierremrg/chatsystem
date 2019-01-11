@@ -95,21 +95,25 @@ public class Group implements Serializable {
 	}
 	
 	/**
-	 * Permet de mettre à jour les informations sur un membre du groupe
+	 * Permet de mettre a jour les informations sur un membre du groupe
 	 * @param newVersionMember La nouvelle version de l'utilisateur
 	 */
 	public void updateMember(User newVersionMember) {
+		ArrayList<User> newMembers = new ArrayList<User>(members);
+		
 		for(User oldVersionMember : members) {
 			if(oldVersionMember.equals(newVersionMember)) {
-				members.remove(oldVersionMember);
-				members.add(newVersionMember);
+				newMembers.remove(oldVersionMember);
+				newMembers.add(newVersionMember);
 			}
 		}
+		
+		members = newMembers;
 	}
 	
 	/**
 	 * Renvoie le nom d'un groupe vu par un utilisateur en particulier
-	 * Dans une conversation à deux, le nom correspond au nom du contact distant
+	 * Dans une conversation ï¿½ deux, le nom correspond au nom du contact distant
 	 * Utilise pour faire le lien avec ce qui est affiche dans le GUI
 	 * @param user L'utilisateur qui veut obtenir le nom
 	 * @return Le nom du groupe vu par l'utilisateur demandeur

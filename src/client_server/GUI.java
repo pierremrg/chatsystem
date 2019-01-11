@@ -30,11 +30,11 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 	
@@ -59,7 +59,6 @@ public class GUI extends JFrame{
 	private JLabel labelConnectedUsers; // Label "Utilisateurs connectés"
 	private JButton userButton; //Bouton info profil
 	
-	private static final String NEW_MESSAGE_INDICATOR = "- ";
 	
 	
 	public GUI(String username) {
@@ -81,7 +80,7 @@ public class GUI extends JFrame{
 		/* Bouton Envoyer */
 		sendButton = new JButton("Envoyer");
 		sendButton.addActionListener(new sendMessageListener());
-		//sendButton.setEnabled(false);
+		sendButton.setEnabled(false);
 		c.fill = GridBagConstraints.BOTH;
 		c.weightx = 0.2;
 		c.gridx = 3;
@@ -113,6 +112,10 @@ public class GUI extends JFrame{
 		messagesArea.setContentType("text/html");
 		messagesArea.setEditable(false);
 		
+		messagesArea.setMinimumSize(new Dimension(600, 600));
+		messagesArea.setMaximumSize(new Dimension(600, 600));
+        messagesArea.setPreferredSize(new Dimension(600, 600));
+		
 		scrollMessageArea = new JScrollPane(messagesArea);
 		scrollMessageArea.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollMessageArea.setBorder(null);
@@ -142,9 +145,9 @@ public class GUI extends JFrame{
 			groupnames.addElement(g.getGroupNameForUser(controller.getUser()));*/
 		
 		DefaultListModel<String> groupnames = new DefaultListModel<String>();
-		groupnames.addElement("jean");
+		/*groupnames.addElement("jean");
 		groupnames.addElement("truc");
-		groupnames.addElement("titi");
+		groupnames.addElement("titi");*/
 		
 		groupList = new JList<String>();
 		groupList.setModel(groupnames);
@@ -200,6 +203,7 @@ public class GUI extends JFrame{
 		//connectedUsersList.setBorder(BorderFactory.createRaisedBevelBorder());
 		connectedUsersList.setPreferredSize(new Dimension(40,0));
 		connectedUsersList.addListSelectionListener(new connectedUsersListSelectionChange());
+		connectedUsersList.setCellRenderer(new MyListCellThing());
 		c.weightx = 0.1;
 		c.weighty = 2;
 		c.gridx = 3;
@@ -255,6 +259,9 @@ public class GUI extends JFrame{
 	        	setBackground(new Color(230,230,230));
 	        else
 	        	setBackground(Color.WHITE);
+	        
+	        
+	        setBorder(new EmptyBorder(10, 10, 10, 10));
 	        	
 
 	        return this;
@@ -282,25 +289,22 @@ public class GUI extends JFrame{
 		
 		public void actionPerformed(ActionEvent e) {
 			
-			ArrayList<User> members0 = new ArrayList<User>();
+			try {
+				controller.editUsername("boby");
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			/*ArrayList<User> members0 = new ArrayList<User>();
 			members0.add(new User(5, "truc", null));
 			
 			Group group0 = new Group(0, members0, members0.get(0));
 			
-			controller.receiveMessage(new Message(new Date(), "coucou3", members0.get(0), group0, Message.FUNCTION_NORMAL));
+			controller.receiveMessage(new Message(new Date(), "coucou", members0.get(0), group0, Message.FUNCTION_NORMAL));*/
 			
 			/*String textToSend = textField.getText();
 			textField.setText(null);
-			
-			/*String history = messagesArea.getText();
-			String newText = "Moi >> " + textToSend;
-			
-			if(history.equals(""))
-				messagesArea.setText(newText);
-			else
-				messagesArea.setText(history + "\n" + newText);
-			
-			textField.setText(null);*
 			
 			/* Envoi du message *
 			// TODO
@@ -370,7 +374,7 @@ public class GUI extends JFrame{
 				if (inList == false) {
 					connectedUsersList.clearSelection();
 					textField.setEditable(false);		
-					//sendButton.setEnabled(false);
+					sendButton.setEnabled(false);
 				}
 					
 				
@@ -536,6 +540,63 @@ public class GUI extends JFrame{
 		
 		groupList.setModel(groupNames);*/
 		//groupList.setSelectedIndex(selectedIndex);
+		
+	}
+	
+	public void selectGroupInList(Group selectedGroup) {
+		String selectedGroupName = selectedGroup.getGroupNameForUser(controller.getUser());
+		int selectedIndex = -1;
+		
+		for(int i=0; i<groupList.getModel().getSize(); i++) {
+			String groupName = groupList.getModel().getElementAt(i);
+			
+			if(groupName.equals(selectedGroupName))
+				selectedIndex = i;
+		}
+		
+		if(selectedIndex >= 0)
+			groupList.setSelectedIndex(selectedIndex);
+	}
+	
+	public void replaceUsernameInList(String oldUsername, String newUsername) {
+		
+		// Remplacement dans la liste des groupes
+		int selectedIndex = groupList.getSelectedIndex();
+		DefaultListModel<String> groupNames = new DefaultListModel<String>();
+		
+		for(int i=0; i<groupList.getModel().getSize(); i++) {
+			String groupName = groupList.getModel().getElementAt(i);
+			
+			if(groupName.equals(oldUsername))
+				groupNames.addElement(newUsername);
+			else
+				groupNames.addElement(oldUsername);
+		}
+		
+		groupList.setModel(groupNames);
+		
+		if(selectedIndex >= 0)
+			groupList.setSelectedIndex(selectedIndex);
+		
+		
+		
+		// Remplacement dans la liste des utilisateurs connectes
+		selectedIndex = connectedUsersList.getSelectedIndex();
+		DefaultListModel<String> usernames = new DefaultListModel<String>();
+		
+		for(int i=0; i<connectedUsersList.getModel().getSize(); i++) {
+			String username = connectedUsersList.getModel().getElementAt(i);
+			
+			if(username.equals(oldUsername))
+				groupNames.addElement(newUsername);
+			else
+				groupNames.addElement(oldUsername);
+		}
+		
+		connectedUsersList.setModel(groupNames);
+		
+		if(selectedIndex >= 0)
+			connectedUsersList.setSelectedIndex(selectedIndex);
 		
 	}
 	
