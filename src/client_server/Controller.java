@@ -553,7 +553,7 @@ public class Controller {
 			if(u.equals(receivedUser)) {
 				oldUsername = u.getUsername();
 				connectedUsers.remove(u);
-				connectedUsers.add(u);
+				connectedUsers.add(receivedUser);
 				break;
 			}
 		}
