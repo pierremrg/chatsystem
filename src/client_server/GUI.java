@@ -463,13 +463,19 @@ public class GUI extends JFrame{
 					sendButton.setEnabled(true);
 				}
 				
+				int selectedIndex = connectedUsersList.getSelectedIndex();
+				groupList.clearSelection();
+				connectedUsersList.setSelectedIndex(selectedIndex);
+				
 				for(int index = 0; index < groupList.getModel().getSize(); index ++) {
 					String username = groupList.getModel().getElementAt(index);
 					
 					if (username.equals(connectedUsersList.getSelectedValue())){
 						groupList.setSelectedIndex(index);
+						break;
 					}
 				}
+					
 				
 			}
 			
