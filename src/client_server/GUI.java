@@ -720,6 +720,8 @@ public class GUI extends JFrame{
 			controller.setGUI(new GUI(username));
 			controller.connect(id, username, ipMachine);
 			
+		} catch (IOException e) {
+			showError("Une erreur s'est produite dans le service UDP.");
 			
 		} catch (Exception e) {
 			showError("Une erreur s'est produite à l'ouverture.");

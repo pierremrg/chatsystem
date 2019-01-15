@@ -12,7 +12,7 @@ public class User implements Serializable{
 	private static final long serialVersionUID = 1L;
 
 	private int id;
-	private String username; // TODO : crypter ?
+	private String username;
 	private InetAddress ip;
 	private int port;
 	
@@ -69,7 +69,7 @@ public class User implements Serializable{
 	}
 	
 	/**
-	 * Modifie le port associe a l'utilisateur
+	 * Modifie le port associe aï¿½l'utilisateur
 	 * @param port Port associe a l'utilisateur
 	 */
 	public void setPort(int port) {

@@ -20,17 +20,19 @@ import java.util.Random;
  */
 public class DataManager {
 	
-	public static class PasswordError extends Exception {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L; }
-	
+	/**
+	 * Constantes
+	 */
 	private static final String PATH_DATA = "data/";
 	private static final String PATH_MESSAGES = "data/messages.bin";
 	private static final String PATH_GROUPS = "data/groups.bin";
 	private static final String PATH_USER = "data/user.bin";
+	
+	/**
+	 * Erreurs
+	 */
+	@SuppressWarnings("serial")
+	public static class PasswordError extends Exception {};
 	
 	/**
 	 * Stocke sur la machine l'ensemble des messages de l'utilisateur
@@ -91,7 +93,6 @@ public class DataManager {
 		}
 		
 		return messages;
-		
 	}
 	
 	/**
@@ -153,7 +154,6 @@ public class DataManager {
 		}
 		
 		return groups;
-		
 	}
 	
 	/**
@@ -176,7 +176,6 @@ public class DataManager {
 		ObjectOutputStream out = new ObjectOutputStream(file);   
 		
 		// ID de l'utilisateur random
-		// TODO Check si username + ID pas pris
 		Random rand = new Random();
 		int id = rand.nextInt(999999999);
 		
@@ -243,9 +242,8 @@ public class DataManager {
 			FileInputStream file_read = new FileInputStream(PATH_USER);			
 			ObjectInputStream in = new ObjectInputStream(file_read);	
 			
-			
 			int id = (int) in.readInt();
-			String oldUsername = (String) in.readObject();
+			in.readObject();
 			byte[] password = (byte[]) in.readObject();
 			in.close();
 			file_read.close();

@@ -32,6 +32,10 @@ public class SocketReader extends Thread {
 		this.controller = controller;
 	}
 
+	/**
+	 * Thread qui permet de lire les messages recus
+	 */
+	@Override
 	public void run() {
 
 		try {
@@ -61,20 +65,22 @@ public class SocketReader extends Thread {
 			}
 		} catch (SocketException e) {
 
-			if (!socket.isClosed()) // Socket deja ferme par le SocketWriter : pas d'erreur
-				System.out.println("Erreur reader...");
+			// Socket deja ferme par le SocketWriter : pas d'erreur
+			if (!socket.isClosed())
+				GUI.showError("Erreur dans la lecture des messages reçus.");
 
 		} catch (Exception e) {
-			// TODO gerer erreurs dans controller + GUI
-			System.out.println("Erreur reader...");
+			GUI.showError("Erreur dans la lecture des messages reçus.");
+			
 		} finally {
-			System.out.println("Deconnecting reader...");
+			System.out.println("Deconnecting reader..."); // TODO A supprimer
+			
 			try {
 				socket.close();
 			} catch (Exception e) {
-				System.out.println("Erreur deconnexion reader");
+				GUI.showError("Erreur lors de la deconnexion du lecteur des messages reçus.");
 			}
-			System.out.println("Reader deconnected");
+			System.out.println("Reader deconnected"); // TODO A supprimer
 		}
 
 	}
@@ -100,8 +106,6 @@ public class SocketReader extends Thread {
 
 		ObjectInputStream iStream = new ObjectInputStream(new ByteArrayInputStream(data));
 		return (Message) iStream.readObject();
-		
-		// TODO : gerer erreur (au-dessus)
 	
 	}
 

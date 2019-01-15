@@ -24,6 +24,10 @@ public class ServerSocketWaiter extends Thread {
 		this.controller = controller;
 	}
 	
+	/**
+	 * Thread qui gere la connexion avec de nouveaux utilisateurs
+	 */
+	@Override
 	public void run() {
 		
 		Socket socket;
@@ -47,8 +51,7 @@ public class ServerSocketWaiter extends Thread {
 			}
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block --> lier au controller ?
-			e.printStackTrace();
+			GUI.showError("Erreur : impossible de recevoir les connexions.");
 		}
 		
 	}

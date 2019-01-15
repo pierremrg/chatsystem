@@ -34,25 +34,15 @@ public class Udp extends Thread {
 	/**
 	 * Creer un service UDP (thread)
 	 * @param controller Controller associe a l'UDP
+	 * @throws SocketException Si une erreur UDP survient
 	 */
-	public Udp(Controller controller) {
-		
+	public Udp(Controller controller) throws SocketException {
 		super("UDP");
 		this.controller = controller;
-		
-		// TODO : gerer erreurs ensemble + lier au controller + GUI
-		try {
-			this.socket = new DatagramSocket(PORT);
-		} catch (SocketException e) {
-			System.out.println("Erreur socket udp 1");
-			e.printStackTrace();
-		}
-		try {
-			socket.setBroadcast(true);
-		} catch (SocketException e) {
-			System.out.println("Erreur socket udp 2");
-			e.printStackTrace();
-		}
+
+		this.socket = new DatagramSocket(PORT);
+
+		socket.setBroadcast(true);
 	}
 	
 	/**
@@ -79,24 +69,19 @@ public class Udp extends Thread {
 	 * Envoie un message UDP
 	 * @param message Message a envoyer
 	 * @param ipAdresse Adresse IP a laquelle envoyer le message
+	 * @throws IOException Si une erreur a lieu au moment de l'envoi du message UDP
 	 */
-	public void sendUdpMessage(byte[] message, InetAddress ipAddress) {
-		
+	public void sendUdpMessage(byte[] message, InetAddress ipAddress) throws IOException {
 		DatagramPacket out = new DatagramPacket(message, message.length, ipAddress, PORT);
 		
-		// TODO : gerer erreur controller + GUI
-		try {
-			socket.send(out);
-			System.out.println("message UDP envoye : " + message + " a " + ipAddress.toString()); // TODO : a supprimer
-		} catch (IOException e) {
-			System.out.println("Erreur socketsend udp");
-			e.printStackTrace();
-		}
+		socket.send(out);
+		System.out.println("message UDP envoye : " + message + " a " + ipAddress.toString()); // TODO : a supprimer
 	}
 	
 	/**
 	 * Thread qui ecoute en UDP et qui traite les messages suivant le contenu
 	 */
+	@Override
 	public void run() {
 		
 		byte[] buffer = new byte[1024];
@@ -154,16 +139,10 @@ public class Udp extends Thread {
 						
 				}
 				
-			} catch (StreamCorruptedException e) {
-				// Message pas pour nous
-			} catch (EOFException e) {
-				// Message pas pour nous
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			} catch (StreamCorruptedException | EOFException e) {
+				// Message pas pour nous, ne rien faire
+			} catch (IOException | ClassNotFoundException e1) {
+				GUI.showError("Erreur lors de la lecture d'un message UDP.");
 			}
 			
 		}

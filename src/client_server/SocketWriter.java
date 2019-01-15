@@ -33,6 +33,10 @@ public class SocketWriter extends Thread {
 		this.group = group;
 	}
 	
+	/**
+	 * Thread qui envoie les messages vers les utilisateurs concernes
+	 */
+	@Override
 	public void run() {
 		
 		try {
@@ -67,17 +71,16 @@ public class SocketWriter extends Thread {
 			
 		}
 		catch(Exception e) {
-			// TODO gerer erreurs dans controller + GUI
-			System.out.println("Erreur sur le writer");
+			GUI.showError("Erreur dans l'ecriture du message.");
 		}
 		
 		finally {
-			System.out.println("Deconnecting writer...");
+			System.out.println("Deconnecting writer..."); // TODO A supprimer
 			if (socket != null) {
 				try {
 					socket.close();
 				} catch (Exception e) {
-					System.out.println("Erreur fermeture socket");
+					GUI.showError("Erreur lors de la deconnexion du writer des messages envoyes.");
 				}
 			}
 		}
@@ -93,15 +96,10 @@ public class SocketWriter extends Thread {
 		
 		ByteArrayOutputStream bStream = new ByteArrayOutputStream();
 		ObjectOutput oo;
-
-		try {
-			oo = new ObjectOutputStream(bStream);
-			oo.writeObject(message);
-			oo.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
+		oo = new ObjectOutputStream(bStream);
+		oo.writeObject(message);
+		oo.close();
 		
 		return Base64.getEncoder().encodeToString(bStream.toByteArray());
 	}

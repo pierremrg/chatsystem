@@ -1,5 +1,6 @@
 package client_server;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -49,47 +50,43 @@ public class Controller {
 	// Utilise pour envoyer un message
 	private volatile Message messageToSend = null;
 	
-	
+
 	/**
-	 * Cree un controller
-	 * @param user utilisateur associe au controller
-	 * @throws SocketException 
-	 * @throws UnknownHostException 
+	 * @param ipBroadcast L'adresse IP de la machine
+	 * @throws IOException Erreur dans la lecture des fichiers
+	 * @throws ClassNotFoundException Erreur dans la lecture des fichiers
+	 * @throws FileNotFoundException Erreur dans la lecture des fichiers
 	 */
-	public Controller (InetAddress ipBroadcast) throws SocketException, UnknownHostException {
-		this.udp = new Udp(this);
+	public Controller (InetAddress ipBroadcast) throws FileNotFoundException, ClassNotFoundException, IOException {
+		
 		this.connectedUsers = new ArrayList<User>();
 		this.groups = new ArrayList<Group>();
 		this.messages = new ArrayList<Message>();
 		this.ipBroadcast = ipBroadcast;
+
+		this.udp = new Udp(this);
 		
-		try {
-			messages = DataManager.readAllMessages();
-			groups = DataManager.readAllGroups();
-			
-			/* Tests pour verifier le bon fonctionnement de la sauvegarde des donnees, TODO a supprimer */
-			/*for(Group g : groups) {
-				System.out.println(g.getID());
-			}
-			
-			for(Message m : messages) {
-				if(m.getReceiverGroup() != null) {
-					System.out.println("Group " + m.getReceiverGroup().getID());
-					
-					if(!groups.contains(m.getReceiverGroup()))
-						groups.add(m.getReceiverGroup());
-				}
-					
-				else
-					System.out.println("no group");
-			}*/
-			
-			//testSaveMessages();
-			
-		} catch (Exception e) {
-			// TODO Gerer erreur dans GUI
-			e.printStackTrace();
+		messages = DataManager.readAllMessages();
+		groups = DataManager.readAllGroups();
+		
+		/* Tests pour verifier le bon fonctionnement de la sauvegarde des donnees, TODO a supprimer */
+		/*for(Group g : groups) {
+			System.out.println(g.getID());
 		}
+		
+		for(Message m : messages) {
+			if(m.getReceiverGroup() != null) {
+				System.out.println("Group " + m.getReceiverGroup().getID());
+				
+				if(!groups.contains(m.getReceiverGroup()))
+					groups.add(m.getReceiverGroup());
+			}
+				
+			else
+				System.out.println("no group");
+		}*/
+		
+		//testSaveMessages();
 		
 	}
 	
@@ -128,8 +125,8 @@ public class Controller {
 	}
 	
 	/**
-	 * Retourne l'utilisateur associe au controlleur
-	 * @return User
+	 * Retourne l'utilisateur associe au controller
+	 * @return User L'utilisateur associe au controller
 	 */
 	public User getUser() {
 		return user;
@@ -168,9 +165,8 @@ public class Controller {
 	
 	/**
 	 * Permet d'envoyer un message
-	 * @param textToSend Le contenu du message � envoyer
-	 * @param receiverGroupNameForUser Le groupe a qui envoyer le message
-	 * 		Le nom de groupe est different selon l'utilisateur
+	 * @param textToSend Le contenu du message a envoyer
+	 * @param receiverGroupNameForUser Le groupe a qui envoyer le message. Le nom de groupe est different selon l'utilisateur.
 	 * @param function La fonction du message
 	 * @see Message.java
 	 * @throws IOException
@@ -195,7 +191,6 @@ public class Controller {
 			
 			// Si le groupe n'etait plus actif (groupe hors ligne), on le redemarre
 			// TODO Besoin de tester si user en ligne ? Logiquement, si le groupe est en ligne le contact aussi
-			// TODO Throws erreur pas connecte
 			if(!group.isOnline() && connectedUsers.contains(contact))
 				restartGroup(group);
 				
@@ -259,10 +254,9 @@ public class Controller {
 		// Enregistrement du message recu
 		messages.add(message);
 		
-		// TODO affichage a faire correctement
+		// TODO A supprimer
 		System.out.println(message.getContent());
 		gui.setGroupNoRead(group);
-		
 	}
 	
 	/**
@@ -337,7 +331,6 @@ public class Controller {
 		// Demarrage du service UDP et envoi du message de presence
 		udp.start();
 		udp.sendUdpMessage(udp.createMessage(Udp.STATUS_CONNEXION, getUser()), ipBroadcast);
-		// TODO : constantes a utiliser
 		
 		// Ajout des groupes au GUI
 		for(Group g : groups)
@@ -355,14 +348,11 @@ public class Controller {
 		for(Group g : groups)
 			g.setOnline(false);
 		
-		// TODO Gestion de l'erreur
 		DataManager.writeAllMessages(messages);
 		DataManager.writeAllGroups(groups);
 
-		// TODO Gestion de l'erreur
-		// TODO Constantes a utiliser
 		udp.sendUdpMessage(udp.createMessage(Udp.STATUS_DECONNEXION, getUser()), ipBroadcast);
-
+		
 	}
 
 	/**
@@ -441,7 +431,9 @@ public class Controller {
 	/**
 	 * Demarre une nouvelle conversation
 	 * @param members Utilisateurs presents dans la conversation
-	 * @return Le groupe cree
+	 * @return Le groupe creecatch (EOFException e) {
+				// Message pas pour nous, ne rien faire
+			} 
 	 * @throws IOException
 	 * @see SocketWriter SocketReader
 	 */
@@ -451,8 +443,6 @@ public class Controller {
 		// TODO Faire pour plusieurs personnes ?
 		User contact = members.get(0);
 
-		
-		// TODO Gerer numero de groupe minimum ? + gerer l'erreur
 		Random rand = new Random();
 		int idGroup = rand.nextInt(999999999); // Rand()
 		
@@ -524,20 +514,21 @@ public class Controller {
 		
 		return groupMessages;
 	}
-	
-	// TODO
+
+	/**
+	 * Modifie le username de l'utilisateur
+	 * @param newUsername Le nouveau username
+	 * @throws IOException Si erreur a l'ecriture du fichier
+	 * @throws ClassNotFoundException Si erreur a l'ecriture du fichier
+	 */
 	public void editUsername(String newUsername) throws IOException, ClassNotFoundException {
-		// TODO Check si username pas pris
 		// TODO Gestion erreur
-		// TODO Update user BDD
-		//TODO update user controller
 		
 		DataManager.changeUsername(newUsername);
 		
 		user.setUsername(newUsername);
 		
 		udp.sendUdpMessage(udp.createMessage(Udp.STATUS_USERNAME_CHANGED, user), ipBroadcast);
-		
 	}
 	
 	public void editPassword(char[] oldPassword, char[] newPassword) throws ClassNotFoundException, NoSuchAlgorithmException, IOException, PasswordError {

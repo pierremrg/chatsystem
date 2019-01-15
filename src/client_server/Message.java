@@ -1,7 +1,6 @@
 package client_server;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -12,7 +11,6 @@ public class Message implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private int id; // TODO a supprimer ?
 	private Date date;
 	private String content;
 	private User sender;
