@@ -200,9 +200,9 @@ public class DataManager {
 	 */
 	public static int checkUser(String username, char[] passwordEnter) throws IOException, ClassNotFoundException, NoSuchAlgorithmException {
 
-		File groupsFile = new File(PATH_USER);
+		File usersFile = new File(PATH_USER);
 
-		if (groupsFile.exists()) {
+		if (usersFile.exists()) {
 			
 			FileInputStream file = new FileInputStream(PATH_USER);
 			ObjectInputStream in = new ObjectInputStream(file);
@@ -227,5 +227,53 @@ public class DataManager {
 		}
 		
 		return -1;
+	}
+	
+	public static void changeUsername(String newUsername) throws IOException, ClassNotFoundException {
+		File usersFile = new File(PATH_USER);
+		
+		if (usersFile.exists()) {
+			FileInputStream file_read = new FileInputStream(PATH_USER);			
+			ObjectInputStream in = new ObjectInputStream(file_read);			
+			int id = (int) in.readInt();
+			String oldUsername = (String) in.readObject();
+			byte[] password = (byte[]) in.readObject();
+			in.close();
+			file_read.close();
+			
+			FileOutputStream file_write = new FileOutputStream(PATH_USER);
+			ObjectOutputStream out = new ObjectOutputStream(file_write);
+			out.writeInt(id);
+			out.writeObject(newUsername);
+			out.writeObject(password);			
+			out.close();
+			file_write.close();
+		}		
+	}
+	
+	public static int changePassword(byte[] oldPassword, byte[] newPassword) throws IOException, ClassNotFoundException {
+		File usersFile = new File(PATH_USER);
+		
+		if (usersFile.exists()) {
+			FileInputStream file_read = new FileInputStream(PATH_USER);			
+			ObjectInputStream in = new ObjectInputStream(file_read);			
+			int id = (int) in.readInt();
+			String username = (String) in.readObject();
+			byte[] password = (byte[]) in.readObject();
+			in.close();
+			file_read.close();
+			
+			if(Arrays.equals(password, oldPassword)) {
+				FileOutputStream file_write = new FileOutputStream(PATH_USER);
+				ObjectOutputStream out = new ObjectOutputStream(file_write);
+				out.writeInt(id);
+				out.writeObject(username);
+				out.writeObject(newPassword);			
+				out.close();
+				file_write.close();
+				return 0;
+			}			
+		}
+		return -1; 
 	}
 }
