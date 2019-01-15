@@ -9,12 +9,15 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+
+import client_server.DataManager.PasswordError;
 
 /**
  * Controller de l'application
@@ -523,11 +526,13 @@ public class Controller {
 	}
 	
 	// TODO
-	public void editUsername(String newUsername) throws IOException {
+	public void editUsername(String newUsername) throws IOException, ClassNotFoundException {
 		// TODO Check si username pas pris
 		// TODO Gestion erreur
 		// TODO Update user BDD
 		//TODO update user controller
+		
+		DataManager.changeUsername(newUsername);
 		
 		user.setUsername(newUsername);
 		
@@ -535,10 +540,8 @@ public class Controller {
 		
 	}
 	
-	public void editPassword(char[] oldPassword, char[] newPassword) {
-		
-		
-		
+	public void editPassword(char[] oldPassword, char[] newPassword) throws ClassNotFoundException, NoSuchAlgorithmException, IOException, PasswordError {
+		DataManager.changePassword(oldPassword, newPassword);		
 	}
 	
 	public void receiveUsernameChanged(User receivedUser) {

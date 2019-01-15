@@ -11,9 +11,12 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 import javax.swing.*;
+
+import client_server.DataManager.PasswordError;
 
 public class GUIModifUser extends JFrame {
 	
@@ -32,10 +35,12 @@ public class GUIModifUser extends JFrame {
 	private JPasswordField newConfirmPasswordField;
 	private JButton modifPasswordButton;
 	private GUI gui;
+	private Controller controller;
 	
-	public GUIModifUser(GUI gui) {
-		super("Modification utilisateur");
+	public GUIModifUser(GUI gui, Controller controller) {
+		super(controller.getUser().getUsername());
 		this.gui = gui;
+		this.controller = controller;
 		addWindowListener(new windowClosingListener());
 		
 		setDefaultCloseOperation(HIDE_ON_CLOSE);
@@ -59,7 +64,7 @@ public class GUIModifUser extends JFrame {
 		
 		modifUsernameField = new JTextField();
 		modifUsernameField.addKeyListener(new KeyAdapter());
-		modifUsernameField.addActionListener(new ModifUsernameListener(gui));
+		modifUsernameField.addActionListener(new ModifUsernameListener(gui, controller));
 		c.weightx = 0.5;
 		c.gridwidth = 1;
 		c.gridx = 0;
@@ -68,7 +73,7 @@ public class GUIModifUser extends JFrame {
 		
 		
 		modifUsernameButton = new JButton("Changer nom d'utilisateur");
-		modifUsernameButton.addActionListener(new ModifUsernameListener(gui));
+		modifUsernameButton.addActionListener(new ModifUsernameListener(gui, controller));
 		c.weightx = 1;
 		c.gridwidth = 3;
 		c.gridx = 0;
@@ -92,7 +97,7 @@ public class GUIModifUser extends JFrame {
 		modifUserPanel.add(oldPasswordLabel, c);
 		
 		oldPasswordField = new JPasswordField();
-		oldPasswordField.addActionListener(new ModifPasswordListener(gui));
+		oldPasswordField.addActionListener(new ModifPasswordListener(gui, controller));
 		c.weightx = 0.5;
 		c.gridwidth = 1;
 		c.gridx = 0;
@@ -114,7 +119,7 @@ public class GUIModifUser extends JFrame {
 		modifUserPanel.add(newConfirmPasswordLabel, c);		
 		
 		newPasswordField = new JPasswordField();
-		newPasswordField.addActionListener(new ModifPasswordListener(gui));
+		newPasswordField.addActionListener(new ModifPasswordListener(gui, controller));
 		c.weightx = 0.5;
 		c.gridwidth = 1;
 		c.gridx = 0;
@@ -122,7 +127,7 @@ public class GUIModifUser extends JFrame {
 		modifUserPanel.add(newPasswordField, c);
 		
 		newConfirmPasswordField = new JPasswordField();
-		newConfirmPasswordField.addActionListener(new ModifPasswordListener(gui));
+		newConfirmPasswordField.addActionListener(new ModifPasswordListener(gui, controller));
 		c.weightx = 0.5;
 		c.gridwidth = 1;
 		c.gridx = 1;
@@ -130,7 +135,7 @@ public class GUIModifUser extends JFrame {
 		modifUserPanel.add(newConfirmPasswordField, c);
 		
 		modifPasswordButton = new JButton("Changer mot de passe");
-		modifPasswordButton.addActionListener(new ModifPasswordListener(gui));
+		modifPasswordButton.addActionListener(new ModifPasswordListener(gui, controller));
 		c.weightx = 1;
 		c.gridwidth = 3;
 		c.gridx = 0;
@@ -143,27 +148,39 @@ public class GUIModifUser extends JFrame {
 	
 	public class ModifUsernameListener implements ActionListener {
 		private GUI gui;
+		private Controller controller;
 		
-		public ModifUsernameListener(GUI gui) {
+		public ModifUsernameListener(GUI gui, Controller controller) {
 			super();
 			this.gui = gui;
+			this.controller = controller;
 		}
 		
 		public void actionPerformed(ActionEvent e) {
 			String newUsername = modifUsernameField.getText();
-			//Controller.editUsername(newUsername);
-			setVisible(false);
-			gui.setVisible(true);
-			gui.setEnabled(true);
+			try {
+				controller.editUsername(newUsername);
+				setVisible(false);
+				gui.setVisible(true);
+				gui.setEnabled(true);
+			} catch (ClassNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		}
 	}	
 	
 	public class ModifPasswordListener implements ActionListener {
 		private GUI gui;
+		private Controller controller;
 		
-		public ModifPasswordListener(GUI gui) {
+		public ModifPasswordListener(GUI gui, Controller controller) {
 			super();
 			this.gui = gui;
+			this.controller = controller;
 		}
 		
 		public void actionPerformed(ActionEvent e) {
@@ -173,10 +190,23 @@ public class GUIModifUser extends JFrame {
 			
 			if (oldPassword.length != 0 && newPassword.length != 0 && newConfirmPassword.length != 0) {
 				if (Arrays.equals(newPassword, newConfirmPassword)) {
-					//controller.editPassword(oldPassword, newPassword);
-					setVisible(false);
-					gui.setVisible(true);
-					gui.setEnabled(true);
+					try {
+						controller.editPassword(oldPassword, newPassword);
+						setVisible(false);
+						gui.setVisible(true);
+						gui.setEnabled(true);
+					} catch (ClassNotFoundException | NoSuchAlgorithmException | IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (PasswordError e1) {
+						// TODO Auto-generated catch block
+						setAlwaysOnTop(false);
+						JOptionPane.showMessageDialog(null, "Erreur mot de passe", "Erreur", JOptionPane.ERROR_MESSAGE);
+						e1.printStackTrace();
+					}
+				}
+				else {
+					JOptionPane.showMessageDialog(null, "Erreur mot de passe", "Erreur", JOptionPane.ERROR_MESSAGE);
 				}
 			}else {
 				setAlwaysOnTop(false);
