@@ -337,9 +337,8 @@ public class Controller {
 		// TODO : constantes a utiliser
 		
 		// Ajout des groupes au GUI
-		for(Group g : groups) {
+		for(Group g : groups)
 			gui.addGroup(g);
-		}
 		
 	}
 	
@@ -380,8 +379,21 @@ public class Controller {
 			connectedUsers.add(receivedUser);
 		
 		// Mise a jour des groupes avec les nouvelles informations de l'utilisateur connecte
-		for(Group group : groups)
-			group.updateMember(receivedUser);
+		boolean hasChanged = false;
+		String oldName;
+		for(Group group : groups) {
+			oldName = group.getGroupNameForUser(user);
+			hasChanged = group.updateMember(receivedUser);
+			
+			if(hasChanged) {
+				gui.replaceUsernameInList(oldName, group.getGroupNameForUser(user));
+			}
+		}
+			
+		
+		// Mise a jour des messages avec les nouvelles informations de l'utilisateur
+		for(Message m : messages)
+			m.updateSender(receivedUser);
 		
 		// Mise a jour du GUI
 		if(gui != null)
@@ -523,7 +535,7 @@ public class Controller {
 		
 	}
 	
-	public void editPassword(String oldPassword, String newPassword) {
+	public void editPassword(char[] oldPassword, char[] newPassword) {
 		
 		
 		
@@ -543,10 +555,13 @@ public class Controller {
 			}
 		}
 		
-		
 		// Mise a jour des groupes avec les nouvelles informations de l'utilisateur
 		for(Group group : groups)
 			group.updateMember(receivedUser);
+		
+		// Mise a jour des messages avec les nouvelles informations de l'utilisateur
+		for(Message m : messages)
+			m.updateSender(receivedUser);
 		
 		
 		// Mise a jour du GUI

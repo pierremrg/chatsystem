@@ -182,8 +182,8 @@ public class GUI extends JFrame{
 		//ArrayList<User> connectedUsers = controller.getConnectedUsers();
 		//ArrayList<User> connectedUsers = new ArrayList<User>();
 		
-		usernames.addElement("jean");
-		usernames.addElement("truc");
+		/*usernames.addElement("jean");
+		usernames.addElement("truc");*/
 		
 		// TODO vide au début ?
 		/*for(User u : connectedUsers)
@@ -277,8 +277,16 @@ public class GUI extends JFrame{
 		}
 		
 		public void actionPerformed(ActionEvent e) {
-			setEnabled(false);
-			new GUIModifUser(gui);			
+
+			try {
+				controller.editUsername("boby");
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+//			setEnabled(false);
+//			new GUIModifUser(gui);			
 		}
 	}
 	
@@ -289,13 +297,6 @@ public class GUI extends JFrame{
 		
 		public void actionPerformed(ActionEvent e) {
 			
-			try {
-				controller.editUsername("boby");
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			
 			/*ArrayList<User> members0 = new ArrayList<User>();
 			members0.add(new User(5, "truc", null));
 			
@@ -303,10 +304,14 @@ public class GUI extends JFrame{
 			
 			controller.receiveMessage(new Message(new Date(), "coucou", members0.get(0), group0, Message.FUNCTION_NORMAL));*/
 			
-			/*String textToSend = textField.getText();
+			String textToSend = textField.getText();
+			
+			if(textToSend.equals(""))
+				return;
+			
 			textField.setText(null);
 			
-			/* Envoi du message *
+			/* Envoi du message */
 			// TODO
 			try {
 				// TODO on crée le groupe ici ou on garde que l'ID ? que le nom ?
@@ -319,7 +324,7 @@ public class GUI extends JFrame{
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}*/
+			}
 
 		}
 		
@@ -352,8 +357,6 @@ public class GUI extends JFrame{
 	}
 	
 	public class groupListSelectionChange implements ListSelectionListener {
-		
-		private int refreshNumber = 0;
 
 		public void valueChanged(ListSelectionEvent e) {
 			
@@ -376,7 +379,6 @@ public class GUI extends JFrame{
 					textField.setEditable(false);		
 					sendButton.setEnabled(false);
 				}
-					
 				
 				
 				displayMessages(selectedGroup);
@@ -588,12 +590,12 @@ public class GUI extends JFrame{
 			String username = connectedUsersList.getModel().getElementAt(i);
 			
 			if(username.equals(oldUsername))
-				groupNames.addElement(newUsername);
+				usernames.addElement(newUsername);
 			else
-				groupNames.addElement(oldUsername);
+				usernames.addElement(oldUsername);
 		}
 		
-		connectedUsersList.setModel(groupNames);
+		connectedUsersList.setModel(usernames);
 		
 		if(selectedIndex >= 0)
 			connectedUsersList.setSelectedIndex(selectedIndex);
