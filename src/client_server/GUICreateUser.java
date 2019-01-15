@@ -17,12 +17,9 @@ import java.util.Arrays;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-
-import client_server.GUIConnect.ConnectListener;
 
 /**
  * Fenetre de creation de l'utilisateur
@@ -117,8 +114,6 @@ public class GUICreateUser extends JFrame {
 		 * Clique sur le bouton de creation
 		 */
 		public void actionPerformed(ActionEvent e) {
-			// TODO check username pas deja utilise
-			
 			// Obtient les donnees
 			String username = usernameField.getText();
 			char[] password = passwordField.getPassword();
@@ -131,23 +126,18 @@ public class GUICreateUser extends JFrame {
 						setVisible(false);
 						guiConnect.setVisible(true);
 						guiConnect.setEnabled(true);
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (NoSuchAlgorithmException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+					} catch (IOException | NoSuchAlgorithmException e1) {
+						GUI.showError("Erreur ecriture fichier");
 					}
 				} else {
-					// TODO Gerer les erreurs ailleurs ?
 					setAlwaysOnTop(false);
-					JOptionPane.showMessageDialog(null, "Mot de passe incorrect", "Erreur", JOptionPane.ERROR_MESSAGE);
+					GUI.showError("Erreur mot de passe");
 					passwordField.setText("");
 					confirmPasswordField.setText("");
 				}
 			} else {
 				setAlwaysOnTop(false);
-				JOptionPane.showMessageDialog(null, "Champs vides", "Erreur", JOptionPane.ERROR_MESSAGE);
+				GUI.showError("Champs vide");
 			}
 		}
 
