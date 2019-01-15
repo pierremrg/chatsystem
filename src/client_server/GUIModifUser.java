@@ -35,12 +35,10 @@ public class GUIModifUser extends JFrame {
 	private JPasswordField newConfirmPasswordField;
 	private JButton modifPasswordButton;
 	private GUI gui;
-	private Controller controller;
 	
 	public GUIModifUser(GUI gui, Controller controller) {
 		super(controller.getUser().getUsername());
 		this.gui = gui;
-		this.controller = controller;
 		addWindowListener(new windowClosingListener());
 		
 		setDefaultCloseOperation(HIDE_ON_CLOSE);
@@ -163,13 +161,9 @@ public class GUIModifUser extends JFrame {
 				setVisible(false);
 				gui.setVisible(true);
 				gui.setEnabled(true);
-			} catch (ClassNotFoundException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+			} catch (ClassNotFoundException | IOException e1) {
+				GUI.showError("Erreur ecriture fichier");
+			} 
 		}
 	}	
 	
@@ -196,21 +190,24 @@ public class GUIModifUser extends JFrame {
 						gui.setVisible(true);
 						gui.setEnabled(true);
 					} catch (ClassNotFoundException | NoSuchAlgorithmException | IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						GUI.showError("Erreur ecriture fichier");
 					} catch (PasswordError e1) {
-						// TODO Auto-generated catch block
 						setAlwaysOnTop(false);
-						JOptionPane.showMessageDialog(null, "Erreur mot de passe", "Erreur", JOptionPane.ERROR_MESSAGE);
-						e1.printStackTrace();
+						GUI.showError("Erreur ancien mot de passe");
+						oldPasswordField.setText("");
+						newPasswordField.setText("");
+						newConfirmPasswordField.setText("");
 					}
 				}
 				else {
-					JOptionPane.showMessageDialog(null, "Erreur mot de passe", "Erreur", JOptionPane.ERROR_MESSAGE);
+					GUI.showError("Erreur nouveau mot de passe different");
+					oldPasswordField.setText("");
+					newPasswordField.setText("");
+					newConfirmPasswordField.setText("");
 				}
 			}else {
 				setAlwaysOnTop(false);
-				JOptionPane.showMessageDialog(null, "Champs mot de passe vides", "Erreur", JOptionPane.ERROR_MESSAGE);
+				GUI.showError("Champs vide");
 			}
 				
 		}

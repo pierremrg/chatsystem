@@ -163,10 +163,7 @@ public class DataManager {
 	 * @throws IOException
 	 * @throws NoSuchAlgorithmException 
 	 */
-	public static void createUser(String username, char[] password) throws IOException, NoSuchAlgorithmException {
-		
-		// TODO Gestion erreur
-		
+	public static void createUser(String username, char[] password) throws IOException, NoSuchAlgorithmException {		
 		// Verifie que le dossier "data" existe, sinon le cree
 		File directory = new File(PATH_DATA);
 	    if(!directory.exists())
@@ -183,12 +180,7 @@ public class DataManager {
 		out.writeObject(username);
 		
 		// Chiffrement du mot de passe avec MD5
-		byte[] passwordBytes = new byte[password.length];
-		for (int i = 0; i < passwordBytes.length; i++)
-			passwordBytes[i] = (byte) password[i];
-		
-		MessageDigest md = MessageDigest.getInstance("MD5");
-		byte[] passwordHashed = md.digest(passwordBytes);
+		byte[] passwordHashed = hashPassword(password);
 		out.writeObject(passwordHashed);
 		
 		out.close();
@@ -217,21 +209,14 @@ public class DataManager {
 			String usernameFile = (String) in.readObject();
 			byte[] passwordFileHashed = (byte[]) in.readObject();
 			
-			byte[] passwordEnterBytes = new byte[passwordEnter.length];
-			for (int i = 0; i < passwordEnterBytes.length; i++)
-				passwordEnterBytes[i] = (byte) passwordEnter[i];
-			
-			MessageDigest md = MessageDigest.getInstance("MD5");
-			byte[] passwordEnterHashed = md.digest(passwordEnterBytes);
+			byte[] passwordEnterHashed = hashPassword(passwordEnter);
 
 			if (usernameFile.equals(username) && Arrays.equals(passwordFileHashed, passwordEnterHashed)) {
 				in.close();
 				return id;
-			}
-			
+			}			
 			in.close();
-		}
-		
+		}		
 		return -1;
 	}
 	
@@ -240,10 +225,12 @@ public class DataManager {
 		
 		if (usersFile.exists()) {
 			FileInputStream file_read = new FileInputStream(PATH_USER);			
-			ObjectInputStream in = new ObjectInputStream(file_read);	
-			
+
+			ObjectInputStream in = new ObjectInputStream(file_read);			
 			int id = (int) in.readInt();
-			in.readObject();
+			@SuppressWarnings("unused")
+			String oldUsername = (String) in.readObject();
+
 			byte[] password = (byte[]) in.readObject();
 			in.close();
 			file_read.close();
@@ -252,7 +239,7 @@ public class DataManager {
 			ObjectOutputStream out = new ObjectOutputStream(file_write);
 			out.writeInt(id);
 			out.writeObject(newUsername);
-			out.writeObject(password);			
+			out.writeObject(password);	
 			out.close();
 			file_write.close();
 		}		
@@ -264,12 +251,7 @@ public class DataManager {
 		if (usersFile.exists()) {
 			FileInputStream file_read = new FileInputStream(PATH_USER);			
 			ObjectInputStream in = new ObjectInputStream(file_read);	
-			
-			byte[] oldPasswordBytes = new byte[oldPassword.length];
-			for (int i = 0; i < oldPasswordBytes.length; i++)
-				oldPasswordBytes[i] = (byte) oldPassword[i];			
-			MessageDigest oldmd = MessageDigest.getInstance("MD5");
-			byte[] oldPasswordHashed = oldmd.digest(oldPasswordBytes);
+			byte[] oldPasswordHashed = hashPassword(oldPassword);
 			
 			int id = (int) in.readInt();
 			String username = (String) in.readObject();
@@ -281,11 +263,7 @@ public class DataManager {
 				FileOutputStream file_write = new FileOutputStream(PATH_USER, false);
 				ObjectOutputStream out = new ObjectOutputStream(file_write);
 				
-				byte[] passwordBytes = new byte[newPassword.length];
-				for (int i = 0; i < passwordBytes.length; i++)
-					passwordBytes[i] = (byte) newPassword[i];			
-				MessageDigest newmd = MessageDigest.getInstance("MD5");
-				byte[] newPasswordHashed = newmd.digest(passwordBytes);
+				byte[] newPasswordHashed = hashPassword(newPassword);
 				
 				out.writeInt(id);
 				out.writeObject(username);
@@ -297,5 +275,16 @@ public class DataManager {
 				throw new PasswordError();
 			}
 		} 
+	}
+	
+	private static byte[] hashPassword (char[] password) throws NoSuchAlgorithmException {
+		byte[] passwordBytes = new byte[password.length];
+		for (int i = 0; i < passwordBytes.length; i++)
+			passwordBytes[i] = (byte) password[i];
+		
+		MessageDigest md = MessageDigest.getInstance("MD5");
+		byte[] passwordHashed = md.digest(passwordBytes);
+		
+		return passwordHashed;
 	}
 }

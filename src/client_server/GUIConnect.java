@@ -3,7 +3,6 @@ package client_server;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.HeadlessException;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,7 +18,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -33,7 +31,7 @@ public class GUIConnect extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 	private JPanel connectPanel;
-	private JComboBox iPList;
+	private JComboBox<Object> iPList;
 	private JButton connectButton;
 	private JButton createUserButton;
 	private JLabel usernameLabel;
@@ -66,7 +64,7 @@ public class GUIConnect extends JFrame {
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.insets = new Insets(3, 3, 3, 3);
 
-		iPList = new JComboBox(ipListMachine.toArray());
+		iPList = new JComboBox<Object>(ipListMachine.toArray());
 		c.weightx = 1;
 		c.gridx = 0;
 		c.gridy = 0;
@@ -168,7 +166,7 @@ public class GUIConnect extends JFrame {
 
 	/**
 	 * Indique l'etat de la connexion
-	 * @param statusConnexion L'etat de la connexion
+	 * @param statusConnexion L'etat de la connexionObject
 	 */
 	public void setStatusConnexion(boolean statusConnexion) {
 		this.statusConnexion = statusConnexion;
@@ -191,24 +189,17 @@ public class GUIConnect extends JFrame {
 					// On indique les informations de l'utilisateur
 					setId(id);
 					setUsername(username);
-					setIPSelected((InetAddress) iPList.getSelectedItem());
-					
+					setIPSelected((InetAddress) iPList.getSelectedItem());					
 					setStatusConnexion(true);
 					setVisible(false);
 				
 				} else {
-					// TODO Gérer l'erreur avec les autres ?
-					JOptionPane.showMessageDialog(null, "Erreur connexion", "Erreur", JOptionPane.ERROR_MESSAGE);
+					GUI.showError("Erreur connexion");
+					usernameField.setText("");
+					passwordField.setText("");
 				}
-			} catch (ClassNotFoundException | IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (HeadlessException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (NoSuchAlgorithmException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			} catch (ClassNotFoundException | IOException | NoSuchAlgorithmException e1) {
+				GUI.showError("Erreur ecriture fichier");
 			}
 		}
 	}
