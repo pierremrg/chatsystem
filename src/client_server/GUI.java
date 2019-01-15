@@ -463,10 +463,7 @@ public class GUI extends JFrame{
 					sendButton.setEnabled(true);
 				}
 				
-				int selectedIndex = connectedUsersList.getSelectedIndex();
-				groupList.clearSelection();
-				connectedUsersList.setSelectedIndex(selectedIndex);
-				
+
 				for(int index = 0; index < groupList.getModel().getSize(); index ++) {
 					String username = groupList.getModel().getElementAt(index);
 					
@@ -487,17 +484,33 @@ public class GUI extends JFrame{
 	 * Met a jour la liste des utilisateurs connectes (GUI)
 	 */
 	public void updateConnectedUsers() {
+		
+		String prevSelected = groupList.getSelectedValue();
+		
 		DefaultListModel<String> usernames = new DefaultListModel<String>();
 		ArrayList<User> connectedUsers;
 		connectedUsers = controller.getConnectedUsers();
 		
-		for(User u : connectedUsers)
+		int selectedIndex = -1;
+		int i = 0;
+		for(User u : connectedUsers) {
+			if(u.getUsername().equals(prevSelected))
+				selectedIndex = i;
+			
 			usernames.addElement(u.getUsername());
+			
+			i++;
+		}
+			
 		
 		/*usernames.addElement("jean");
 		usernames.addElement("truc");*/
 		
+		
 		connectedUsersList.setModel(usernames);
+		
+		if(selectedIndex >= 0)
+			connectedUsersList.setSelectedIndex(selectedIndex);
 	}
 	
 	/**
