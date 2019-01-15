@@ -20,6 +20,13 @@ import java.util.Random;
  */
 public class DataManager {
 	
+	public static class PasswordError extends Exception {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L; }
+	
 	private static final String PATH_DATA = "data/";
 	private static final String PATH_MESSAGES = "data/messages.bin";
 	private static final String PATH_GROUPS = "data/groups.bin";
@@ -234,14 +241,16 @@ public class DataManager {
 		
 		if (usersFile.exists()) {
 			FileInputStream file_read = new FileInputStream(PATH_USER);			
-			ObjectInputStream in = new ObjectInputStream(file_read);			
+			ObjectInputStream in = new ObjectInputStream(file_read);	
+			
+			
 			int id = (int) in.readInt();
 			String oldUsername = (String) in.readObject();
 			byte[] password = (byte[]) in.readObject();
 			in.close();
 			file_read.close();
 			
-			FileOutputStream file_write = new FileOutputStream(PATH_USER);
+			FileOutputStream file_write = new FileOutputStream(PATH_USER, false);
 			ObjectOutputStream out = new ObjectOutputStream(file_write);
 			out.writeInt(id);
 			out.writeObject(newUsername);
@@ -251,29 +260,44 @@ public class DataManager {
 		}		
 	}
 	
-	public static int changePassword(byte[] oldPassword, byte[] newPassword) throws IOException, ClassNotFoundException {
+	public static void changePassword(char[] oldPassword, char[] newPassword) throws IOException, ClassNotFoundException, NoSuchAlgorithmException, PasswordError {
 		File usersFile = new File(PATH_USER);
 		
 		if (usersFile.exists()) {
 			FileInputStream file_read = new FileInputStream(PATH_USER);			
-			ObjectInputStream in = new ObjectInputStream(file_read);			
+			ObjectInputStream in = new ObjectInputStream(file_read);	
+			
+			byte[] oldPasswordBytes = new byte[oldPassword.length];
+			for (int i = 0; i < oldPasswordBytes.length; i++)
+				oldPasswordBytes[i] = (byte) oldPassword[i];			
+			MessageDigest oldmd = MessageDigest.getInstance("MD5");
+			byte[] oldPasswordHashed = oldmd.digest(oldPasswordBytes);
+			
 			int id = (int) in.readInt();
 			String username = (String) in.readObject();
-			byte[] password = (byte[]) in.readObject();
+			byte[] passwordFileHashed = (byte[]) in.readObject();
 			in.close();
 			file_read.close();
 			
-			if(Arrays.equals(password, oldPassword)) {
-				FileOutputStream file_write = new FileOutputStream(PATH_USER);
+			if(Arrays.equals(passwordFileHashed, oldPasswordHashed)) {
+				FileOutputStream file_write = new FileOutputStream(PATH_USER, false);
 				ObjectOutputStream out = new ObjectOutputStream(file_write);
+				
+				byte[] passwordBytes = new byte[newPassword.length];
+				for (int i = 0; i < passwordBytes.length; i++)
+					passwordBytes[i] = (byte) newPassword[i];			
+				MessageDigest newmd = MessageDigest.getInstance("MD5");
+				byte[] newPasswordHashed = newmd.digest(passwordBytes);
+				
 				out.writeInt(id);
 				out.writeObject(username);
-				out.writeObject(newPassword);			
+				out.writeObject(newPasswordHashed);			
 				out.close();
 				file_write.close();
-				return 0;
-			}			
-		}
-		return -1; 
+			}
+			else {
+				throw new PasswordError();
+			}
+		} 
 	}
 }

@@ -189,7 +189,7 @@ public class GUI extends JFrame{
 		/*for(User u : connectedUsers)
 			usernames.addElement(u.getUsername());*/
 		
-		userButton = new JButton(username);
+		userButton = new JButton("Mon profil");
 		userButton.addActionListener(new modifUserListener(this));
 		c.fill = GridBagConstraints.BOTH;
 		c.weightx = 0.2;
@@ -276,17 +276,9 @@ public class GUI extends JFrame{
 			this.gui = gui;
 		}
 		
-		public void actionPerformed(ActionEvent e) {
-
-			try {
-				controller.editUsername("boby");
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			
-//			setEnabled(false);
-//			new GUIModifUser(gui);			
+		public void actionPerformed(ActionEvent e) {			
+			setEnabled(false);
+			new GUIModifUser(gui, controller);			
 		}
 	}
 	
