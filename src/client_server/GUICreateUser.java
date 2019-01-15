@@ -129,6 +129,7 @@ public class GUICreateUser extends JFrame {
 					try {
 						DataManager.createUser(username, password);
 						setVisible(false);
+						guiConnect.setVisible(true);
 						guiConnect.setEnabled(true);
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
