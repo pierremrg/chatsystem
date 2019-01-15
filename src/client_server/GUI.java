@@ -332,7 +332,6 @@ public class GUI extends JFrame{
 				displayMessages(controller.getGroupByName(groupName));
 			
 			} catch (Exception e1) {
-				// TODO Auto-generated catch block
 				showError("Impossible d'envoyer le message à cet utilisateur.");
 			}
 
@@ -346,10 +345,9 @@ public class GUI extends JFrame{
 			
 			try {
 				controller.deconnect();
-				//controller.sendMessage(null, 0, Message.FUNCTION_STOP);
+				//controller.sendMessage(null, 0, Message.FUNCTION_STOP); // TODO pourquoi ?
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				showError("Une erreur est survenue lors de la déconnexion.");
 			}
 			finally {
 				// Fin du programme sans erreur
