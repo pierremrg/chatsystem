@@ -572,7 +572,7 @@ public class GUI extends JFrame{
 			if(groupName.equals(oldUsername))
 				groupNames.addElement(newUsername);
 			else
-				groupNames.addElement(oldUsername);
+				groupNames.addElement(groupName);
 		}
 		
 		groupList.setModel(groupNames);
@@ -592,7 +592,7 @@ public class GUI extends JFrame{
 			if(username.equals(oldUsername))
 				usernames.addElement(newUsername);
 			else
-				usernames.addElement(oldUsername);
+				usernames.addElement(username);
 		}
 		
 		connectedUsersList.setModel(usernames);
