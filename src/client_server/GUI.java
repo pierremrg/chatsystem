@@ -451,16 +451,26 @@ public class GUI extends JFrame{
 	public class connectedUsersListSelectionChange implements ListSelectionListener {
 
 		public void valueChanged(ListSelectionEvent e) {
-			if(!e.getValueIsAdjusting()) {				
-				int index;
-				for(index = 0; index < groupList.getModel().getSize(); index ++) {
+			
+			if(!e.getValueIsAdjusting()) {
+				
+				if(connectedUsersList.getSelectedIndex() == -1) {
+					textField.setEditable(false);
+					sendButton.setEnabled(false);
+				}
+				else {
+					textField.setEditable(true);
+					sendButton.setEnabled(true);
+				}
+				
+				for(int index = 0; index < groupList.getModel().getSize(); index ++) {
 					String username = groupList.getModel().getElementAt(index);
+					
 					if (username.equals(connectedUsersList.getSelectedValue())){
 						groupList.setSelectedIndex(index);
 					}
 				}
-				textField.setEditable(true);
-				sendButton.setEnabled(true);			
+				
 			}
 			
 		}
