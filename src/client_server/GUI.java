@@ -28,6 +28,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -154,7 +155,7 @@ public class GUI extends JFrame{
 		//groupList.setBorder(BorderFactory.createRaisedBevelBorder());
 		groupList.setPreferredSize(new Dimension(40,0));
 		groupList.addListSelectionListener(new groupListSelectionChange());
-		groupList.setCellRenderer(new MyListCellThing());
+		groupList.setCellRenderer(new MyListCellThing(MyListCellThing.STYLE_GROUP));
 		c.fill = GridBagConstraints.BOTH;
 		c.weightx = 0.1;
 		c.weighty = 1;
@@ -203,7 +204,7 @@ public class GUI extends JFrame{
 		//connectedUsersList.setBorder(BorderFactory.createRaisedBevelBorder());
 		connectedUsersList.setPreferredSize(new Dimension(40,0));
 		connectedUsersList.addListSelectionListener(new connectedUsersListSelectionChange());
-		connectedUsersList.setCellRenderer(new MyListCellThing());
+		connectedUsersList.setCellRenderer(new MyListCellThing(MyListCellThing.STYLE_USERS));
 		c.weightx = 0.1;
 		c.weighty = 2;
 		c.gridx = 3;
@@ -231,9 +232,15 @@ public class GUI extends JFrame{
 	}
 	
 	public class MyListCellThing extends JLabel implements ListCellRenderer {
+		
+		int style;
+		
+		public static final int STYLE_GROUP = 1;
+		public static final int STYLE_USERS = 2;
 
-	    public MyListCellThing() {
+	    public MyListCellThing(int style) {
 	        setOpaque(true);
+	        this.style = style;
 	    }
 
 	    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -248,7 +255,7 @@ public class GUI extends JFrame{
 	        String groupName = list.getModel().getElementAt(index).toString();
 	        Group selectedGroup = controller.getGroupByName(groupName);
 	        
-	        if(selectedGroup != null &&
+	        if(style == STYLE_GROUP && selectedGroup != null &&
 	        	newMessageGroups.containsKey(selectedGroup.getID()) && newMessageGroups.get(selectedGroup.getID()))
 	        	
 	        	setFont(getFont().deriveFont(Font.BOLD));
@@ -314,6 +321,9 @@ public class GUI extends JFrame{
 			/* Envoi du message */
 			// TODO
 			try {
+				if(connectedUsersList.getSelectedIndex() == -1)
+					return;
+				
 				// TODO on crée le groupe ici ou on garde que l'ID ? que le nom ?
 				String groupName = connectedUsersList.getSelectedValue();
 
@@ -321,9 +331,9 @@ public class GUI extends JFrame{
 				
 				displayMessages(controller.getGroupByName(groupName));
 			
-			} catch (IOException e1) {
+			} catch (Exception e1) {
 				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				showError("Impossible d'envoyer le message à cet utilisateur.");
 			}
 
 		}
@@ -372,7 +382,7 @@ public class GUI extends JFrame{
 					if (username.equals(groupList.getSelectedValue())) {
 						connectedUsersList.setSelectedIndex(index);
 						inList = true;
-					}
+					} 
 				}
 				if (inList == false) {
 					connectedUsersList.clearSelection();
@@ -689,22 +699,19 @@ public class GUI extends JFrame{
 		
 	}
 	
-//	private static String getRealGroupName(String groupName) {
-//		if(groupName != null && groupName.startsWith(NEW_MESSAGE_INDICATOR))
-//			return groupName.substring(NEW_MESSAGE_INDICATOR.length());
-//		else
-//			return groupName;
-//	}
+	/**
+	 * Affiche une erreur
+	 * @param errorMessage Le message d'erreur a afficher
+	 */
+	public static void showError(String errorMessage) {
+		JOptionPane.showMessageDialog(null, errorMessage, "Erreur", JOptionPane.ERROR_MESSAGE);
+	}
 
 
 	public static void main(String[] args) throws SocketException, ClassNotFoundException, SQLException, UnknownHostException {	
 		
+		// TODO A supprimer
 		System.out.println("Main started");
-		
-		/*Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
-		Connection con = DriverManager.getConnection("jdbc:odbc:MovieCatalog");
-		
-		Statement statement = (Statement) con.createStatement();*/
 		
 		Map<InetAddress, InetAddress> allIP = Controller.getAllIpAndBroadcast();
 		InetAddress ipMachine;
@@ -724,9 +731,9 @@ public class GUI extends JFrame{
 			controller.connect(id, username, ipMachine);
 			
 			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			showError("Une erreur s'est produite à l'ouverture.");
+			System.exit(1);
 		}
 		
 	}
