@@ -49,7 +49,8 @@ public class SocketReader extends Thread {
 			String stringData = in_data.readLine();
 
 			// Tant que la connexion est ouverte, on lit les messages
-			while (stringData != null && !stringData.equals("-1")) { // TODO : "-1" a supprimer ? Pas d'utilite, non ?
+		 // TODO : "-1" a supprimer ? Pas d'utilite, non ?
+			while (stringData != null && !stringData.equals("-1")) {
 
 				// On decode le message recu et on l'envoie au controller
 				message = decodeMessageFromString(stringData);
@@ -65,12 +66,10 @@ public class SocketReader extends Thread {
 			}
 		} catch (SocketException e) {
 
-			// Socket deja ferme par le SocketWriter : pas d'erreur
-			if (!socket.isClosed())
-				GUI.showError("Erreur dans la lecture des messages reçus.");
+			// Socket deja ferme : pas d'erreur
 
 		} catch (Exception e) {
-			GUI.showError("Erreur dans la lecture des messages reçus.");
+			GUI.showError("Erreur dans la lecture des messages recus.");
 			
 		} finally {
 			System.out.println("Deconnecting reader..."); // TODO A supprimer

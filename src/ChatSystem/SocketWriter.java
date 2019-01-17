@@ -75,7 +75,8 @@ public class SocketWriter extends Thread {
 		}
 		
 		finally {
-			System.out.println("Deconnecting writer..."); // TODO A supprimer
+			// TODO A supprimer
+			System.out.println("Deconnecting writer...");
 			if (socket != null) {
 				try {
 					socket.close();
