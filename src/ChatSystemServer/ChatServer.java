@@ -6,7 +6,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.prefs.Preferences;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
@@ -16,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.ini4j.Ini;
-import org.ini4j.IniPreferences;
 
 /**
  * Servlet implementation class ChatServer
@@ -28,14 +26,14 @@ public class ChatServer extends HttpServlet {
 	public static final int ACTION_GET_CONNECTED_USERS = 2;
 	
 	private ArrayList<Integer> ids;
-	
        
     /**
      * @see HttpServlet#HttpServlet()
      */
     public ChatServer() {
         super();
-
+        // TODO Auto-generated constructor stub
+        
         ids = new ArrayList<Integer>();
     }
 
@@ -43,17 +41,7 @@ public class ChatServer extends HttpServlet {
 	 * @see Servlet#init(ServletConfig)
 	 */
 	public void init(ServletConfig config) throws ServletException {
-
-//		System.out.println("Waiting ENTER...");
-		
-//      try {
-//			System.in.read();
-//			System.exit(0);
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-		
+		// TODO Auto-generated method stub
 	}
 
 	/**
@@ -61,6 +49,7 @@ public class ChatServer extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+
 //		response.getWriter().append("Served at: ").append(request.getContextPath());
 		
 //		response.setContentType("application/json");
@@ -74,7 +63,7 @@ public class ChatServer extends HttpServlet {
 			try {
 				int action = Integer.parseInt(parameters.get("action"));
 				
-				Ini ini = new Ini(new File("ini.txt"));
+				//Ini ini = new Ini(new File("ini.txt"));
 				//Preferences prefs = new IniPreferences(ini);
 				
 				//out.write(prefs.node("toto").get("param1", "no value"));
