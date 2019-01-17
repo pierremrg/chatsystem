@@ -7,25 +7,21 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.desktop.UserSessionEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.net.SocketException;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
@@ -42,6 +38,9 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import ChatSystem.Controller.ConnectionError;
+import ChatSystem.Controller.SendPresenceError;
 	
 /**
  * Fenetre principale du programme
@@ -792,16 +791,37 @@ public class GUI extends JFrame{
 
 		
 		try {
-			controller = new Controller(allIP.get(ipMachine));
+			
+			boolean useServer = (DataManager.getSetting("general", "use_server", "0").equals("1")) ? true : false;
+			
+			if(useServer) {
+				String serverIP = DataManager.getSetting("server", "ip", "0.0.0.0");
+				int serverPort = Integer.parseInt(DataManager.getSetting("server", "port", "-1"));
+				controller = new Controller(allIP.get(ipMachine), serverIP, serverPort);
+				
+				if(!Controller.testConnectionServer()) {
+					showError("Impossible de se connecter au serveur.\nVerifiez la configuration de la connexion ou utilisez le protocole UDP.");
+					System.exit(1);
+				}
+			}
+			else {
+				controller = new Controller(allIP.get(ipMachine), null, -1);
+			}
+			
+			
 			controller.setGUI(new GUI(username));
 			controller.connect(id, username, ipMachine);
 			
-		} catch (IOException e) {
-			showError("Une erreur s'est produite dans le service UDP.");
-			
-		} catch (Exception e) {
-			showError("Une erreur s'est produite à l'ouverture.");
+		} catch (ConnectionError | NumberFormatException e) {
+			// Erreurs generees par une mauvaise configuration dans le fichier de configuration
+			showError("Impossible de se connecter au serveur.\nVerifiez la configuration de la connexion ou utilisez le protocole UDP.");
 			System.exit(1);
+		} catch (SendPresenceError e) {
+			showError("Impossible de se connecter au chat.");
+			System.exit(3);
+		} catch (IOException e) {
+			showError("Une erreur s'est produite dans la decouverte du reseau.");
+			System.exit(2);
 		}
 		
 	}

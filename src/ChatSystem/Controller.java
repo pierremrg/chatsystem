@@ -1,7 +1,10 @@
 package ChatSystem;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -13,6 +16,7 @@ import java.net.SocketException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -22,12 +26,16 @@ import java.util.Random;
 import com.google.gson.Gson;
 
 import ChatSystem.DataManager.PasswordError;
+import ChatSystemServer.ChatServer;
+import ChatSystemServer.ChatServer.ServerResponse;
 
 /**
  * Controller de l'application
  *
  */
 public class Controller {
+	
+	// Mega TODO : singleton !!
 	
 	// Utilisateur associe au controller
 	private User user;
@@ -53,6 +61,25 @@ public class Controller {
 	// Utilise pour envoyer un message
 	private volatile Message messageToSend = null;
 	
+	// Informations sur le serveur (si besoin)
+	private static boolean useServer;
+	private static String serverIP;
+	private static int serverPort;
+	
+	
+	/**
+	 * Constantes
+	 */
+	private static final int TIMEOUT_CONNECTION = 3000; // TODO Lire dans la conf
+
+	
+	/**
+	 * Erreurs
+	 */
+	@SuppressWarnings("serial")
+	public static class ConnectionError extends Exception {};
+	@SuppressWarnings("serial")
+	public static class SendPresenceError extends Exception {};
 
 	/**
 	 * @param ipBroadcast L'adresse IP de la machine
@@ -60,17 +87,30 @@ public class Controller {
 	 * @throws ClassNotFoundException Erreur dans la lecture des fichiers
 	 * @throws FileNotFoundException Erreur dans la lecture des fichiers
 	 */
-	public Controller (InetAddress ipBroadcast) throws FileNotFoundException, ClassNotFoundException, IOException {
-		
+	public Controller (InetAddress ipBroadcast, String serverIP, int serverPort) throws FileNotFoundException, ClassNotFoundException, IOException {
+
 		this.connectedUsers = new ArrayList<User>();
 		this.groups = new ArrayList<Group>();
 		this.messages = new ArrayList<Message>();
+		
+		// TODO a deplacer si utilisation du serveur
 		this.ipBroadcast = ipBroadcast;
-
 		this.udp = new Udp(this);
 		
 		messages = DataManager.readAllMessages();
 		groups = DataManager.readAllGroups();
+		
+		if(serverPort > 0) {
+			System.out.println("Use server (controller)");
+			Controller.useServer = true;
+			Controller.serverIP = serverIP;
+			Controller.serverPort = serverPort;
+		}
+		else {
+			Controller.useServer = false;
+			Controller.serverIP = null;
+			Controller.serverPort = -1;
+		}
 		
 		/* Tests pour verifier le bon fonctionnement de la sauvegarde des donnees, TODO a supprimer */
 		/*for(Group g : groups) {
@@ -311,10 +351,12 @@ public class Controller {
 	 * @param username L'username de l'utilisateur
 	 * @param ip L'IP de l'utilisateur
 	 * @throws IOException
+	 * @throws ConnectionError Si le serveur n'est pas accessible
+	 * @throws SendPresenceError Si on ne parvient pas a indiquer sa presence au serveur
 	 * @see ServerSocketWaiter
 	 */
-	public void connect(int id, String username, InetAddress ip) throws IOException {
-
+	public void connect(int id, String username, InetAddress ip) throws IOException, ConnectionError, SendPresenceError {
+		
 		// Les verifications sur les identifiants de l'utilisateur sont faites avant
 
 		// Cr�ation de l'utilisateur associe au controller
@@ -331,23 +373,66 @@ public class Controller {
 		ServerSocketWaiter serverSocketWaiter = new ServerSocketWaiter(serverSocket, this);
 		serverSocketWaiter.start();
 
-		// Demarrage du service UDP et envoi du message de presence
-		/*udp.start();
-		udp.sendUdpMessage(udp.createMessage(Udp.STATUS_CONNEXION, getUser()), ipBroadcast);*/
-		
-		Gson gson = new Gson();
-		String json = gson.toJson(user);
-		
-		URL url = new URL("http://172.20.10.2:8080/ChatSystem/ChatServer?action=" +  ChatSystemServer.ChatServer.ACTION_NEW_USER + "&userdata=" + json );
-		HttpURLConnection con = (HttpURLConnection) url.openConnection();
-		con.setRequestMethod("GET");
-		con.setRequestProperty("Content-Type", "text/html");
-		con.setConnectTimeout(5000);
-		con.setReadTimeout(5000);
-		
-		int status = con.getResponseCode();
-		System.out.println("Status: " + status);
-		
+		if(!useServer) {
+			// Demarrage du service UDP et envoi du message de presence
+			udp.start();
+			udp.sendUdpMessage(udp.createMessage(Udp.STATUS_CONNEXION, getUser()), ipBroadcast);
+		}
+		else {
+			// Connexion au serveur
+			
+			Gson gson = new Gson();
+			
+			// Creation des donnees utilisateur
+			String jsonData = gson.toJson(user);
+			String paramValue = "userdata=" + jsonData;
+			
+			// Test de la connexion
+			if(!testConnectionServer())
+				throw new ConnectionError();
+			
+			// Connexion au serveur et traitement de la reponse
+			HttpURLConnection con = sendRequestToServer(ChatSystemServer.ChatServer.ACTION_NEW_USER, paramValue);		
+			
+			int status = con.getResponseCode();
+			if(status != HttpURLConnection.HTTP_OK)
+				throw new SendPresenceError();
+			
+			String jsonResponse = getResponseContent(con);
+			ServerResponse serverResponse = gson.fromJson(jsonResponse, ServerResponse.class);
+
+			if(serverResponse.getCode() != ChatServer.NO_ERROR)
+				throw new SendPresenceError();
+			
+			// On recupere la liste des utilisateurs connectes
+			User[] responseUsers = gson.fromJson(serverResponse.getData(), User[].class);
+			connectedUsers = new ArrayList<User>(Arrays.asList(responseUsers));
+			
+			// TODO Pas optimal ?
+			// Mise a jour des groupes avec les nouvelles informations des utilisateurs connectes
+			boolean hasChanged = false;
+			String oldName;
+			for(User receivedUser : connectedUsers) {
+				
+				for(Group group : groups) {
+					oldName = group.getGroupNameForUser(user);
+					hasChanged = group.updateMember(receivedUser);
+					
+					if(hasChanged) {
+						gui.replaceUsernameInList(oldName, group.getGroupNameForUser(user));
+					}
+				}
+				
+			
+				// Mise a jour des messages avec les nouvelles informations de l'utilisateur
+				for(Message m : messages)
+					m.updateSender(receivedUser);
+			}
+				
+			// Mise a jour du GUI
+			if(gui != null)
+				gui.updateConnectedUsers();
+		}
 		
 		// Ajout des groupes au GUI
 		for(Group g : groups)
@@ -381,10 +466,10 @@ public class Controller {
 		if(receivedUser == null)
 			return;
 
-		// TODO Affichage dans le GUI
-		System.out.println("connexion reçu! iduser=" +receivedUser.getID());
+		// TODO Affichage dans le GUI ?
+		System.out.println("connexion recu! iduser=" +receivedUser.getID());
 
-		// On verifie qu'on ne re�oit pas sa propre annonce et qu'on ne conna�t pas deja l'utilisateur
+		// On verifie qu'on ne recoit pas sa propre annonce et qu'on ne connact pas deja l'utilisateur
 		if(!connectedUsers.contains(receivedUser) && !receivedUser.equals(user))
 			connectedUsers.add(receivedUser);
 		
@@ -605,6 +690,78 @@ public class Controller {
 		}
 		
 		return listIP;
+	}
+	
+	/**
+	 * Envoie une requete au serveur
+	 * @param action L'action demandee au serveur
+	 * @param paramValue La valeur du parametre passe
+	 * @return La connexion au serveur (contenant le status, la reponse, etc.)
+	 * @throws IOException Si le serveur est inaccessible
+	 */
+	private static HttpURLConnection sendRequestToServer(int action, String paramValue) throws IOException {
+		
+		URL url = new URL("http://" + serverIP + ":" + serverPort + "/ChatSystem/ChatServer?action=" + action + "&" + paramValue);
+		
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+		con.setRequestMethod("POST");
+		con.setRequestProperty("Content-Type", "application/json");
+		con.setConnectTimeout(500);
+		con.setReadTimeout(500);
+			
+		return con;
+		
+	}
+	
+	/**
+	 * Teste si le serveur est accessible
+	 * @param ip L'IP du serveur
+	 * @param port Le port sur lequel se connecter
+	 * @return True si le serveur est accessible, False sinon
+	 */
+	public static boolean testConnectionServer() {
+		
+		try {
+			URL url = new URL("http://" + serverIP + ":" + serverPort + "/ChatSystem/ChatServer");
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			con.setRequestMethod("HEAD");
+			con.setConnectTimeout(TIMEOUT_CONNECTION);
+			
+			return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
+		}
+		catch (IOException e) {
+			return false;
+		}
+
+	}
+	
+	/**
+	 * Retourne le contenu texte d'une reponse du serveur
+	 * @param con La connexion au serveur
+	 * @return Le contenu texte de la reponse
+	 * @throws IOException Si une erreur dans la connexion survient
+	 */
+	private static String getResponseContent(HttpURLConnection con) throws IOException {
+		
+		int responseCode = con.getResponseCode();
+		InputStream inputStream;
+		
+		if(200 <= responseCode && responseCode <= 299)
+			inputStream = con.getInputStream();
+		else
+			inputStream = con.getErrorStream();
+		
+		BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
+		
+		StringBuilder content = new StringBuilder();
+		String currentLine;
+		
+		while((currentLine = in.readLine()) != null)
+			content.append(currentLine);
+		
+		in.close();
+		
+		return content.toString();
 	}
 	
 }

@@ -13,6 +13,11 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
+import java.util.prefs.Preferences;
+
+import org.ini4j.Ini;
+import org.ini4j.IniPreferences;
+import org.ini4j.InvalidFileFormatException;
 
 /**
  * Permet de gerer la lecture et l'ecriture des donnees sur la machine locale
@@ -28,11 +33,15 @@ public class DataManager {
 	private static final String PATH_GROUPS = "data/groups.bin";
 	private static final String PATH_USER = "data/user.bin";
 	
+	private static final String PATH_CONFIG = "settings.ini";
+	
+	
 	/**
 	 * Erreurs
 	 */
 	@SuppressWarnings("serial")
 	public static class PasswordError extends Exception {};
+	
 	
 	/**
 	 * Stocke sur la machine l'ensemble des messages de l'utilisateur
@@ -287,4 +296,26 @@ public class DataManager {
 		
 		return passwordHashed;
 	}
+	
+	
+	public static String getSetting(String node, String setting, String defaultValue) {
+		
+		File iniFile = new File(PATH_CONFIG);
+		if(!iniFile.exists() || iniFile.isDirectory())
+			return defaultValue;
+		
+		try {
+			
+			Ini ini;
+			ini = new Ini(iniFile);
+		
+			Preferences prefs = new IniPreferences(ini);
+			return prefs.node(node).get(setting, defaultValue);
+			
+		} catch (Exception e) {
+			return defaultValue;
+		}
+		
+	}
+	
 }
