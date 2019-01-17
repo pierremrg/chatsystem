@@ -1,4 +1,4 @@
-package client_server;
+package ChatSystem;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -14,9 +14,14 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 
-import client_server.DataManager.PasswordError;
+import ChatSystem.DataManager.PasswordError;
 
 public class GUIModifUser extends JFrame {
 	

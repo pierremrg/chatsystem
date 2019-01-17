@@ -1,4 +1,4 @@
-package client_server;
+package ChatSystem;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;

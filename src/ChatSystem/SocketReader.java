@@ -1,4 +1,4 @@
-package client_server;
+package ChatSystem;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;

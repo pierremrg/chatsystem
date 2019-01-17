@@ -1,4 +1,4 @@
-package client_server;
+package ChatSystem;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

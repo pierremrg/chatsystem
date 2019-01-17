@@ -1,4 +1,4 @@
-package client_server;
+package ChatSystem;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -11,16 +11,22 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.SocketException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.prefs.Preferences;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -38,6 +44,9 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import org.ini4j.Ini;
+import org.ini4j.IniPreferences;
 	
 /**
  * Fenetre principale du programme
@@ -728,6 +737,49 @@ public class GUI extends JFrame{
 
 
 	public static void main(String[] args) throws SocketException, ClassNotFoundException, SQLException, UnknownHostException {	
+		
+		// TODO Tests : a supprimer
+		/*try {
+			URL url = new URL("http://localhost:8080/ChatSystemServer/ChatServer?toto=5&titi=2");
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			con.setRequestMethod("GET");
+//			con.setRequestProperty("Content-Type", "text/html");
+			con.setConnectTimeout(5000);
+			con.setReadTimeout(5000);
+			
+			int status = con.getResponseCode();
+			System.out.println("Status: " + status);
+			
+			String inputLine;
+			StringBuffer content = new StringBuffer();
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			
+			while((inputLine = in.readLine()) != null)
+				content.append(inputLine);
+			
+			System.out.println("Response :" + content.toString());
+			
+			File iniFile = new File("settings.ini");
+			if(!iniFile.exists() || iniFile.isDirectory()) {
+				System.out.println("Fichier de configuration inexistant.");
+				return;
+			}
+			
+			Ini ini = new Ini(iniFile);
+			Preferences prefs = new IniPreferences(ini);
+			System.out.println(prefs.node("toto").get("a", "none"));
+			
+			
+		} catch (MalformedURLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+		
+		
+		
 		
 		// TODO A supprimer
 		System.out.println("Main started");

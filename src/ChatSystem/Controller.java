@@ -1,4 +1,4 @@
-package client_server;
+package ChatSystem;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -9,7 +9,6 @@ import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import client_server.DataManager.PasswordError;
+import ChatSystem.DataManager.PasswordError;
 
 /**
  * Controller de l'application
