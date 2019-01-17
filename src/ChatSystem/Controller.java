@@ -2,6 +2,7 @@ package ChatSystem;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
@@ -9,6 +10,7 @@ import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,6 +18,8 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+
+import com.google.gson.Gson;
 
 import ChatSystem.DataManager.PasswordError;
 
@@ -328,8 +332,22 @@ public class Controller {
 		serverSocketWaiter.start();
 
 		// Demarrage du service UDP et envoi du message de presence
-		udp.start();
-		udp.sendUdpMessage(udp.createMessage(Udp.STATUS_CONNEXION, getUser()), ipBroadcast);
+		/*udp.start();
+		udp.sendUdpMessage(udp.createMessage(Udp.STATUS_CONNEXION, getUser()), ipBroadcast);*/
+		
+		Gson gson = new Gson();
+		String json = gson.toJson(user);
+		
+		URL url = new URL("http://172.20.10.2:8080/ChatSystem/ChatServer?action=" +  ChatSystemServer.ChatServer.ACTION_NEW_USER + "&userdata=" + json );
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+		con.setRequestMethod("GET");
+		con.setRequestProperty("Content-Type", "text/html");
+		con.setConnectTimeout(5000);
+		con.setReadTimeout(5000);
+		
+		int status = con.getResponseCode();
+		System.out.println("Status: " + status);
+		
 		
 		// Ajout des groupes au GUI
 		for(Group g : groups)
