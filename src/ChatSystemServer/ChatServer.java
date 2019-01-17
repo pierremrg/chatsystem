@@ -13,6 +13,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+
 import ChatSystem.User;
 
 /**
@@ -25,7 +28,9 @@ public class ChatServer extends HttpServlet {
 	public static final int ACTION_GET_CONNECTED_USERS = 2;
 	
 	private ArrayList<User> connectedUsers;
-       
+//	Gson gson;
+ 
+	
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -34,6 +39,7 @@ public class ChatServer extends HttpServlet {
         // TODO Auto-generated constructor stub
         
         connectedUsers = new ArrayList<User>();
+        
     }
 
 	/**
@@ -71,10 +77,14 @@ public class ChatServer extends HttpServlet {
 					if(!parameters.containsKey("userdata"))
 						return;
 					
-					// TODO Obtenir User avec Gson
-					User user = new User(10000, "ordipierre", null);
+//					User user = new User(10000, "ordipierre", null);
+
+				
+					Gson gson = new Gson();
+
+					User newUser = gson.fromJson(parameters.get("userdata"), User.class);
 					
-					connectedUsers.add(user);
+					connectedUsers.add(newUser);
 					
 					out.write("New user connected");
 				}
@@ -82,8 +92,11 @@ public class ChatServer extends HttpServlet {
 				else if(action == ACTION_GET_CONNECTED_USERS) {
 //					out.write(connectedUsers.toString());
 					
-					for(User u : connectedUsers)
-						out.write(u.toString());
+					Gson gson = new Gson();
+					out.write(gson.toJson(connectedUsers));
+					
+//					for(User u : connectedUsers)
+//						out.write(u.toString());
 					
 				}
 				else
@@ -92,6 +105,9 @@ public class ChatServer extends HttpServlet {
 			}
 			catch (NumberFormatException | NullPointerException e) {
 				// Pas un entier, ne rien faire
+			}
+			catch (JsonSyntaxException e) {
+				out.write("Erreur format JSON");
 			}
 			
 		}

@@ -786,7 +786,7 @@ public class GUI extends JFrame{
 		
 		Map<InetAddress, InetAddress> allIP = Controller.getAllIpAndBroadcast();
 		InetAddress ipMachine;
-		String username ;
+		String username;
 		int id;
 		GUIConnect guiConnect = new GUIConnect(new ArrayList<InetAddress>(allIP.keySet()));
 		

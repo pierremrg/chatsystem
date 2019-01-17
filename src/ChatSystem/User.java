@@ -86,8 +86,7 @@ public class User implements Serializable{
 	}
 	
 	@Override
-	public String toString() {
-//		return "aaa";
+	public String toString() {		
 		return "{" + Integer.toString(id) + ", " + username + "}";
 	}
 
