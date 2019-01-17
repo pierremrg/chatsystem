@@ -84,5 +84,11 @@ public class User implements Serializable{
 		User u = (User) obj;
 		return u.id == id;
 	}
+	
+	@Override
+	public String toString() {
+//		return "aaa";
+		return "{" + Integer.toString(id) + ", " + username + "}";
+	}
 
 }

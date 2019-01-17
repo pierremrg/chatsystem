@@ -1,6 +1,5 @@
 package ChatSystemServer;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -14,7 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.ini4j.Ini;
+import ChatSystem.User;
 
 /**
  * Servlet implementation class ChatServer
@@ -25,7 +24,7 @@ public class ChatServer extends HttpServlet {
 	public static final int ACTION_NEW_USER = 1;
 	public static final int ACTION_GET_CONNECTED_USERS = 2;
 	
-	private ArrayList<Integer> ids;
+	private ArrayList<User> connectedUsers;
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -34,7 +33,7 @@ public class ChatServer extends HttpServlet {
         super();
         // TODO Auto-generated constructor stub
         
-        ids = new ArrayList<Integer>();
+        connectedUsers = new ArrayList<User>();
     }
 
 	/**
@@ -55,7 +54,6 @@ public class ChatServer extends HttpServlet {
 //		response.setContentType("application/json");
 		
 		PrintWriter out = response.getWriter();
-		
 		HashMap<String, String> parameters = getParametersMap(request);
 		
 		if(parameters.containsKey("action")) {
@@ -70,15 +68,23 @@ public class ChatServer extends HttpServlet {
 			
 				if(action == ACTION_NEW_USER) {
 					
-					if(!parameters.containsKey("id"))
+					if(!parameters.containsKey("userdata"))
 						return;
 					
-					ids.add(Integer.parseInt(parameters.get("id")));
-					out.write("ID added");
+					// TODO Obtenir User avec Gson
+					User user = new User(10000, "ordipierre", null);
+					
+					connectedUsers.add(user);
+					
+					out.write("New user connected");
 				}
 					
 				else if(action == ACTION_GET_CONNECTED_USERS) {
-					out.write(ids.toString());
+//					out.write(connectedUsers.toString());
+					
+					for(User u : connectedUsers)
+						out.write(u.toString());
+					
 				}
 				else
 					out.write("Do nothing");
@@ -87,7 +93,6 @@ public class ChatServer extends HttpServlet {
 			catch (NumberFormatException | NullPointerException e) {
 				// Pas un entier, ne rien faire
 			}
-			
 			
 		}
 //			out.write(Integer.parseInt(parameters.get("action")));
