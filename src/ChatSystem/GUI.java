@@ -48,6 +48,8 @@ import ChatSystem.Controller.SendDeconnectionError;
  */
 public class GUI extends JFrame{
 
+	private static final long serialVersionUID = 1L;
+	
 	private static Controller controller;
 	private Map<Integer, Boolean> newMessageGroups = new HashMap<Integer, Boolean>();
 	
@@ -441,7 +443,7 @@ public class GUI extends JFrame{
 //				
 //				}
 //				else {
-//					// TODO erreur
+//					// TODO erreu
 //					//System.out.println("Erreur groupe inexistant");
 //				}*/
 //				

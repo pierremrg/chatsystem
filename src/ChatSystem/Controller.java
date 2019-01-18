@@ -35,13 +35,12 @@ import ChatSystemServer.ChatServer.ServerResponse;
  */
 public class Controller {
 	
-	// Mega TODO : singleton !!
-	
 	// Utilisateur associe au controller
 	private User user;
 	
 	// GUI
-	private volatile GUI gui; // TODO Pourquoi volatile ?
+//	private volatile GUI gui; // TODO Pourquoi volatile ?
+	private GUI gui;
 	
 	// Groupes de l'utilisateur
 	private ArrayList<Group> groups;
