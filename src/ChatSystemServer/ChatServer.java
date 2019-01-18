@@ -30,7 +30,7 @@ public class ChatServer extends HttpServlet {
 	public static final int ACTION_USER_DECONNECTION = 2;
 	
 	// TODO lire depuis config
-	public static final int AUTO_DECONNECTION_DELAY = 10000;
+	public static final int AUTO_DECONNECTION_DELAY = 5000;
 	
 	// TODO a supprimer
 	public static final int ACTION_REMOVE_ALL_USERS = 50;
@@ -229,7 +229,7 @@ public class ChatServer extends HttpServlet {
 		ArrayList<User> stillConnectedUsers = new ArrayList<User>();
 		
 		for(User u : connectedUsers) {
-			if(currentTime.getTime() - u.getLastVisit().getTime() < AUTO_DECONNECTION_DELAY*10000)
+			if(currentTime.getTime() - u.getLastVisit().getTime() < AUTO_DECONNECTION_DELAY)
 				stillConnectedUsers.add(u);
 		}
 		

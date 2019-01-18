@@ -805,7 +805,7 @@ public class GUI extends JFrame{
 				
 				if(!Controller.testConnectionServer()) {
 					showError("Impossible de se connecter au serveur.\nVerifiez la configuration de la connexion ou utilisez le protocole UDP.");
-					//System.exit(EXIT_ERROR_SERVER_UNAVAILABLE);
+					System.exit(Controller.EXIT_ERROR_SERVER_UNAVAILABLE);
 				}
 			}
 			else {

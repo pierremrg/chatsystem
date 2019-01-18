@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.FormatFlagsConversionMismatchException;
 import java.util.TimerTask;
 
 import com.google.gson.Gson;
@@ -77,26 +76,6 @@ public class ResquestTimer extends TimerTask {
 			GUI.showError("Impossible de se connecter au chat.");
 			System.exit(Controller.EXIT_ERROR_SEND_CONNECTION);
 		}
-		
-		
-		/*boolean hasChanged = false;
-		String oldName;
-		for(User receivedUser : controller.getConnectedUsers()) {
-			
-			for(Group group : controller.getGroups()) {
-				oldName = group.getGroupNameForUser(controller.getUser());
-				hasChanged = group.updateMember(receivedUser);
-				
-				if(hasChanged) {
-					controller.getGUI().replaceUsernameInList(oldName, group.getGroupNameForUser(controller.getUser()));
-				}
-			}
-			
-		
-			// Mise a jour des messages avec les nouvelles informations de l'utilisateur
-			for(Message m : controller.getme)
-				m.updateSender(receivedUser);
-		}*/
 
 	}
 
