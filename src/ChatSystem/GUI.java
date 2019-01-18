@@ -56,19 +56,20 @@ public class GUI extends JFrame{
 	private JPanel panel; // Panel principal
 	private JButton sendButton; // Bouton Envoyer 
 	private JTextField textField; // Zone de texte
-	//private JTextArea messagesArea; // Zone des messages
-	private JEditorPane messagesArea;
-	private JScrollPane scrollMessageArea;
-	private static JList<String> groupList; // Liste des groupes déjà démarrés
-	private JList<String> connectedUsersList; // Liste des utilisateurs connectés
-	private JLabel labelGroups; // Label "Conversations démarrées"
-	private JLabel labelConnectedUsers; // Label "Utilisateurs connectés"
-	private JButton userButton; //Bouton info profil
+	private JEditorPane messagesArea; // Zone des messages
+	private JScrollPane scrollMessageArea; // TODO Auto-scroll en bas
+	private static JList<String> groupList; // Liste des groupes deja demarres
+	private JList<String> connectedUsersList; // Liste des utilisateurs connectes
+	private JLabel labelGroups; // Label "Conversations demarees"
+	private JLabel labelConnectedUsers; // Label "Utilisateurs connectes"
+	private JButton userButton; // Bouton "Profil"
 	
+	@SuppressWarnings("unchecked")
 	public GUI(String username) {
-		/* Fenêtre principale */
+		
+		/* Fenetre principale */
 		super("Chatsystem");
-		//setDefaultCloseOperation(new windowClosingListener());
+
 		addWindowListener(new windowClosingListener());
 		setSize(new Dimension(900, 500));
 		setLocationRelativeTo(null);
@@ -80,6 +81,7 @@ public class GUI extends JFrame{
 		panel.setBackground(new Color(200,200,200));
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(1,1,1,1);
+		
 		
 		/* Bouton Envoyer */
 		sendButton = new JButton("Envoyer");
@@ -109,13 +111,11 @@ public class GUI extends JFrame{
 		
 		
 		/* Zone des messages */
-		//messagesArea = new JTextArea();
 		messagesArea = new JEditorPane();
 		messagesArea.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 		messagesArea.setFont(textField.getFont());
 		messagesArea.setContentType("text/html");
 		messagesArea.setEditable(false);
-		
 		messagesArea.setMinimumSize(new Dimension(600, 600));
 		messagesArea.setMaximumSize(new Dimension(600, 600));
         messagesArea.setPreferredSize(new Dimension(600, 600));
@@ -134,28 +134,10 @@ public class GUI extends JFrame{
 		panel.add(scrollMessageArea, c);
 		
 		
-		/* Liste des groupes déjà démarrés */
-		
-		
-		// TODO a supprimer
-		/*usernames.addElement("jean");
-		usernames.addElement("truc");
+		/* Liste des groupes deja demarres */
 		DefaultListModel<String> groupnames = new DefaultListModel<String>();
-		ArrayList<Group> startedGroups = controller.getGroups();
-		//ArrayList<Group> startedGroups = new ArrayList<Group>();
-		
-		// TODO vide au début ?
-		for(Group g : startedGroups)
-			groupnames.addElement(g.getGroupNameForUser(controller.getUser()));*/
-		
-		DefaultListModel<String> groupnames = new DefaultListModel<String>();
-		/*groupnames.addElement("jean");
-		groupnames.addElement("truc");
-		groupnames.addElement("titi");*/
-		
 		groupList = new JList<String>();
 		groupList.setModel(groupnames);
-		//groupList.setBorder(BorderFactory.createRaisedBevelBorder());
 		groupList.setPreferredSize(new Dimension(40,0));
 		groupList.addListSelectionListener(new groupListSelectionChange());
 		groupList.setCellRenderer(new MyListCellThing(MyListCellThing.STYLE_GROUP));
@@ -183,28 +165,7 @@ public class GUI extends JFrame{
 		
 		/* Liste de tous les utilisateurs connectes */
 		DefaultListModel<String> usernames = new DefaultListModel<String>();
-		//ArrayList<User> connectedUsers = controller.getConnectedUsers();
-		//ArrayList<User> connectedUsers = new ArrayList<User>();
-		
-		/*usernames.addElement("jean");
-		usernames.addElement("truc");*/
-		
-		// TODO vide au début ?
-		/*for(User u : connectedUsers)
-			usernames.addElement(u.getUsername());*/
-		
-		userButton = new JButton("Mon profil");
-		userButton.addActionListener(new modifUserListener(this));
-		c.fill = GridBagConstraints.BOTH;
-		c.weightx = 0.2;
-		c.gridx = 3;
-		c.gridy = 0;
-		c.gridwidth = 1;
-		c.gridheight = 1;
-		panel.add(userButton, c);
-		
 		connectedUsersList = new JList<String>(usernames);
-		//connectedUsersList.setBorder(BorderFactory.createRaisedBevelBorder());
 		connectedUsersList.setPreferredSize(new Dimension(40,0));
 		connectedUsersList.addListSelectionListener(new connectedUsersListSelectionChange());
 		connectedUsersList.setCellRenderer(new MyListCellThing(MyListCellThing.STYLE_USERS));
@@ -228,36 +189,57 @@ public class GUI extends JFrame{
 		panel.add(labelConnectedUsers, c);
 		
 		
+		/* Bouton "Profil" */
+		userButton = new JButton("Mon profil");
+		userButton.addActionListener(new editUserListener(this));
+		c.fill = GridBagConstraints.BOTH;
+		c.weightx = 0.2;
+		c.gridx = 3;
+		c.gridy = 0;
+		c.gridwidth = 1;
+		c.gridheight = 1;
+		panel.add(userButton, c);
+		
+		
 		/* Affichage */
 		add(panel);
 		setVisible(true);
 		
 	}
 	
+	/**
+	 * Permet de mettre en forme les listes des groupes et des utilisateurs connectes
+	 */
+	@SuppressWarnings("rawtypes")
 	public class MyListCellThing extends JLabel implements ListCellRenderer {
 		
-		int style;
+		private static final long serialVersionUID = 1L;
+
+		private int style;
 		
+		// Pour ne pas mettre en gras le nom des utilisateurs connectes (uniquement les groupes)
 		public static final int STYLE_GROUP = 1;
 		public static final int STYLE_USERS = 2;
 
+		/**
+		 * Cree une nouvelle liste
+		 */
 	    public MyListCellThing(int style) {
 	        setOpaque(true);
 	        this.style = style;
 	    }
-
+	    
+	    /**
+	     * Permet de definir le rendu graphique de la liste
+	     */
 	    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-	        // Assumes the stuff in the list has a pretty toString
+
 	        setText(value.toString());
 
-	        // based on the index you set the color.  This produces the every other effect.
-	        //if (index % 2 == 0) setBackground(Color.RED);
-	        //else setBackground(Color.BLUE);
-	        
-	        //if(list.getModel().getElementAt(index).toString().startsWith(NEW_MESSAGE_INDICATOR))
 	        String groupName = list.getModel().getElementAt(index).toString();
 	        Group selectedGroup = controller.getGroupByName(groupName);
 	        
+	        // On met en gras dans la liste des groupes si nouveau message
 	        if(style == STYLE_GROUP && selectedGroup != null &&
 	        	newMessageGroups.containsKey(selectedGroup.getID()) && newMessageGroups.get(selectedGroup.getID()))
 	        	
@@ -265,6 +247,7 @@ public class GUI extends JFrame{
 	        else
 	        	setFont(getFont().deriveFont(Font.PLAIN));
 
+	        // Coloration de l'item selectionne
 	        if(isSelected)
 	        	setBackground(new Color(230,230,230));
 	        else
@@ -272,20 +255,26 @@ public class GUI extends JFrame{
 	        
 	        
 	        setBorder(new EmptyBorder(10, 10, 10, 10));
-	        	
 
 	        return this;
 	    }
 	}
+	
 
-	public class modifUserListener implements ActionListener {
+	/***************************** LISTENERS *****************************/
+	
+	/**
+	 * Listener du bouton "Profil"
+	 */
+	public class editUserListener implements ActionListener {
 		private GUI gui;
 		
-		public modifUserListener(GUI gui) {
+		public editUserListener(GUI gui) {
 			super();
 			this.gui = gui;
 		}
 		
+		// Affichage de la fenetre de profil
 		public void actionPerformed(ActionEvent e) {			
 			setEnabled(false);
 			new GUIModifUser(gui, controller);			
@@ -299,30 +288,26 @@ public class GUI extends JFrame{
 		
 		public void actionPerformed(ActionEvent e) {
 			
-			/*ArrayList<User> members0 = new ArrayList<User>();
-			members0.add(new User(5, "truc", null));
-			
-			Group group0 = new Group(0, members0, members0.get(0));
-			
-			controller.receiveMessage(new Message(new Date(), "coucou", members0.get(0), group0, Message.FUNCTION_NORMAL));*/
-			
+			// Texte a envoyer
 			String textToSend = textField.getText();
 			
 			if(textToSend.equals(""))
 				return;
 			
-			textField.setText(null);
 			
 			/* Envoi du message */
-			// TODO
 			try {
 				if(connectedUsersList.getSelectedIndex() == -1)
 					return;
 				
-				// TODO on crée le groupe ici ou on garde que l'ID ? que le nom ?
+				// Obtention du groupe a partir de son nom
 				String groupName = connectedUsersList.getSelectedValue();
-
+				
+				// Envoi du message
 				controller.sendMessage(textToSend, groupName, Message.FUNCTION_NORMAL);
+				
+				// RAZ de la zone de texte
+				textField.setText(null);
 				
 				displayMessages(controller.getGroupByName(groupName));
 			
@@ -334,11 +319,15 @@ public class GUI extends JFrame{
 		
 	}
 	
+	/**
+	 * Listener de la fermeture de la fenetre
+	 */
 	public class windowClosingListener implements WindowListener {
 		
 		public void windowClosing(WindowEvent e) {
 			
 			try {
+				// Deconnexion de l'utilisateur
 				controller.deconnect();
 				//controller.sendMessage(null, 0, Message.FUNCTION_STOP); // TODO pourquoi ?
 				
@@ -364,15 +353,18 @@ public class GUI extends JFrame{
 
 	}
 	
+	/**
+	 * Listener du changement de groupe selectionne
+	 */
 	public class groupListSelectionChange implements ListSelectionListener {
 
 		public void valueChanged(ListSelectionEvent e) {
 			
 			if(!e.getValueIsAdjusting()) {
 				
-				// Mise à jour des noms des groupes
 				Group selectedGroup = controller.getGroupByName(groupList.getSelectedValue());
 				
+				// Selection de l'utilisateur correspond (si connecte)
 				int index;
 				boolean inList = false;
 				for (index = 0; index < connectedUsersList.getModel().getSize(); index++) {
@@ -389,79 +381,28 @@ public class GUI extends JFrame{
 				}
 				
 				
+				// Rafraichissement des messages
 				displayMessages(selectedGroup);
 				
 				if(selectedGroup != null)
 					newMessageGroups.put(selectedGroup.getID(), false);
 				
 			}
-			
-//			if(refreshNumber < 2 && !e.getValueIsAdjusting()) {
-//				//System.out.println("Group changed " + refreshNumber);
-//				refreshNumber++;
-//			
-//				// Mise à jour des noms des groupes
-//				String selectedGroupName = getRealGroupName(groupList.getSelectedValue());
-//				
-//				DefaultListModel<String> groupNames = new DefaultListModel<String>();
-//				
-//				for(int i=0; i<groupList.getModel().getSize(); i++) {
-//					
-//					String realGroupName = getRealGroupName(groupList.getModel().getElementAt(i));
-//					groupNames.addElement(realGroupName);
-//					
-//					/*if(!realGroupName.equals(selectedGroupName))
-//						groupNames.addElement(realGroupName);
-//					else
-//						groupNames.addElement(selectedGroupName);*/
-//				}
-//				
-//				int selectedIndex = groupList.getSelectedIndex();
-//				groupList.setModel(groupNames);
-//				groupList.setSelectedIndex(selectedIndex);
-//				
-//				
-//				
-//				Group selectedGroup = controller.getGroupByName(getRealGroupName(selectedGroupName));
-//				
-//				displayMessages(selectedGroup);
-//				
-//				/*if(selectedGroup != null) {
-//					ArrayList<Message> groupMessages = controller.getGroupMessages(selectedGroup);
-//					
-//					String history = "";
-//					
-//					
-//					for(Message m : groupMessages)
-//						history += m.getContent() + "\n";
-//						
-//					
-//					if(history.equals(null))
-//						messagesArea.setText(null);
-//					else
-//						messagesArea.setText(history);
-//				
-//				}
-//				else {
-//					// TODO erreu
-//					//System.out.println("Erreur groupe inexistant");
-//				}*/
-//				
-//			}
-//			else
-//				refreshNumber = 0;
 
-			
 		}
 
 	}
 	
+	/**
+	 * Listener du changement d'utilisateur connecte selection
+	 */
 	public class connectedUsersListSelectionChange implements ListSelectionListener {
 
 		public void valueChanged(ListSelectionEvent e) {
 			
 			if(!e.getValueIsAdjusting()) {
 				
+				// (Des)activation de la zone de texte et du bouton "Envoyer"
 				if(connectedUsersList.getSelectedIndex() == -1) {
 					textField.setEditable(false);
 					sendButton.setEnabled(false);
@@ -472,6 +413,7 @@ public class GUI extends JFrame{
 				}
 				
 
+				// Selection du groupe corespondant
 				for(int index = 0; index < groupList.getModel().getSize(); index ++) {
 					String username = groupList.getModel().getElementAt(index);
 					
@@ -480,13 +422,14 @@ public class GUI extends JFrame{
 						break;
 					}
 				}
-					
 				
 			}
 			
 		}
 		
 	}
+	
+	/***************************** Methodes diverses *****************************/
 	
 	/**
 	 * Met a jour la liste des utilisateurs connectes (GUI)
@@ -509,14 +452,10 @@ public class GUI extends JFrame{
 			
 			i++;
 		}
-			
-		
-		/*usernames.addElement("jean");
-		usernames.addElement("truc");*/
-		
 		
 		connectedUsersList.setModel(usernames);
 		
+		// Garde l'utilisateur selectionne
 		if(selectedIndex >= 0)
 			connectedUsersList.setSelectedIndex(selectedIndex);
 	}
@@ -527,7 +466,7 @@ public class GUI extends JFrame{
 	 */
 	public void setGroupNoRead(Group updatedGroup) {
 		
-		//if(!existReadGroup(updatedGroup))
+		// Indique qu'il y a un nouveau message pour updatedGroup
 		newMessageGroups.put(updatedGroup.getID(), true);
 		
 		DefaultListModel<String> groupNames = new DefaultListModel<String>();
@@ -545,44 +484,19 @@ public class GUI extends JFrame{
 		
 		groupList.setModel(groupNames);
 		
-		if(selectedIndex >= 0) {
+		// Garde le groupe selectionne
+		if(selectedIndex >= 0)
 			groupList.setSelectedIndex(selectedIndex);
-			//displayMessages(updatedGroup);
-		}
-			
-		
-		
-		
-		
-		// Nom du groupe dans la liste (pour cet utilisateur)
-		/*String updatedGroupName = updatedGroup.getGroupNameForUser(controller.getUser());
-		
-		
-		String selectedGroupName = groupList.getSelectedValue();
-		int selectedIndex = 0;
-		
-		// Liste des groupes a afficher
-		DefaultListModel<String> groupNames = new DefaultListModel<String>();
-		
-		// On met en evidence le groupe avec le nouveau message (indicateur + 1ere place)
-		groupNames.addElement(NEW_MESSAGE_INDICATOR + updatedGroupName);
-		
-		for(int i=0; i<groupList.getModel().getSize(); i++) {
-			String realGroupName = getRealGroupName(groupList.getModel().getElementAt(i));
-			
-			if(!realGroupName.equals(updatedGroupName))
-				groupNames.addElement(realGroupName);
-			
-			if(realGroupName.equals(selectedGroupName))
-				selectedIndex = i;
-		}
-		
-		groupList.setModel(groupNames);*/
-		//groupList.setSelectedIndex(selectedIndex);
 		
 	}
 	
+	/**
+	 * Permet de selectionner un groupe dans la liste
+	 * @param selectedGroup Le groupe a selectionner
+	 */
 	public void selectGroupInList(Group selectedGroup) {
+		
+		// Cherche le groupe dans la liste a partir de son nom
 		String selectedGroupName = selectedGroup.getGroupNameForUser(controller.getUser());
 		int selectedIndex = -1;
 		
@@ -593,10 +507,16 @@ public class GUI extends JFrame{
 				selectedIndex = i;
 		}
 		
+		// Garde le groupe selectionne
 		if(selectedIndex >= 0)
 			groupList.setSelectedIndex(selectedIndex);
 	}
 	
+	/**
+	 * Permet de modifier le username d'un utilisateur dans les deux listes
+	 * @param oldUsername L'ancien username
+	 * @param newUsername Le nouveau username
+	 */
 	public void replaceUsernameInList(String oldUsername, String newUsername) {
 		
 		// Remplacement dans la liste des groupes
@@ -639,6 +559,10 @@ public class GUI extends JFrame{
 		
 	}
 	
+	/**
+	 * Permet d'ajouter un groupe a la liste
+	 * @param group Le groupe a ajouter
+	 */
 	public void addGroup(Group group) {
 		
 		DefaultListModel<String> groupNames = new DefaultListModel<String>();
@@ -663,6 +587,10 @@ public class GUI extends JFrame{
 		
 	}
 	
+	/**
+	 * Permet de rafraichir la zone des messages pour le groupe selectionne
+	 * @param selectedGroup Le groupe dont les messages doivent etre affiches (null si le groupe n'existe pas ou aucun selectionne)
+	 */
 	private void displayMessages(Group selectedGroup) {
 		
 		if(selectedGroup != null) {
@@ -706,28 +634,20 @@ public class GUI extends JFrame{
 					history += username + content;
 				
 				prevSender = m.getSender();
-				
-				//history += date + " <strong>" + username + "</strong> : " + content + "<br/>";
 			}
-				
-				
 			
-			if(history.equals(null))
-				messagesArea.setText(null);
-			else
-				messagesArea.setText(history);
+			messagesArea.setText(history);
+			// TODO Scroll auto
 		
 		}
 		else {
-			// TODO erreur
 			messagesArea.setText(null);
-			//System.out.println("Erreur groupe inexistant");
 		}
 		
 	}
 	
 	/**
-	 * Affiche une erreur
+	 * Affiche une erreur a l'utilisateur
 	 * @param errorMessage Le message d'erreur a afficher
 	 */
 	public static void showError(String errorMessage) {
@@ -736,59 +656,15 @@ public class GUI extends JFrame{
 
 
 	public static void main(String[] args) throws SocketException, ClassNotFoundException, SQLException, UnknownHostException {	
-		
-		// TODO Tests : a supprimer
-		/*try {
-			URL url = new URL("http://localhost:8080/ChatSystemServer/ChatServer?toto=5&titi=2");
-			HttpURLConnection con = (HttpURLConnection) url.openConnection();
-			con.setRequestMethod("GET");
-//			con.setRequestProperty("Content-Type", "text/html");
-			con.setConnectTimeout(5000);
-			con.setReadTimeout(5000);
-			
-			int status = con.getResponseCode();
-			System.out.println("Status: " + status);
-			
-			String inputLine;
-			StringBuffer content = new StringBuffer();
-			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-			
-			while((inputLine = in.readLine()) != null)
-				content.append(inputLine);
-			
-			System.out.println("Response :" + content.toString());
-			
-			File iniFile = new File("settings.ini");
-			if(!iniFile.exists() || iniFile.isDirectory()) {
-				System.out.println("Fichier de configuration inexistant.");
-				return;
-			}
-			
-			Ini ini = new Ini(iniFile);
-			Preferences prefs = new IniPreferences(ini);
-			System.out.println(prefs.node("toto").get("a", "none"));
-			
-			
-		} catch (MalformedURLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
-		
-		
-		
-		
-		// TODO A supprimer
-		System.out.println("Main started");
-		
+
+		// Recupere la liste des adresses IP que possede la machine (et les adresses de broadcast correspondantes)
 		Map<InetAddress, InetAddress> allIP = Controller.getAllIpAndBroadcast();
 		InetAddress ipMachine;
 		String username;
 		int id;
 		GUIConnect guiConnect = new GUIConnect(new ArrayList<InetAddress>(allIP.keySet()));
 		
+		// Attente de la connexion de l'utilisateur
 		while(guiConnect.getStatusConnexion() == false);		
 		ipMachine = guiConnect.getIPSelected();
 		username = guiConnect.getUsername();
@@ -796,13 +672,15 @@ public class GUI extends JFrame{
 
 		
 		try {
-			
-			// TODO dans le controller
+
+			// On teste la connexion du serveur ici pour ne pas afficher la fenetre principale s'il y a une erreur
 			boolean useServer = (DataManager.getSetting("general", "use_server", "0").equals("1")) ? true : false;
 			
 			if(useServer) {
 				String serverIP = DataManager.getSetting("server", "ip", "0.0.0.0");
 				int serverPort = Integer.parseInt(DataManager.getSetting("server", "port", "-1"));
+				
+				// Cree le controller en utilisant le serveur
 				controller = new Controller(allIP.get(ipMachine), serverIP, serverPort);
 				
 				if(!Controller.testConnectionServer()) {
@@ -811,13 +689,17 @@ public class GUI extends JFrame{
 				}
 			}
 			else {
+				// Cree le controller sans serveur (utilisation de UDP)
 				controller = new Controller(allIP.get(ipMachine), null, -1);
 			}
-			
 			
 			controller.setGUI(new GUI(username));
 			controller.connect(id, username, ipMachine);
 
+		} catch (NumberFormatException e) {
+			// Mauvaise configuration du timeout dans le fichier ini
+			showError("Impossible de se connecter au serveur.\nVerifiez la configuration de la connexion ou utilisez le protocole UDP.");
+			System.exit(Controller.EXIT_ERROR_SERVER_UNAVAILABLE);
 		} catch (IOException e) {
 			showError("Une erreur s'est produite dans la decouverte du reseau (Protocole UDP).");
 			System.exit(Controller.EXIT_ERROR_GET_CONNECTED_USERS);
