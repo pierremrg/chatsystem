@@ -14,3 +14,15 @@ https://drive.google.com/open?id=1V-Kt5rgTPScUG5Wes187R13PkTTwpHBO
 - Faire fonctions controller
 - Faire la GUI
 - Stocker
+
+
+# Ini
+
+[general]
+use_server=1
+
+[server]
+ip=localhost
+port=8080
+timeout=5000
+update_interval=1000
