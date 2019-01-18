@@ -417,20 +417,19 @@ public class Controller {
 		else {
 			// TODO
 			// TODO update groups + messages
+			
+			// Lancement du timer
+			// Ce timer sert a recuperer les utilisateurs connectes
+			// et a indiquer sa presence de facon reguliere
+			timer = new Timer();
+			// TODO lire config
+			timer.scheduleAtFixedRate(new ResquestTimer(this), 0, 5000);
 		}
 		
 		// Ajout des groupes au GUI
 		for(Group g : groups)
 			gui.addGroup(g);
 		
-		
-		// TODO selon config
-		// Lancement du timer
-		// Ce timer sert a recuperer les utilisateurs connectes
-		// et a indiquer sa presence de facon reguliere
-		timer = new Timer();
-		// TODO lire config
-		timer.scheduleAtFixedRate(new ResquestTimer(this), 0, 5000);
 		
 	}
 	
