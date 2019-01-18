@@ -102,6 +102,7 @@ public class Controller {
 		groups = DataManager.readAllGroups();
 		
 		if(serverPort > 0) {
+			// TODO remove
 			System.out.println("Use server (controller)");
 			Controller.useServer = true;
 			Controller.serverIP = serverIP;

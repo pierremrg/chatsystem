@@ -84,8 +84,8 @@ public class ChatServer extends HttpServlet {
         // TODO Auto-generated constructor stub
         
         connectedUsers = new ArrayList<User>();
-        connectedUsers.add(new User(10, "jean", null));
-        connectedUsers.add(new User(70, "truc", null));
+//        connectedUsers.add(new User(10, "jean", null));
+//        connectedUsers.add(new User(70, "truc", null));
     }
 
 	/**
