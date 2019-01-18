@@ -103,10 +103,16 @@ public class Group implements Serializable {
 		ArrayList<User> newMembers = new ArrayList<User>(members);
 		
 		for(User oldVersionMember : members) {
+			
 			if(oldVersionMember.equals(newVersionMember)) {
-				newMembers.remove(oldVersionMember);
-				newMembers.add(newVersionMember);
-				hasChanged = true;
+				
+				if(oldVersionMember.getPort() != newVersionMember.getPort()
+						|| !oldVersionMember.getUsername().equals(newVersionMember.getUsername())) {
+					newMembers.remove(oldVersionMember);
+					newMembers.add(newVersionMember);
+					hasChanged = true;
+				}
+				
 			}
 		}
 		

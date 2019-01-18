@@ -229,7 +229,7 @@ public class ChatServer extends HttpServlet {
 		ArrayList<User> stillConnectedUsers = new ArrayList<User>();
 		
 		for(User u : connectedUsers) {
-			if(currentTime.getTime() - u.getLastVisit().getTime() < AUTO_DECONNECTION_DELAY)
+			if(currentTime.getTime() - u.getLastVisit().getTime() < AUTO_DECONNECTION_DELAY*10000)
 				stillConnectedUsers.add(u);
 		}
 		

@@ -60,9 +60,12 @@ public class ResquestTimer extends TimerTask {
 			
 			// TODO Pas optimal ?
 			// Mise a jour des groupes avec les nouvelles informations des utilisateurs connectes
-			for(User receivedUser : connectedUsers) {
-				controller.receiveConnection(receivedUser);
-			}
+//			for(User receivedUser : connectedUsers) {
+//				controller.receiveConnection(receivedUser);
+//			}
+			
+			//if(!connectedUsers.isEmpty())
+				controller.receiveConnectedUsersFromServer(connectedUsers);
 		
 		} catch (ConnectionError | NumberFormatException e) {
 			GUI.showError("Impossible de se connecter au serveur.\nVerifiez la configuration de la connexion ou utilisez le protocole UDP.");

@@ -103,6 +103,14 @@ public class User implements Serializable{
 		return u.id == id;
 	}
 	
+	public boolean equalsUsername(Object obj) {
+		if(!(obj instanceof User))
+			return false;
+		
+		User u = (User) obj;
+		return u.username.equals(username);
+	}
+	
 	@Override
 	public String toString() {		
 		return "{" + Integer.toString(id) + ", " + username + "}";
