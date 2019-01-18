@@ -2,6 +2,7 @@ package ChatSystem;
 
 import java.io.Serializable;
 import java.net.InetAddress;
+import java.util.Date;
 
 /**
  * Represente un utilisateur de l'application
@@ -15,6 +16,7 @@ public class User implements Serializable{
 	private String username;
 	private InetAddress ip;
 	private int port;
+	private Date lastVisit;
 	
 	/**
 	 * Cree un utilisateur

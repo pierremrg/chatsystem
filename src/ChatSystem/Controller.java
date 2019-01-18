@@ -70,6 +70,7 @@ public class Controller {
 	/**
 	 * Constantes
 	 */
+	private static final String PATH_WEBPAGE = "/chatsystem/ChatServer";
 	private static final int TIMEOUT_CONNECTION = 3000; // TODO Lire dans la conf
 
 	
@@ -701,7 +702,7 @@ public class Controller {
 	 */
 	private static HttpURLConnection sendRequestToServer(int action, String paramValue) throws IOException {
 		
-		URL url = new URL("http://" + serverIP + ":" + serverPort + "/ChatSystem/ChatServer?action=" + action + "&" + paramValue);
+		URL url = new URL("http://" + serverIP + ":" + serverPort + PATH_WEBPAGE +"?action=" + action + "&" + paramValue);
 		
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestMethod("POST");
@@ -722,7 +723,7 @@ public class Controller {
 	public static boolean testConnectionServer() {
 		
 		try {
-			URL url = new URL("http://" + serverIP + ":" + serverPort + "/ChatSystem/ChatServer");
+			URL url = new URL("http://" + serverIP + ":" + serverPort + PATH_WEBPAGE);
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("HEAD");
 			con.setConnectTimeout(TIMEOUT_CONNECTION);
