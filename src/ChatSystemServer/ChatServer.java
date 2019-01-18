@@ -26,6 +26,7 @@ public class ChatServer extends HttpServlet {
 	
 	public static final int ACTION_NEW_USER = 1;
 	public static final int ACTION_GET_CONNECTED_USERS = 2;
+	public static final int ACTION_USER_DECONNECTION = 3;
 	
 	public static final int NO_ERROR = 0;
 	public static final int ERROR_NO_ACTION = 1;
@@ -137,6 +138,16 @@ public class ChatServer extends HttpServlet {
 						serverResponse.setCode(ERROR_NO_USER_DATA);
 					}
 
+				}
+				
+				else if(action == ACTION_USER_DECONNECTION) {
+					
+					if(parameters.containsKey("userdata")) {
+						
+						// TODO
+						
+					}
+					
 				}
 					
 				else if(action == ACTION_GET_CONNECTED_USERS) {
