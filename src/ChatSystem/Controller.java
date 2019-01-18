@@ -449,31 +449,35 @@ public class Controller {
 		DataManager.writeAllGroups(groups);
 
 		// TODO Selon config
-		// Connexion au serveur et envoie des donnees au format JSON
-		Gson gson = new Gson();
+		if(useServer) {
+			// Connexion au serveur et envoie des donnees au format JSON
+			Gson gson = new Gson();
+			
+			// Creation des donnees utilisateur
+			String jsonData = gson.toJson(user);
+			String paramValue = "userdata=" + jsonData;
+			
+			// Test de la connexion
+			if(!testConnectionServer())
+				throw new ConnectionError();
+			
+			// Connexion au serveur et traitement de la reponse
+			HttpURLConnection con = sendRequestToServer(ChatSystemServer.ChatServer.ACTION_USER_DECONNECTION, paramValue);		
+			
+			int status = con.getResponseCode();
+			if(status != HttpURLConnection.HTTP_OK)
+				throw new SendDeconnectionError();
+			
+			String jsonResponse = getResponseContent(con);
+			ServerResponse serverResponse = gson.fromJson(jsonResponse, ServerResponse.class);
+	
+			if(serverResponse.getCode() != ChatServer.NO_ERROR)
+				throw new SendDeconnectionError();
+		}
+		else {
+			udp.sendUdpMessage(udp.createMessage(Udp.STATUS_DECONNEXION, getUser()), ipBroadcast);
+		}
 		
-		// Creation des donnees utilisateur
-		String jsonData = gson.toJson(user);
-		String paramValue = "userdata=" + jsonData;
-		
-		// Test de la connexion
-		if(!testConnectionServer())
-			throw new ConnectionError();
-		
-		// Connexion au serveur et traitement de la reponse
-		HttpURLConnection con = sendRequestToServer(ChatSystemServer.ChatServer.ACTION_USER_DECONNECTION, paramValue);		
-		
-		int status = con.getResponseCode();
-		if(status != HttpURLConnection.HTTP_OK)
-			throw new SendDeconnectionError();
-		
-		String jsonResponse = getResponseContent(con);
-		ServerResponse serverResponse = gson.fromJson(jsonResponse, ServerResponse.class);
-
-		if(serverResponse.getCode() != ChatServer.NO_ERROR)
-			throw new SendDeconnectionError();
-		
-//		udp.sendUdpMessage(udp.createMessage(Udp.STATUS_DECONNEXION, getUser()), ipBroadcast);
 		
 	}
 
