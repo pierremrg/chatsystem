@@ -41,8 +41,8 @@ public class GUIModifUser extends JFrame {
 	private JButton modifPasswordButton;
 	private GUI gui;
 	
-	public GUIModifUser(GUI gui, Controller controller) {
-		super(controller.getUser().getUsername());
+	public GUIModifUser(GUI gui) {
+		super(Controller.getInstance().getUser().getUsername());
 		this.gui = gui;
 		addWindowListener(new windowClosingListener());
 		
@@ -67,7 +67,7 @@ public class GUIModifUser extends JFrame {
 		
 		modifUsernameField = new JTextField();
 		modifUsernameField.addKeyListener(new KeyAdapter());
-		modifUsernameField.addActionListener(new ModifUsernameListener(gui, controller));
+		modifUsernameField.addActionListener(new ModifUsernameListener(gui));
 		c.weightx = 0.5;
 		c.gridwidth = 1;
 		c.gridx = 0;
@@ -76,7 +76,7 @@ public class GUIModifUser extends JFrame {
 		
 		
 		modifUsernameButton = new JButton("Changer nom d'utilisateur");
-		modifUsernameButton.addActionListener(new ModifUsernameListener(gui, controller));
+		modifUsernameButton.addActionListener(new ModifUsernameListener(gui));
 		c.weightx = 1;
 		c.gridwidth = 3;
 		c.gridx = 0;
@@ -100,7 +100,7 @@ public class GUIModifUser extends JFrame {
 		modifUserPanel.add(oldPasswordLabel, c);
 		
 		oldPasswordField = new JPasswordField();
-		oldPasswordField.addActionListener(new ModifPasswordListener(gui, controller));
+		oldPasswordField.addActionListener(new ModifPasswordListener(gui));
 		c.weightx = 0.5;
 		c.gridwidth = 1;
 		c.gridx = 0;
@@ -122,7 +122,7 @@ public class GUIModifUser extends JFrame {
 		modifUserPanel.add(newConfirmPasswordLabel, c);		
 		
 		newPasswordField = new JPasswordField();
-		newPasswordField.addActionListener(new ModifPasswordListener(gui, controller));
+		newPasswordField.addActionListener(new ModifPasswordListener(gui));
 		c.weightx = 0.5;
 		c.gridwidth = 1;
 		c.gridx = 0;
@@ -130,7 +130,7 @@ public class GUIModifUser extends JFrame {
 		modifUserPanel.add(newPasswordField, c);
 		
 		newConfirmPasswordField = new JPasswordField();
-		newConfirmPasswordField.addActionListener(new ModifPasswordListener(gui, controller));
+		newConfirmPasswordField.addActionListener(new ModifPasswordListener(gui));
 		c.weightx = 0.5;
 		c.gridwidth = 1;
 		c.gridx = 1;
@@ -138,7 +138,7 @@ public class GUIModifUser extends JFrame {
 		modifUserPanel.add(newConfirmPasswordField, c);
 		
 		modifPasswordButton = new JButton("Changer mot de passe");
-		modifPasswordButton.addActionListener(new ModifPasswordListener(gui, controller));
+		modifPasswordButton.addActionListener(new ModifPasswordListener(gui));
 		c.weightx = 1;
 		c.gridwidth = 3;
 		c.gridx = 0;
@@ -151,18 +151,17 @@ public class GUIModifUser extends JFrame {
 	
 	public class ModifUsernameListener implements ActionListener {
 		private GUI gui;
-		private Controller controller;
+		//private Controller controller;
 		
-		public ModifUsernameListener(GUI gui, Controller controller) {
+		public ModifUsernameListener(GUI gui) {
 			super();
 			this.gui = gui;
-			this.controller = controller;
 		}
 		
 		public void actionPerformed(ActionEvent e) {
 			String newUsername = modifUsernameField.getText();
 			try {
-				controller.editUsername(newUsername);
+				Controller.getInstance().editUsername(newUsername);
 				setVisible(false);
 				gui.setVisible(true);
 				gui.setEnabled(true);
@@ -174,12 +173,11 @@ public class GUIModifUser extends JFrame {
 	
 	public class ModifPasswordListener implements ActionListener {
 		private GUI gui;
-		private Controller controller;
+		//private Controller controller;
 		
-		public ModifPasswordListener(GUI gui, Controller controller) {
+		public ModifPasswordListener(GUI gui) {
 			super();
 			this.gui = gui;
-			this.controller = controller;
 		}
 		
 		public void actionPerformed(ActionEvent e) {
@@ -190,7 +188,7 @@ public class GUIModifUser extends JFrame {
 			if (oldPassword.length != 0 && newPassword.length != 0 && newConfirmPassword.length != 0) {
 				if (Arrays.equals(newPassword, newConfirmPassword)) {
 					try {
-						controller.editPassword(oldPassword, newPassword);
+						Controller.getInstance().editPassword(oldPassword, newPassword);
 						setVisible(false);
 						gui.setVisible(true);
 						gui.setEnabled(true);

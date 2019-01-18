@@ -37,6 +37,9 @@ public class Controller {
 	
 	// Mega TODO : singleton !!
 	
+	// Controller est un singleton
+	private static Controller instance = null;
+	
 	// Utilisateur associe au controller
 	private User user;
 	
@@ -91,13 +94,24 @@ public class Controller {
 	public static class SendDeconnectionError extends Exception {};
 
 
+	private Controller() {}
+	
+	public static Controller getInstance() {
+		if(instance == null) {
+			instance = new Controller();
+		}
+		
+		return instance;
+	}
+	
 	/**
 	 * @param ipBroadcast L'adresse IP de la machine
 	 * @throws IOException Erreur dans la lecture des fichiers
 	 * @throws ClassNotFoundException Erreur dans la lecture des fichiers
 	 * @throws FileNotFoundException Erreur dans la lecture des fichiers
 	 */
-	public Controller (InetAddress ipBroadcast, String serverIP, int serverPort) throws FileNotFoundException, ClassNotFoundException, IOException {
+//	public Controller (InetAddress ipBroadcast, String serverIP, int serverPort) throws FileNotFoundException, ClassNotFoundException, IOException {
+	public void init (InetAddress ipBroadcast, String serverIP, int serverPort) throws FileNotFoundException, ClassNotFoundException, IOException {
 
 		this.connectedUsers = new ArrayList<User>();
 		this.groups = new ArrayList<Group>();

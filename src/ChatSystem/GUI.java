@@ -48,7 +48,9 @@ import ChatSystem.Controller.SendDeconnectionError;
  */
 public class GUI extends JFrame{
 
-	private static Controller controller;
+	private static final long serialVersionUID = 1L;
+	
+	//private static Controller controller;
 	private Map<Integer, Boolean> newMessageGroups = new HashMap<Integer, Boolean>();
 	
 	private JPanel panel; // Panel principal
@@ -254,7 +256,7 @@ public class GUI extends JFrame{
 	        
 	        //if(list.getModel().getElementAt(index).toString().startsWith(NEW_MESSAGE_INDICATOR))
 	        String groupName = list.getModel().getElementAt(index).toString();
-	        Group selectedGroup = controller.getGroupByName(groupName);
+	        Group selectedGroup = Controller.getInstance().getGroupByName(groupName);
 	        
 	        if(style == STYLE_GROUP && selectedGroup != null &&
 	        	newMessageGroups.containsKey(selectedGroup.getID()) && newMessageGroups.get(selectedGroup.getID()))
@@ -286,7 +288,7 @@ public class GUI extends JFrame{
 		
 		public void actionPerformed(ActionEvent e) {			
 			setEnabled(false);
-			new GUIModifUser(gui, controller);			
+			new GUIModifUser(gui);			
 		}
 	}
 	
@@ -320,9 +322,9 @@ public class GUI extends JFrame{
 				// TODO on crée le groupe ici ou on garde que l'ID ? que le nom ?
 				String groupName = connectedUsersList.getSelectedValue();
 
-				controller.sendMessage(textToSend, groupName, Message.FUNCTION_NORMAL);
+				Controller.getInstance().sendMessage(textToSend, groupName, Message.FUNCTION_NORMAL);
 				
-				displayMessages(controller.getGroupByName(groupName));
+				displayMessages(Controller.getInstance().getGroupByName(groupName));
 			
 			} catch (Exception e1) {
 				showError("Impossible d'envoyer le message à cet utilisateur.");
@@ -801,7 +803,8 @@ public class GUI extends JFrame{
 			if(useServer) {
 				String serverIP = DataManager.getSetting("server", "ip", "0.0.0.0");
 				int serverPort = Integer.parseInt(DataManager.getSetting("server", "port", "-1"));
-				controller = new Controller(allIP.get(ipMachine), serverIP, serverPort);
+//				controller = new Controller(allIP.get(ipMachine), serverIP, serverPort);
+				Controller.getInstance().init(allIP.get(ipMachine), serverIP, serverPort);
 				
 				if(!Controller.testConnectionServer()) {
 					showError("Impossible de se connecter au serveur.\nVerifiez la configuration de la connexion ou utilisez le protocole UDP.");
@@ -809,7 +812,8 @@ public class GUI extends JFrame{
 				}
 			}
 			else {
-				controller = new Controller(allIP.get(ipMachine), null, -1);
+//				controller = new Controller(allIP.get(ipMachine), null, -1);
+				Controller.getInstance().init(allIP.get(ipMachine), null, -1);
 			}
 			
 			
