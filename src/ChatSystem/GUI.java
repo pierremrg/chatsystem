@@ -39,7 +39,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import ChatSystem.Controller.ConnectionError;
-import ChatSystem.Controller.SendConnectionError;
 import ChatSystem.Controller.SendDeconnectionError;
 	
 /**
@@ -49,8 +48,9 @@ import ChatSystem.Controller.SendDeconnectionError;
 public class GUI extends JFrame{
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private static Controller controller;
+	
 	private Map<Integer, Boolean> newMessageGroups = new HashMap<Integer, Boolean>();
 	
 	private JPanel panel; // Panel principal

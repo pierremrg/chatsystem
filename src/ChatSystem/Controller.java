@@ -35,7 +35,6 @@ import ChatSystemServer.ChatServer.ServerResponse;
  */
 public class Controller {
 	
-	// Utilisateur associe au controller
 	private User user;
 	
 	// GUI
@@ -89,7 +88,7 @@ public class Controller {
 	@SuppressWarnings("serial")
 	public static class SendDeconnectionError extends Exception {};
 
-
+	
 	/**
 	 * @param ipBroadcast L'adresse IP de la machine
 	 * @throws IOException Erreur dans la lecture des fichiers
