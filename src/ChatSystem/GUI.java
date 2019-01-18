@@ -39,14 +39,15 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import ChatSystem.Controller.ConnectionError;
-import ChatSystem.Controller.SendPresenceError;
+import ChatSystem.Controller.SendConnectionError;
+import ChatSystem.Controller.SendDeconnectionError;
 	
 /**
  * Fenetre principale du programme
  *
  */
 public class GUI extends JFrame{
-	
+
 	private static Controller controller;
 	private Map<Integer, Boolean> newMessageGroups = new HashMap<Integer, Boolean>();
 	
@@ -61,8 +62,6 @@ public class GUI extends JFrame{
 	private JLabel labelGroups; // Label "Conversations démarrées"
 	private JLabel labelConnectedUsers; // Label "Utilisateurs connectés"
 	private JButton userButton; //Bouton info profil
-	
-	
 	
 	public GUI(String username) {
 		/* Fenêtre principale */
@@ -340,13 +339,18 @@ public class GUI extends JFrame{
 			try {
 				controller.deconnect();
 				//controller.sendMessage(null, 0, Message.FUNCTION_STOP); // TODO pourquoi ?
-			} catch (IOException e1) {
-				showError("Une erreur est survenue lors de la déconnexion.");
-			}
-			finally {
+				
 				// Fin du programme sans erreur
-				System.exit(0);
+				System.exit(Controller.EXIT_NO_ERROR);
+				
+			} catch (ConnectionError | SendDeconnectionError err) {
+				showError("Une erreur est survenue lors de la connexion au serveur.");
+				System.exit(Controller.EXIT_ERROR_SEND_DECONNECTION);
+			} catch (IOException err) {
+				showError("Une erreur est survenue lors de la déconnexion.");
+				System.exit(Controller.EXIT_ERROR_SEND_DECONNECTION);
 			}
+
 		}
 		
 		public void windowOpened(WindowEvent arg0) {}
@@ -791,6 +795,7 @@ public class GUI extends JFrame{
 		
 		try {
 			
+			// TODO dans le controller
 			boolean useServer = (DataManager.getSetting("general", "use_server", "0").equals("1")) ? true : false;
 			
 			if(useServer) {
@@ -800,7 +805,7 @@ public class GUI extends JFrame{
 				
 				if(!Controller.testConnectionServer()) {
 					showError("Impossible de se connecter au serveur.\nVerifiez la configuration de la connexion ou utilisez le protocole UDP.");
-					System.exit(1);
+					//System.exit(EXIT_ERROR_SERVER_UNAVAILABLE);
 				}
 			}
 			else {
@@ -810,17 +815,10 @@ public class GUI extends JFrame{
 			
 			controller.setGUI(new GUI(username));
 			controller.connect(id, username, ipMachine);
-			
-		} catch (ConnectionError | NumberFormatException e) {
-			// Erreurs generees par une mauvaise configuration dans le fichier de configuration
-			showError("Impossible de se connecter au serveur.\nVerifiez la configuration de la connexion ou utilisez le protocole UDP.");
-			System.exit(1);
-		} catch (SendPresenceError e) {
-			showError("Impossible de se connecter au chat.");
-			System.exit(3);
+
 		} catch (IOException e) {
-			showError("Une erreur s'est produite dans la decouverte du reseau.");
-			System.exit(2);
+			showError("Une erreur s'est produite dans la decouverte du reseau (Protocole UDP).");
+			System.exit(Controller.EXIT_ERROR_GET_CONNECTED_USERS);
 		}
 		
 	}

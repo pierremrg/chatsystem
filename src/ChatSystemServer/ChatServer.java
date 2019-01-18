@@ -3,6 +3,7 @@ package ChatSystemServer;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 
@@ -24,9 +25,15 @@ import ChatSystem.User;
 public class ChatServer extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
-	public static final int ACTION_NEW_USER = 1;
-	public static final int ACTION_GET_CONNECTED_USERS = 2;
-	public static final int ACTION_USER_DECONNECTION = 3;
+	public static final int ACTION_USER_CONNECTION = 1;
+	//public static final int ACTION_GET_CONNECTED_USERS = 2;
+	public static final int ACTION_USER_DECONNECTION = 2;
+	
+	// TODO lire depuis config
+	public static final int AUTO_DECONNECTION_DELAY = 10000;
+	
+	// TODO a supprimer
+	public static final int ACTION_REMOVE_ALL_USERS = 50;
 	
 	public static final int NO_ERROR = 0;
 	public static final int ERROR_NO_ACTION = 1;
@@ -116,12 +123,21 @@ public class ChatServer extends HttpServlet {
 			try {
 				int action = Integer.parseInt(parameters.get("action"));
 				
-				if(action == ACTION_NEW_USER) {
+				/**
+				 * Recoit une indication de presence d'un utilisateur
+				 * Met a jour les donnees sur cet utilisateur
+				 * et renvoie la liste des autres utilisateurs connectes
+				 */
+				if(action == ACTION_USER_CONNECTION) {
 					
 					if(parameters.containsKey("userdata")) {
 						
 						// Lecture des donnees de l'utilisateur
 						User newUser = gson.fromJson(parameters.get("userdata"), User.class);
+						
+						// Gestion de la deconnexion automatique
+						deconnectOldUsers();
+						newUser.setLastVisit(new Date());
 						
 						// On se met a la fin (et on n'apparait pas a soi-meme)
 						if(connectedUsers.contains(newUser))
@@ -140,24 +156,35 @@ public class ChatServer extends HttpServlet {
 
 				}
 				
+				/**
+				 * Supprime l'utilisateur de la liste des utilisateurs connectes
+				 */
 				else if(action == ACTION_USER_DECONNECTION) {
 					
 					if(parameters.containsKey("userdata")) {
 						
-						// TODO
+						// Lecture des donnees de l'utilisateur
+						User removedUser = gson.fromJson(parameters.get("userdata"), User.class);
 						
+						// Suppression de l'utilisateur
+						if(connectedUsers.contains(removedUser))
+							connectedUsers.remove(removedUser);
+						
+					}
+					else {
+						serverResponse.setCode(ERROR_NO_USER_DATA);
 					}
 					
 				}
-					
-				else if(action == ACTION_GET_CONNECTED_USERS) {
 
-					// On renvoie la liste des utilisateurs
-					serverResponse.setData(gson.toJson(connectedUsers));
+				/**
+				 * Vide la liste des utilisateurs connectes
+				 */
+				else if(action == ACTION_REMOVE_ALL_USERS) {
+					
+					connectedUsers.clear();
 					
 				}
-				else
-					out.write("Do nothing");
 				
 			}
 			catch (JsonSyntaxException e) {
@@ -194,6 +221,19 @@ public class ChatServer extends HttpServlet {
 		}
 		
 		return map;
+	}
+	
+	private void deconnectOldUsers() {
+	
+		Date currentTime = new Date();
+		ArrayList<User> stillConnectedUsers = new ArrayList<User>();
+		
+		for(User u : connectedUsers) {
+			if(currentTime.getTime() - u.getLastVisit().getTime() < AUTO_DECONNECTION_DELAY)
+				stillConnectedUsers.add(u);
+		}
+		
+		connectedUsers = stillConnectedUsers;
 	}
 
 	/**

@@ -71,11 +71,27 @@ public class User implements Serializable{
 	}
 	
 	/**
-	 * Modifie le port associe a�l'utilisateur
+	 * Modifie le port associe a l'utilisateur
 	 * @param port Port associe a l'utilisateur
 	 */
 	public void setPort(int port) {
 		this.port = port;
+	}
+	
+	/**
+	 * Retourne la date de derniere visite sur le serveur de l'utilisateur
+	 * @return La date de derniere visite sur le serveur de l'utilisateur
+	 */
+	public Date getLastVisit() {
+		return lastVisit;
+	}
+	
+	/**
+	 * Modifie la date de derniere visite sur le serveur de l'utilisateur
+	 * @param lastVisit La date de derniere visite sur le serveur de l'utilisateur
+	 */
+	public void setLastVisit(Date lastVisit) {
+		this.lastVisit = lastVisit;
 	}
 	
 	@Override

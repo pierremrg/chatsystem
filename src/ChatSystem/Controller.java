@@ -16,12 +16,12 @@ import java.net.SocketException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.Timer;
 
 import com.google.gson.Gson;
 
@@ -65,6 +65,7 @@ public class Controller {
 	private static boolean useServer;
 	private static String serverIP;
 	private static int serverPort;
+	private Timer timer;
 	
 	
 	/**
@@ -73,6 +74,11 @@ public class Controller {
 	private static final String PATH_WEBPAGE = "/chatsystem/ChatServer";
 	private static final int TIMEOUT_CONNECTION = 3000; // TODO Lire dans la conf
 
+	public static final int EXIT_NO_ERROR = 0;
+	public static final int EXIT_ERROR_SERVER_UNAVAILABLE = 1;
+	public static final int EXIT_ERROR_GET_CONNECTED_USERS = 2;
+	public static final int EXIT_ERROR_SEND_CONNECTION = 3;
+	public static final int EXIT_ERROR_SEND_DECONNECTION = 4;
 	
 	/**
 	 * Erreurs
@@ -80,7 +86,10 @@ public class Controller {
 	@SuppressWarnings("serial")
 	public static class ConnectionError extends Exception {};
 	@SuppressWarnings("serial")
-	public static class SendPresenceError extends Exception {};
+	public static class SendConnectionError extends Exception {};
+	@SuppressWarnings("serial")
+	public static class SendDeconnectionError extends Exception {};
+
 
 	/**
 	 * @param ipBroadcast L'adresse IP de la machine
@@ -100,6 +109,8 @@ public class Controller {
 		
 		messages = DataManager.readAllMessages();
 		groups = DataManager.readAllGroups();
+		
+		// TODO lire config ici
 		
 		if(serverPort > 0) {
 			// TODO remove
@@ -160,6 +171,13 @@ public class Controller {
 		messages.add(new Message(new Date(), "coucou3", user, group1, Message.FUNCTION_NORMAL));
 	}
 	
+	/**
+	 * Retourne le GUI principal
+	 * @return Le GUI principal
+	 */
+	public GUI getGUI() {
+		return gui;
+	}
 	
 	/**
 	 * Associe un GUI au controller
@@ -193,6 +211,21 @@ public class Controller {
 		return connectedUsers;
 	}
 	
+	/**
+	 * Modifie la liste des utilisateurs connectes
+	 * @param connectedUsers La liste des utilisateurs connectes
+	 */
+	public void setConnectedUsers(ArrayList<User> connectedUsers) {
+		this.connectedUsers = connectedUsers;
+	}
+	
+	/**
+	 * Retourne la liste de tous les messages
+	 * @return La liste de tous les messages
+	 */
+	public ArrayList<Message> getMessages(){
+		return messages;
+	}
 	
 	
 	/**
@@ -354,14 +387,15 @@ public class Controller {
 	 * @param ip L'IP de l'utilisateur
 	 * @throws IOException
 	 * @throws ConnectionError Si le serveur n'est pas accessible
+	 * @throws SendConnectionError Si une erreur survient lors de l'envoi des donnees
 	 * @throws SendPresenceError Si on ne parvient pas a indiquer sa presence au serveur
 	 * @see ServerSocketWaiter
 	 */
-	public void connect(int id, String username, InetAddress ip) throws IOException, ConnectionError, SendPresenceError {
+	public void connect(int id, String username, InetAddress ip) throws IOException {
 		
 		// Les verifications sur les identifiants de l'utilisateur sont faites avant
 
-		// Cr�ation de l'utilisateur associe au controller
+		// Creation de l'utilisateur associe au controller
 		user = new User(id, username, ip);
 		
 		// On associe un port random a ce nouvel utilisateur
@@ -381,72 +415,32 @@ public class Controller {
 			udp.sendUdpMessage(udp.createMessage(Udp.STATUS_CONNEXION, getUser()), ipBroadcast);
 		}
 		else {
-			// Connexion au serveur
-			
-			Gson gson = new Gson();
-			
-			// Creation des donnees utilisateur
-			String jsonData = gson.toJson(user);
-			String paramValue = "userdata=" + jsonData;
-			
-			// Test de la connexion
-			if(!testConnectionServer())
-				throw new ConnectionError();
-			
-			// Connexion au serveur et traitement de la reponse
-			HttpURLConnection con = sendRequestToServer(ChatSystemServer.ChatServer.ACTION_NEW_USER, paramValue);		
-			
-			int status = con.getResponseCode();
-			if(status != HttpURLConnection.HTTP_OK)
-				throw new SendPresenceError();
-			
-			String jsonResponse = getResponseContent(con);
-			ServerResponse serverResponse = gson.fromJson(jsonResponse, ServerResponse.class);
-
-			if(serverResponse.getCode() != ChatServer.NO_ERROR)
-				throw new SendPresenceError();
-			
-			// On recupere la liste des utilisateurs connectes
-			User[] responseUsers = gson.fromJson(serverResponse.getData(), User[].class);
-			connectedUsers = new ArrayList<User>(Arrays.asList(responseUsers));
-			
-			// TODO Pas optimal ?
-			// Mise a jour des groupes avec les nouvelles informations des utilisateurs connectes
-			boolean hasChanged = false;
-			String oldName;
-			for(User receivedUser : connectedUsers) {
-				
-				for(Group group : groups) {
-					oldName = group.getGroupNameForUser(user);
-					hasChanged = group.updateMember(receivedUser);
-					
-					if(hasChanged) {
-						gui.replaceUsernameInList(oldName, group.getGroupNameForUser(user));
-					}
-				}
-				
-			
-				// Mise a jour des messages avec les nouvelles informations de l'utilisateur
-				for(Message m : messages)
-					m.updateSender(receivedUser);
-			}
-				
-			// Mise a jour du GUI
-			if(gui != null)
-				gui.updateConnectedUsers();
+			// TODO
+			// TODO update groups + messages
 		}
 		
 		// Ajout des groupes au GUI
 		for(Group g : groups)
 			gui.addGroup(g);
 		
+		
+		// TODO selon config
+		// Lancement du timer
+		// Ce timer sert a recuperer les utilisateurs connectes
+		// et a indiquer sa presence de facon reguliere
+		timer = new Timer();
+		// TODO lire config
+		timer.scheduleAtFixedRate(new ResquestTimer(this), 0, 5000);
+		
 	}
 	
 	/**
 	 * Deconnecte l'utilisateur et l'annonce a tout le monde
 	 * @throws IOException 
+	 * @throws ConnectionError Si le serveur n'est pas accessible
+	 * @throws SendDeconnectionError Si une erreur survient lors de l'envoi des donnees
 	 */
-	public void deconnect() throws IOException {
+	public void deconnect() throws IOException, ConnectionError, SendDeconnectionError {
 		
 		// Tous les groupes de l'utilisateur sont maintenant offline
 		for(Group g : groups)
@@ -455,7 +449,32 @@ public class Controller {
 		DataManager.writeAllMessages(messages);
 		DataManager.writeAllGroups(groups);
 
-		udp.sendUdpMessage(udp.createMessage(Udp.STATUS_DECONNEXION, getUser()), ipBroadcast);
+		// TODO Selon config
+		// Connexion au serveur et envoie des donnees au format JSON
+		Gson gson = new Gson();
+		
+		// Creation des donnees utilisateur
+		String jsonData = gson.toJson(user);
+		String paramValue = "userdata=" + jsonData;
+		
+		// Test de la connexion
+		if(!testConnectionServer())
+			throw new ConnectionError();
+		
+		// Connexion au serveur et traitement de la reponse
+		HttpURLConnection con = sendRequestToServer(ChatSystemServer.ChatServer.ACTION_USER_DECONNECTION, paramValue);		
+		
+		int status = con.getResponseCode();
+		if(status != HttpURLConnection.HTTP_OK)
+			throw new SendDeconnectionError();
+		
+		String jsonResponse = getResponseContent(con);
+		ServerResponse serverResponse = gson.fromJson(jsonResponse, ServerResponse.class);
+
+		if(serverResponse.getCode() != ChatServer.NO_ERROR)
+			throw new SendDeconnectionError();
+		
+//		udp.sendUdpMessage(udp.createMessage(Udp.STATUS_DECONNEXION, getUser()), ipBroadcast);
 		
 	}
 
@@ -701,7 +720,7 @@ public class Controller {
 	 * @return La connexion au serveur (contenant le status, la reponse, etc.)
 	 * @throws IOException Si le serveur est inaccessible
 	 */
-	private static HttpURLConnection sendRequestToServer(int action, String paramValue) throws IOException {
+	public static HttpURLConnection sendRequestToServer(int action, String paramValue) throws IOException {
 		
 		URL url = new URL("http://" + serverIP + ":" + serverPort + PATH_WEBPAGE +"?action=" + action + "&" + paramValue);
 		
@@ -743,7 +762,7 @@ public class Controller {
 	 * @return Le contenu texte de la reponse
 	 * @throws IOException Si une erreur dans la connexion survient
 	 */
-	private static String getResponseContent(HttpURLConnection con) throws IOException {
+	public static String getResponseContent(HttpURLConnection con) throws IOException {
 		
 		int responseCode = con.getResponseCode();
 		InputStream inputStream;
