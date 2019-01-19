@@ -13,6 +13,9 @@ import ChatSystem.Controller.SendConnectionError;
 import ChatSystemServer.ChatServer;
 import ChatSystemServer.ChatServer.ServerResponse;
 
+/**
+ * Classe chargee de lancer des requetes au serveur
+ */
 public class ResquestTimer extends TimerTask {
 	
 	private Controller controller;
@@ -24,14 +27,8 @@ public class ResquestTimer extends TimerTask {
 	@Override
 	public void run() {
 		
-		System.out.println("time");
-		
-		// Connexion au serveur et envoie des donnees au format JSON
-		Gson gson = new Gson();
-		
 		// Creation des donnees utilisateur
-		String jsonData = gson.toJson(controller.getUser());
-		String paramValue = "userdata=" + jsonData;
+		String paramValue = "userdata=" + controller.getUser().toJson();
 		
 		try {
 		
@@ -42,11 +39,14 @@ public class ResquestTimer extends TimerTask {
 			// Connexion au serveur et traitement de la reponse
 			HttpURLConnection con = Controller.sendRequestToServer(ChatSystemServer.ChatServer.ACTION_USER_CONNECTION, paramValue);		
 			
+			// On verifie la reponse
 			int status = con.getResponseCode();
 			if(status != HttpURLConnection.HTTP_OK)
 				throw new SendConnectionError();
 			
 			String jsonResponse = Controller.getResponseContent(con);
+			
+			Gson gson = new Gson();
 			ServerResponse serverResponse = gson.fromJson(jsonResponse, ServerResponse.class);
 	
 			if(serverResponse.getCode() != ChatServer.NO_ERROR)
@@ -55,13 +55,6 @@ public class ResquestTimer extends TimerTask {
 			// On recupere la liste des utilisateurs connectes
 			User[] responseUsers = gson.fromJson(serverResponse.getData(), User[].class);
 			ArrayList<User> connectedUsers = new ArrayList<User>(Arrays.asList(responseUsers));
-			// controller.setConnectedUsers(new ArrayList<User>(Arrays.asList(responseUsers)));
-			
-			// TODO Pas optimal ?
-			// Mise a jour des groupes avec les nouvelles informations des utilisateurs connectes
-//			for(User receivedUser : connectedUsers) {
-//				controller.receiveConnection(receivedUser);
-//			}
 			
 			//if(!connectedUsers.isEmpty())
 				controller.receiveConnectedUsersFromServer(connectedUsers);

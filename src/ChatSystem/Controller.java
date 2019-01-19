@@ -63,6 +63,7 @@ public class Controller {
 	private static int serverPort;
 	private static int timeoutConnection;
 	private static int updateInterval;
+	private static String pathWebpage = null;
 	
 	// Timer utilise pour les requetes
 	private Timer timer;
@@ -71,8 +72,11 @@ public class Controller {
 	/**
 	 * Constantes
 	 */
-	private static final String PATH_WEBPAGE = "/chatsystem/ChatServer";
-
+	// Utilise sur les machines Linux
+	private static final String PATH_WEBPAGE_LOWERCASE = "/chatsystem/ChatServer";
+	// Utilise sur les machines Windows
+	private static final String PATH_WEBPAGE_UPPERCASE = "/ChatSystem/ChatServer";
+	
 	public static final int EXIT_NO_ERROR = 0;
 	public static final int EXIT_ERROR_SERVER_UNAVAILABLE = 1;
 	public static final int EXIT_ERROR_GET_CONNECTED_USERS = 2;
@@ -108,9 +112,6 @@ public class Controller {
 		messages = DataManager.readAllMessages();
 		groups = DataManager.readAllGroups();
 		
-
-		// TODO lire config ici
-		
 		// On utilise le serveur
 		if(serverPort > 0) {
 			useServer = true;
@@ -127,8 +128,10 @@ public class Controller {
 			Controller.serverIP = null;
 			Controller.serverPort = -1;
 			
+			int udpPort = Integer.parseInt(DataManager.getSetting("udp", "port", "5000"));
+			
 			this.ipBroadcast = ipBroadcast;
-			udp = new Udp(this);
+			udp = new Udp(this, udpPort);
 		}
 		
 	}
@@ -150,15 +153,6 @@ public class Controller {
 	public User getUser() {
 		return user;
 	}
-	
-	/**
-	 * Retourne la liste des groupes de l'utilisateur
-	 * @return La liste des groupes de l'utilisateur
-	 */
-//	public ArrayList<Group> getGroups() {
-//		return groups;
-//	}
-	// TODO remove
 
 	/**
 	 * Retourne la liste des utilisateurs connectes
@@ -326,11 +320,7 @@ public class Controller {
 		// Si on utilise le serveur
 		if(useServer) {
 			// Connexion au serveur et envoie des donnees au format JSON
-			Gson gson = new Gson();
-			
-			// Creation des donnees utilisateur
-			String jsonData = gson.toJson(user);
-			String paramValue = "userdata=" + jsonData;
+			String paramValue = "userdata=" + user.toJson();
 			
 			// Test de la connexion
 			if(!testConnectionServer())
@@ -343,7 +333,10 @@ public class Controller {
 			if(status != HttpURLConnection.HTTP_OK)
 				throw new SendDeconnectionError();
 			
+			// On recupere les donnees
 			String jsonResponse = getResponseContent(con);
+			
+			Gson gson = new Gson();
 			ServerResponse serverResponse = gson.fromJson(jsonResponse, ServerResponse.class);
 	
 			if(serverResponse.getCode() != ChatServer.NO_ERROR)
@@ -724,7 +717,7 @@ public class Controller {
 	public static HttpURLConnection sendRequestToServer(int action, String paramValue) throws IOException {
 		
 		// Creation de l'URL
-		URL url = new URL("http://" + serverIP + ":" + serverPort + PATH_WEBPAGE +"?action=" + action + "&" + paramValue);
+		URL url = new URL("http://" + serverIP + ":" + serverPort + pathWebpage +"?action=" + action + "&" + paramValue);
 		
 		// Envoi de la requete
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -744,20 +737,68 @@ public class Controller {
 	 */
 	public static boolean testConnectionServer() {
 		
-		try {
-			// Creation de l'URL
-			URL url = new URL("http://" + serverIP + ":" + serverPort + PATH_WEBPAGE);
-			HttpURLConnection con = (HttpURLConnection) url.openConnection();
-			con.setRequestMethod("HEAD");
-			con.setConnectTimeout(timeoutConnection);
+		// On a deja teste la connexion et on connait l'URL correcte
+		if(pathWebpage != null) {
 			
-			// Renvoie True si tout se passe bien
-			return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
+			try {
+				
+				// Creation de l'URL
+				URL url = new URL("http://" + serverIP + ":" + serverPort + pathWebpage);
+				HttpURLConnection con = (HttpURLConnection) url.openConnection();
+				con.setRequestMethod("HEAD");
+				con.setConnectTimeout(timeoutConnection);
+				
+				// Renvoie True si tout se passe bien
+				return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
+			}
+			
+			// Permet de detecter un timeout
+			catch (IOException e) {
+				return false;
+			}
+			
 		}
-		
-		// Permet de détecter un timeout
-		catch (IOException e) {
-			return false;
+
+		// On teste les URL avec et sans majuscules (configuration differente selon Windows ou Linux)
+		else {
+			boolean connectionOK = false;
+			
+			// Test pour Linux (sans majuscule)
+			try {
+				// Creation de l'URL
+				URL url = new URL("http://" + serverIP + ":" + serverPort + PATH_WEBPAGE_LOWERCASE);
+				HttpURLConnection con = (HttpURLConnection) url.openConnection();
+				con.setRequestMethod("HEAD");
+				con.setConnectTimeout(timeoutConnection);
+				
+				if(con.getResponseCode() == HttpURLConnection.HTTP_OK) {
+					connectionOK = true;
+					pathWebpage = PATH_WEBPAGE_LOWERCASE;
+				}
+			}
+			// Permet de detecter un timeout
+			catch (IOException e) {}
+
+			// Test pour Windows (avec majuscules) si le premier test a echoue
+			if(!connectionOK) {
+				try {
+					// Creation de l'URL
+					URL url = new URL("http://" + serverIP + ":" + serverPort + PATH_WEBPAGE_UPPERCASE);
+					HttpURLConnection con = (HttpURLConnection) url.openConnection();
+					con.setRequestMethod("HEAD");
+					con.setConnectTimeout(timeoutConnection);
+					
+					if(con.getResponseCode() == HttpURLConnection.HTTP_OK) {
+						connectionOK = true;
+						pathWebpage = PATH_WEBPAGE_UPPERCASE;
+					}
+
+				}
+				// Permet de detecter un timeout
+				catch (IOException e) {}
+			}
+			
+			return connectionOK;
 		}
 
 	}

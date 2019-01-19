@@ -4,9 +4,10 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.Date;
 
+import com.google.gson.Gson;
+
 /**
  * Represente un utilisateur de l'application
- *
  */
 public class User implements Serializable{
 	
@@ -94,6 +95,9 @@ public class User implements Serializable{
 		this.lastVisit = lastVisit;
 	}
 	
+	/**
+	 * Teste si deux utilisateurs sont egaux (utilise l'ID)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if(!(obj instanceof User))
@@ -103,17 +107,24 @@ public class User implements Serializable{
 		return u.id == id;
 	}
 	
-	public boolean equalsUsername(Object obj) {
-		if(!(obj instanceof User))
-			return false;
-		
-		User u = (User) obj;
-		return u.username.equals(username);
-	}
-	
+	/**
+	 * Permet d'utiliser un utilisateur
+	 * @return L'utilisateur sous forme de string
+	 */
 	@Override
 	public String toString() {		
 		return "{" + Integer.toString(id) + ", " + username + "}";
+	}
+	
+	/**
+	 * Retourne l'utilisateur sous forme de chaine de caracteres au format JSON
+	 * @return L'utilisateur sous forme de chaine de caracteres au format JSON
+	 */
+	public String toJson() {
+		Gson gson = new Gson();
+		
+		// Creation des donnees utilisateur
+		return gson.toJson(this);
 	}
 
 }

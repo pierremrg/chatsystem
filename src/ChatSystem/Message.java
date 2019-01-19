@@ -5,7 +5,6 @@ import java.util.Date;
 
 /**
  * Represente un message envoye entre deux utilisateurs
- *
  */
 public class Message implements Serializable {
 	
@@ -17,6 +16,7 @@ public class Message implements Serializable {
 	private Group receiverGroup;
 	private int function;
 	
+	// Fonctions du message
 	public static final int FUNCTION_NORMAL = 0;
 	public static final int FUNCTION_STOP = 1;
 	

@@ -11,7 +11,6 @@ import java.util.Base64;
 
 /**
  * Permet de lire les messages recus
- *
  */
 public class SocketReader extends Thread {
 
@@ -24,7 +23,6 @@ public class SocketReader extends Thread {
 	 * @param name Nom du thread
 	 * @param socket Socket a utiliser
 	 * @param controller Controller de l'application
-	 * @see Message
 	 */
 	public SocketReader(String name, Socket socket, Controller controller) {
 		super(name);

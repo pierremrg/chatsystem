@@ -17,11 +17,9 @@ import java.util.prefs.Preferences;
 
 import org.ini4j.Ini;
 import org.ini4j.IniPreferences;
-import org.ini4j.InvalidFileFormatException;
 
 /**
  * Permet de gerer la lecture et l'ecriture des donnees sur la machine locale
- *
  */
 public class DataManager {
 	
@@ -46,8 +44,8 @@ public class DataManager {
 	/**
 	 * Stocke sur la machine l'ensemble des messages de l'utilisateur
 	 * @param messages Messages a stocker
-	 * @throws FileNotFoundException
-	 * @throws IOException
+	 * @throws FileNotFoundException Si une erreur survient
+	 * @throws IOException Si une erreur survient
 	 */
 	public static void writeAllMessages(ArrayList<Message> messages) throws FileNotFoundException, IOException {
 		
@@ -71,9 +69,9 @@ public class DataManager {
 	/**
 	 * Retourne la liste de tous les messages stockes sur la machine
 	 * @return La liste de tous les messages stockes sur la machine
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 * @throws ClassNotFoundException
+	 * @throws FileNotFoundException Si une erreur survient
+	 * @throws IOException Si une erreur survient
+	 * @throws ClassNotFoundException Si une erreur survient
 	 */
 	public static ArrayList<Message> readAllMessages() throws FileNotFoundException, IOException, ClassNotFoundException{
 		
@@ -107,8 +105,8 @@ public class DataManager {
 	/**
 	 * Stocke sur la machine l'ensemble des groupes de l'utilisateur
 	 * @param groups Groupes a stocker
-	 * @throws FileNotFoundException
-	 * @throws IOException
+	 * @throws FileNotFoundException Si une erreur survient
+	 * @throws IOException Si une erreur survient
 	 */
 	public static void writeAllGroups(ArrayList<Group> groups) throws FileNotFoundException, IOException {
 		
@@ -132,9 +130,9 @@ public class DataManager {
 	/**
 	 * Retourne la liste de tous les groupes stockes sur la machine
 	 * @return La liste de tous les groupes stockes sur la machine
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 * @throws ClassNotFoundException
+	 * @throws FileNotFoundException Si une erreur survient
+	 * @throws IOException Si une erreur survient
+	 * @throws ClassNotFoundException Si une erreur survient
 	 */
 	public static ArrayList<Group> readAllGroups() throws FileNotFoundException, IOException, ClassNotFoundException{
 		
@@ -169,8 +167,8 @@ public class DataManager {
 	 * Permet de stocker un utilisateur sur la machine
 	 * @param username Username de l'utilisateur
 	 * @param password Password de l'utilisateur
-	 * @throws IOException
-	 * @throws NoSuchAlgorithmException 
+	 * @throws IOException Si une erreur survient
+	 * @throws NoSuchAlgorithmException Si une erreur survient
 	 */
 	public static void createUser(String username, char[] password) throws IOException, NoSuchAlgorithmException {		
 		// Verifie que le dossier "data" existe, sinon le cree
@@ -201,9 +199,9 @@ public class DataManager {
 	 * @param username Username de l'utilisateur
 	 * @param password Password de l'utilisateur
 	 * @return L'ID de l'utilisateur si les donnees sont correctes, -1 sinon
-	 * @throws IOException
-	 * @throws ClassNotFoundException
-	 * @throws NoSuchAlgorithmException 
+	 * @throws IOException Si une erreur survient
+	 * @throws ClassNotFoundException Si une erreur survient
+	 * @throws NoSuchAlgorithmException Si une erreur survient
 	 */
 	public static int checkUser(String username, char[] passwordEnter) throws IOException, ClassNotFoundException, NoSuchAlgorithmException {
 
@@ -229,6 +227,12 @@ public class DataManager {
 		return -1;
 	}
 	
+	/**
+	 * Permet de changer le username de l'utilisateur (y compris dans le fichier)
+	 * @param newUsername Le nouveau username
+	 * @throws IOException Si une erreur survient
+	 * @throws ClassNotFoundException Si une erreur survient
+	 */
 	public static void changeUsername(String newUsername) throws IOException, ClassNotFoundException {
 		File usersFile = new File(PATH_USER);
 		
@@ -254,6 +258,15 @@ public class DataManager {
 		}		
 	}
 	
+	/**
+	 * Permet de changer le mot de passe de l'utilisateur
+	 * @param oldPassword L'ancien mot de passe
+	 * @param newPassword Le nouveau mot de passe
+	 * @throws IOException Si une erreur survient
+	 * @throws ClassNotFoundException Si une erreur survient
+	 * @throws NoSuchAlgorithmException Si une erreur survient
+	 * @throws PasswordError Si l'ancien mot de passe fourni est incorrect
+	 */
 	public static void changePassword(char[] oldPassword, char[] newPassword) throws IOException, ClassNotFoundException, NoSuchAlgorithmException, PasswordError {
 		File usersFile = new File(PATH_USER);
 		
@@ -286,6 +299,12 @@ public class DataManager {
 		} 
 	}
 	
+	/**
+	 * Permet de chiffrer le mot de passe
+	 * @param password Le mot de passe a chiffrer
+	 * @return Le mot de passe chiffre
+	 * @throws NoSuchAlgorithmException Si une erreur survient
+	 */
 	private static byte[] hashPassword (char[] password) throws NoSuchAlgorithmException {
 		byte[] passwordBytes = new byte[password.length];
 		for (int i = 0; i < passwordBytes.length; i++)
@@ -297,7 +316,13 @@ public class DataManager {
 		return passwordHashed;
 	}
 	
-	
+	/**
+	 * Permet de lire un parametre dans le fichier ini
+	 * @param node La section du fichier
+	 * @param setting Le nom du parametre
+	 * @param defaultValue La valeur par defaut si le parametre n'existe pas
+	 * @return La valeur du parametre
+	 */
 	public static String getSetting(String node, String setting, String defaultValue) {
 		
 		File iniFile = new File(PATH_CONFIG);

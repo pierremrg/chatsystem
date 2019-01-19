@@ -23,6 +23,9 @@ import javax.swing.JTextField;
 
 import ChatSystem.DataManager.PasswordError;
 
+/**
+ * Fenetre de modification d'utilisateur
+ */
 public class GUIModifUser extends JFrame {
 	
 	private static final long serialVersionUID = 1L;
@@ -41,6 +44,11 @@ public class GUIModifUser extends JFrame {
 	private JButton modifPasswordButton;
 	private GUI gui;
 	
+	/**
+	 * Cree une nouvelle fenetre
+	 * @param gui Le GUI principal
+	 * @param controller Le controller de l'application
+	 */
 	public GUIModifUser(GUI gui, Controller controller) {
 		super(controller.getUser().getUsername());
 		this.gui = gui;
@@ -67,7 +75,7 @@ public class GUIModifUser extends JFrame {
 		
 		modifUsernameField = new JTextField();
 		modifUsernameField.addKeyListener(new KeyAdapter());
-		modifUsernameField.addActionListener(new ModifUsernameListener(gui, controller));
+		modifUsernameField.addActionListener(new EditUsernameListener(gui, controller));
 		c.weightx = 0.5;
 		c.gridwidth = 1;
 		c.gridx = 0;
@@ -76,7 +84,7 @@ public class GUIModifUser extends JFrame {
 		
 		
 		modifUsernameButton = new JButton("Changer nom d'utilisateur");
-		modifUsernameButton.addActionListener(new ModifUsernameListener(gui, controller));
+		modifUsernameButton.addActionListener(new EditUsernameListener(gui, controller));
 		c.weightx = 1;
 		c.gridwidth = 3;
 		c.gridx = 0;
@@ -100,7 +108,7 @@ public class GUIModifUser extends JFrame {
 		modifUserPanel.add(oldPasswordLabel, c);
 		
 		oldPasswordField = new JPasswordField();
-		oldPasswordField.addActionListener(new ModifPasswordListener(gui, controller));
+		oldPasswordField.addActionListener(new EditPasswordListener(gui, controller));
 		c.weightx = 0.5;
 		c.gridwidth = 1;
 		c.gridx = 0;
@@ -122,7 +130,7 @@ public class GUIModifUser extends JFrame {
 		modifUserPanel.add(newConfirmPasswordLabel, c);		
 		
 		newPasswordField = new JPasswordField();
-		newPasswordField.addActionListener(new ModifPasswordListener(gui, controller));
+		newPasswordField.addActionListener(new EditPasswordListener(gui, controller));
 		c.weightx = 0.5;
 		c.gridwidth = 1;
 		c.gridx = 0;
@@ -130,7 +138,7 @@ public class GUIModifUser extends JFrame {
 		modifUserPanel.add(newPasswordField, c);
 		
 		newConfirmPasswordField = new JPasswordField();
-		newConfirmPasswordField.addActionListener(new ModifPasswordListener(gui, controller));
+		newConfirmPasswordField.addActionListener(new EditPasswordListener(gui, controller));
 		c.weightx = 0.5;
 		c.gridwidth = 1;
 		c.gridx = 1;
@@ -138,7 +146,7 @@ public class GUIModifUser extends JFrame {
 		modifUserPanel.add(newConfirmPasswordField, c);
 		
 		modifPasswordButton = new JButton("Changer mot de passe");
-		modifPasswordButton.addActionListener(new ModifPasswordListener(gui, controller));
+		modifPasswordButton.addActionListener(new EditPasswordListener(gui, controller));
 		c.weightx = 1;
 		c.gridwidth = 3;
 		c.gridx = 0;
@@ -149,11 +157,14 @@ public class GUIModifUser extends JFrame {
 		setVisible(true);		
 	}
 	
-	public class ModifUsernameListener implements ActionListener {
+	/**
+	 * Listener du bouton de modification de l'username
+	 */
+	public class EditUsernameListener implements ActionListener {
 		private GUI gui;
 		private Controller controller;
 		
-		public ModifUsernameListener(GUI gui, Controller controller) {
+		public EditUsernameListener(GUI gui, Controller controller) {
 			super();
 			this.gui = gui;
 			this.controller = controller;
@@ -172,11 +183,14 @@ public class GUIModifUser extends JFrame {
 		}
 	}	
 	
-	public class ModifPasswordListener implements ActionListener {
+	/**
+	 * Listener du bouton de modification du mot de passe
+	 */
+	public class EditPasswordListener implements ActionListener {
 		private GUI gui;
 		private Controller controller;
 		
-		public ModifPasswordListener(GUI gui, Controller controller) {
+		public EditPasswordListener(GUI gui, Controller controller) {
 			super();
 			this.gui = gui;
 			this.controller = controller;
@@ -218,6 +232,9 @@ public class GUIModifUser extends JFrame {
 		}
 	}
 	
+	/**
+	 * Permet de limiter le nombre de caracterers des zones de texte
+	 */
 	public class KeyAdapter implements KeyListener {
 
 		/**
@@ -229,37 +246,33 @@ public class GUIModifUser extends JFrame {
 		}
 
 		@Override
-		public void keyPressed(KeyEvent e) {
-		}
+		public void keyPressed(KeyEvent e) {}
 
 		@Override
-		public void keyReleased(KeyEvent e) {
-		}
+		public void keyReleased(KeyEvent e) {}
+		
 	}
 	
+	/**
+	 * Listener de fermeture de fenetre
+	 */
 	public class windowClosingListener implements WindowListener {
 
 		public void windowClosing(WindowEvent e) {
 			gui.setEnabled(true);
 		}
 
-		public void windowOpened(WindowEvent arg0) {
-		}
+		public void windowOpened(WindowEvent arg0) {}
 
-		public void windowClosed(WindowEvent arg0) {
-		}
+		public void windowClosed(WindowEvent arg0) {}
 
-		public void windowIconified(WindowEvent arg0) {
-		}
+		public void windowIconified(WindowEvent arg0) {}
 
-		public void windowDeiconified(WindowEvent arg0) {
-		}
+		public void windowDeiconified(WindowEvent arg0) {}
 
-		public void windowActivated(WindowEvent arg0) {
-		}
+		public void windowActivated(WindowEvent arg0) {}
 
-		public void windowDeactivated(WindowEvent arg0) {
-		}
+		public void windowDeactivated(WindowEvent arg0) {}
 
 	}
 

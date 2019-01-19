@@ -23,7 +23,6 @@ import javax.swing.JTextField;
 
 /**
  * Fenetre de creation de l'utilisateur
- *
  */
 public class GUICreateUser extends JFrame {
 
@@ -39,6 +38,9 @@ public class GUICreateUser extends JFrame {
 	private JButton createUserButton;
 	private GUIConnect guiConnect;
 
+	/**
+	 * Cree une fenetre pour creer un utilisateur
+	 */
 	public GUICreateUser(GUIConnect guiConnect) {
 		super("Creer utilisateur");
 		addWindowListener(new windowClosingListener());
@@ -102,6 +104,9 @@ public class GUICreateUser extends JFrame {
 
 	}
 
+	/**
+	 * Listener du bouton de creation d'utilisateur
+	 */
 	public class CreateUserListener implements ActionListener {
 		private GUIConnect guiConnect;
 
@@ -143,6 +148,9 @@ public class GUICreateUser extends JFrame {
 
 	}
 
+	/**
+	 * Permet de limiter le nombre de caracteres des zones de texte
+	 */
 	public class KeyAdapter implements KeyListener {
 
 		/**
@@ -154,37 +162,33 @@ public class GUICreateUser extends JFrame {
 		}
 
 		@Override
-		public void keyPressed(KeyEvent e) {
-		}
+		public void keyPressed(KeyEvent e) {}
 
 		@Override
-		public void keyReleased(KeyEvent e) {
-		}
+		public void keyReleased(KeyEvent e) {}
+		
 	}
 
+	/**
+	 * Listener de fermeture de fenetre
+	 */
 	public class windowClosingListener implements WindowListener {
 
 		public void windowClosing(WindowEvent e) {
 			guiConnect.setEnabled(true);
 		}
 
-		public void windowOpened(WindowEvent arg0) {
-		}
+		public void windowOpened(WindowEvent arg0) {}
 
-		public void windowClosed(WindowEvent arg0) {
-		}
+		public void windowClosed(WindowEvent arg0) {}
 
-		public void windowIconified(WindowEvent arg0) {
-		}
+		public void windowIconified(WindowEvent arg0) {}
 
-		public void windowDeiconified(WindowEvent arg0) {
-		}
+		public void windowDeiconified(WindowEvent arg0) {}
 
-		public void windowActivated(WindowEvent arg0) {
-		}
+		public void windowActivated(WindowEvent arg0) {}
 
-		public void windowDeactivated(WindowEvent arg0) {
-		}
+		public void windowDeactivated(WindowEvent arg0) {}
 
 	}
 }

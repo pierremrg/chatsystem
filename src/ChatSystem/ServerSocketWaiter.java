@@ -6,7 +6,6 @@ import java.net.Socket;
 
 /**
  * Permet de se mettre en attente d'une connexion d'un utilisateur distant
- *
  */
 public class ServerSocketWaiter extends Thread {
 
@@ -46,8 +45,7 @@ public class ServerSocketWaiter extends Thread {
 				SocketWriter socketWriter = new SocketWriter("ServerSocketWriter", socket, controller, socketReader.getGroup());
 				socketWriter.start();
 
-				// TODO : a supprimer
-				System.out.println("Server started");
+				//System.out.println("Server started");
 			}
 			
 		} catch (IOException e) {

@@ -14,15 +14,16 @@ import java.net.InetAddress;
 import java.net.SocketException;
 
 public class Udp extends Thread {
+	
 	private Controller controller;
 	private DatagramSocket socket;
+	
+	// Port utilise par notre service UDP
+	private int port;
 	
 	// Header des paquets UDP utilises par l'application
 	// Permet de ne pas traiter les paquets d'une autre application
 	private static final int IDENT_UDP = 5289803;
-	
-	// Port utilise par notre service UDP
-	private static final int PORT = 5003; // TODO : autre ?
 	
 	// Constantes de statut de connexion
 	public static final int NO_STATUS = -1;
@@ -36,11 +37,12 @@ public class Udp extends Thread {
 	 * @param controller Controller associe a l'UDP
 	 * @throws SocketException Si une erreur UDP survient
 	 */
-	public Udp(Controller controller) throws SocketException {
+	public Udp(Controller controller, int port) throws SocketException {
 		super("UDP");
 		this.controller = controller;
 
-		this.socket = new DatagramSocket(PORT);
+		this.port = port;
+		this.socket = new DatagramSocket(port);
 
 		socket.setBroadcast(true);
 	}
@@ -50,7 +52,7 @@ public class Udp extends Thread {
 	 * @param status Information envoyee par le message (connexion, deconnexion, etc.)
 	 * @param user L'utilisateur qui envoie ce message
 	 * @return Le message UDP sous forme de bytes
-	 * @throws IOException
+	 * @throws IOException Si une erreur survient dans la creation du message
 	 */
 	public byte[] createMessage(int status, User user) throws IOException {
 		
@@ -72,10 +74,10 @@ public class Udp extends Thread {
 	 * @throws IOException Si une erreur a lieu au moment de l'envoi du message UDP
 	 */
 	public void sendUdpMessage(byte[] message, InetAddress ipAddress) throws IOException {
-		DatagramPacket out = new DatagramPacket(message, message.length, ipAddress, PORT);
+		DatagramPacket out = new DatagramPacket(message, message.length, ipAddress, port);
 		
 		socket.send(out);
-		System.out.println("message UDP envoye : " + message + " a " + ipAddress.toString()); // TODO : a supprimer
+		//System.out.println("message UDP envoye : " + message + " a " + ipAddress.toString());
 	}
 	
 	/**
@@ -93,7 +95,6 @@ public class Udp extends Thread {
 		
 		while(true) {
 			
-			// TODO gerer erreurs dans controller + GUI
 			try {
 				socket.receive(in);
 			

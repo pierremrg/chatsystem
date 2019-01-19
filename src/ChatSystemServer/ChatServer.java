@@ -7,8 +7,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 
-import javax.servlet.Servlet;
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -26,10 +24,9 @@ public class ChatServer extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	public static final int ACTION_USER_CONNECTION = 1;
-	//public static final int ACTION_GET_CONNECTED_USERS = 2;
 	public static final int ACTION_USER_DECONNECTION = 2;
-	
-	// TODO lire depuis config
+
+	// Delai de deconnexion automatique : 5 secondes
 	public static final int AUTO_DECONNECTION_DELAY = 5000;
 	
 	// TODO a supprimer
@@ -39,10 +36,9 @@ public class ChatServer extends HttpServlet {
 	public static final int ERROR_NO_ACTION = 1;
 	public static final int ERROR_NO_USER_DATA = 2;
 	public static final int ERROR_JSON_FORMAT = 50;
-	
+
+	// Liste des utilisateurs connectes sur le serveur
 	private ArrayList<User> connectedUsers;
-//	Gson gson;
- 
 	
 	/**
 	 * Sous-classe utilisee pour envoyer une reponse du serveur
@@ -83,31 +79,21 @@ public class ChatServer extends HttpServlet {
 		}
 	}
 	
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
+	/**
+	 * Demarrage du serveur
+	 */
     public ChatServer() {
         super();
-        // TODO Auto-generated constructor stub
         
         connectedUsers = new ArrayList<User>();
-//        connectedUsers.add(new User(10, "jean", null));
-//        connectedUsers.add(new User(70, "truc", null));
     }
 
-	/**
-	 * @see Servlet#init(ServletConfig)
-	 */
-	public void init(ServletConfig config) throws ServletException {
-		// TODO Auto-generated method stub
-	}
-
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
+    /**
+     * Action a faire lorsqu'on recoit une requete (GET) sur le serveur
+     */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//		response.getWriter().append("Served at: ").append(request.getContextPath());
-		
+
+		// On renvoie des donnees au format JSON
 		response.setContentType("application/json");
 		
 		ServerResponse serverResponse = new ServerResponse(NO_ERROR, "json");
@@ -118,6 +104,7 @@ public class ChatServer extends HttpServlet {
 		Gson gson = new Gson();
 		String jsonData;
 		
+		// La requete doit contenir une action
 		if(parameters.containsKey("action")) {
 			
 			try {
@@ -204,10 +191,16 @@ public class ChatServer extends HttpServlet {
 		
 	}
 	
+	/**
+	 * Retourne une map des parametres envoyes dans la requete
+	 * @param request La requete envoyee au serveur
+	 * @return Une map des parametres envoyes dans la requete
+	 */
 	private HashMap<String, String> getParametersMap(HttpServletRequest request){
 		
 		HashMap<String, String> map = new HashMap<String, String>();
 		
+		@SuppressWarnings("unchecked")
 		Enumeration<String> parameterNames = request.getParameterNames();
 		
 		while(parameterNames.hasMoreElements()) {
@@ -223,6 +216,9 @@ public class ChatServer extends HttpServlet {
 		return map;
 	}
 	
+	/**
+	 * Permet de supprimer les utilisateurs qui n'ont pas envoye d'informations depuis trop longtemps
+	 */
 	private void deconnectOldUsers() {
 	
 		Date currentTime = new Date();
@@ -237,10 +233,10 @@ public class ChatServer extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * Permet de traiter une requete POST
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+		// On renvoie sur une requete GET
 		doGet(request, response);
 	}
 

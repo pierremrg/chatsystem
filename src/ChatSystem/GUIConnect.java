@@ -24,7 +24,6 @@ import javax.swing.JTextField;
 
 /**
  * Fenetre de connexion de l'utilisateur
- *
  */
 public class GUIConnect extends JFrame {
 	
@@ -172,6 +171,9 @@ public class GUIConnect extends JFrame {
 		this.statusConnexion = statusConnexion;
 	}
 
+	/**
+	 * Listener du bouton de connexon
+	 */
 	public class ConnectListener implements ActionListener {
 
 		/**
@@ -204,6 +206,9 @@ public class GUIConnect extends JFrame {
 		}
 	}
 
+	/**
+	 * Listener du bouton de creation d'utilisateur
+	 */
 	public class CreateUserListener implements ActionListener {
 		private GUIConnect guiConnect;
 
@@ -221,6 +226,9 @@ public class GUIConnect extends JFrame {
 		}
 	}
 
+	/**
+	 * Permet de limiter le nombre de caracteres des zones de texte
+	 */
 	public class KeyAdapter implements KeyListener {
 
 		/**
@@ -232,11 +240,11 @@ public class GUIConnect extends JFrame {
 		}
 
 		@Override
-		public void keyPressed(KeyEvent e) {
-		}
+		public void keyPressed(KeyEvent e) {}
 
 		@Override
-		public void keyReleased(KeyEvent e) {
-		}
+		public void keyReleased(KeyEvent e) {}
+	
 	}
+	
 }

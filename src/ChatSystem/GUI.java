@@ -57,7 +57,7 @@ public class GUI extends JFrame{
 	private JButton sendButton; // Bouton Envoyer 
 	private JTextField textField; // Zone de texte
 	private JEditorPane messagesArea; // Zone des messages
-	private JScrollPane scrollMessageArea; // TODO Auto-scroll en bas
+	private JScrollPane scrollMessageArea;
 	private static JList<String> groupList; // Liste des groupes deja demarres
 	private JList<String> connectedUsersList; // Liste des utilisateurs connectes
 	private JLabel labelGroups; // Label "Conversations demarees"
@@ -329,7 +329,7 @@ public class GUI extends JFrame{
 			try {
 				// Deconnexion de l'utilisateur
 				controller.deconnect();
-				//controller.sendMessage(null, 0, Message.FUNCTION_STOP); // TODO pourquoi ?
+				//controller.sendMessage(null, 0, Message.FUNCTION_STOP);
 				
 				// Fin du programme sans erreur
 				System.exit(Controller.EXIT_NO_ERROR);
@@ -635,10 +635,13 @@ public class GUI extends JFrame{
 				
 				prevSender = m.getSender();
 			}
-			
+
+			// Affichage des messages
 			messagesArea.setText(history);
-			// TODO Scroll auto
-		
+			
+			// Scroll a la fin des messages
+			messagesArea.setCaretPosition(messagesArea.getDocument().getLength());
+			
 		}
 		else {
 			messagesArea.setText(null);
@@ -698,7 +701,7 @@ public class GUI extends JFrame{
 
 		} catch (NumberFormatException e) {
 			// Mauvaise configuration du timeout dans le fichier ini
-			showError("Impossible de se connecter au serveur.\nVerifiez la configuration de la connexion ou utilisez le protocole UDP.");
+			showError("Impossible de se connecter au chat.\nVerifiez la configuration de la connexion au serveur ou du protocole UDP.");
 			System.exit(Controller.EXIT_ERROR_SERVER_UNAVAILABLE);
 		} catch (IOException e) {
 			showError("Une erreur s'est produite dans la decouverte du reseau (Protocole UDP).");

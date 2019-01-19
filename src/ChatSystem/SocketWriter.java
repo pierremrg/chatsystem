@@ -10,7 +10,6 @@ import java.util.Base64;
 
 /**
  * Permet d'ecrire des messages a destination d'un groupe
- *
  */
 public class SocketWriter extends Thread {
 	
@@ -24,7 +23,6 @@ public class SocketWriter extends Thread {
 	 * @param socket Le socket a utiliser
 	 * @param controller Le controller de l'application
 	 * @param group Le groupe associe a ce SocketWriter
-	 * @see Message
 	 */
 	public SocketWriter(String name, Socket socket, Controller controller, Group group) {
 		super(name);
@@ -44,8 +42,7 @@ public class SocketWriter extends Thread {
 			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 			
 			Message messageToSend;
-			
-			// TODO : impossible qu'il soit ferme, si ?
+
 			while(!socket.isClosed()) {
 				
 				// On recupere le message a envoyer
@@ -59,8 +56,8 @@ public class SocketWriter extends Thread {
 					
 					// On envoie le message s'il est bien destine a ce groupe
 					if(group.equals(messageToSend.getReceiverGroup())) {					
-						out.println(encodeMessageToString(messageToSend)); // TODO a supprimer
-						System.out.println("Message envoyé"); // TODO a supprimer
+						out.println(encodeMessageToString(messageToSend));
+						//System.out.println("Message envoye");
 						controller.messageSent();
 					}
 					
@@ -75,8 +72,8 @@ public class SocketWriter extends Thread {
 		}
 		
 		finally {
-			// TODO A supprimer
-			System.out.println("Deconnecting writer...");
+			//System.out.println("Deconnecting writer...");
+
 			if (socket != null) {
 				try {
 					socket.close();
@@ -91,7 +88,7 @@ public class SocketWriter extends Thread {
 	 * Permet d'encoder un message sous forme de chaine de caracteres
 	 * @param message Le Message a encoder
 	 * @return Le Message encode sous forme de chaine de caracteres
-	 * @throws IOException
+	 * @throws IOException Si une erreur survient
 	 */
 	private static String encodeMessageToString(Message message) throws IOException {
 		
