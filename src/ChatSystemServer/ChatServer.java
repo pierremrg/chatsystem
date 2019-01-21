@@ -2,6 +2,7 @@ package ChatSystemServer;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
 import ChatSystem.User;
@@ -35,7 +37,7 @@ public class ChatServer extends HttpServlet {
 	public static final int NO_ERROR = 0;
 	public static final int ERROR_NO_ACTION = 1;
 	public static final int ERROR_NO_USER_DATA = 2;
-	public static final int ERROR_JSON_FORMAT = 50;
+	public static final int ERROR_JSON_FORMAT = 10;
 
 	// Liste des utilisateurs connectes sur le serveur
 	private ArrayList<User> connectedUsers;
@@ -101,7 +103,7 @@ public class ChatServer extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		HashMap<String, String> parameters = getParametersMap(request);
 
-		Gson gson = new Gson();
+		Gson gson = new GsonBuilder().setDateFormat("dd/MM/yyyy-hh:mm:ss").create();
 		String jsonData;
 		
 		// La requete doit contenir une action
@@ -124,7 +126,9 @@ public class ChatServer extends HttpServlet {
 						
 						// Gestion de la deconnexion automatique
 						deconnectOldUsers();
+//						SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy-hh:mm:ss");
 						newUser.setLastVisit(new Date());
+//						newUser.setLastVisit(dateFormat.format(new Date()));
 						
 						// On se met a la fin (et on n'apparait pas a soi-meme)
 						if(connectedUsers.contains(newUser))

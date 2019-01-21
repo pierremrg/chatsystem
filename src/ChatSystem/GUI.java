@@ -312,7 +312,7 @@ public class GUI extends JFrame{
 				displayMessages(controller.getGroupByName(groupName));
 			
 			} catch (Exception e1) {
-				showError("Impossible d'envoyer le message à cet utilisateur.");
+				showError("Impossible d'envoyer le message a cet utilisateur.");
 			}
 
 		}
@@ -338,7 +338,7 @@ public class GUI extends JFrame{
 				showError("Une erreur est survenue lors de la connexion au serveur.");
 				System.exit(Controller.EXIT_ERROR_SEND_DECONNECTION);
 			} catch (IOException err) {
-				showError("Une erreur est survenue lors de la déconnexion.");
+				showError("Une erreur est survenue lors de la deconnexion.");
 				System.exit(Controller.EXIT_ERROR_SEND_DECONNECTION);
 			}
 

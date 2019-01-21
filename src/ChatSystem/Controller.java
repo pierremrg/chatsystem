@@ -24,6 +24,7 @@ import java.util.Random;
 import java.util.Timer;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import ChatSystem.DataManager.PasswordError;
 import ChatSystemServer.ChatServer;
@@ -319,8 +320,10 @@ public class Controller {
 
 		// Si on utilise le serveur
 		if(useServer) {
+			Gson gson = new Gson();
+			
 			// Connexion au serveur et envoie des donnees au format JSON
-			String paramValue = "userdata=" + user.toJson();
+			String paramValue = "userdata=" + gson.toJson(user);
 			
 			// Test de la connexion
 			if(!testConnectionServer())
@@ -335,8 +338,6 @@ public class Controller {
 			
 			// On recupere les donnees
 			String jsonResponse = getResponseContent(con);
-			
-			Gson gson = new Gson();
 			ServerResponse serverResponse = gson.fromJson(jsonResponse, ServerResponse.class);
 	
 			if(serverResponse.getCode() != ChatServer.NO_ERROR)
@@ -723,8 +724,8 @@ public class Controller {
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestMethod("POST");
 		con.setRequestProperty("Content-Type", "application/json");
-		con.setConnectTimeout(500);
-		con.setReadTimeout(500);
+		con.setConnectTimeout(timeoutConnection);
+		//con.setReadTimeout(500);
 			
 		return con;
 	}

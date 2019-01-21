@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.TimerTask;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 
 import ChatSystem.Controller.ConnectionError;
 import ChatSystem.Controller.SendConnectionError;
@@ -27,8 +29,10 @@ public class ResquestTimer extends TimerTask {
 	@Override
 	public void run() {
 		
+		Gson gson = new GsonBuilder().setDateFormat("dd/MM/yyyy-hh:mm:ss").create();
+		
 		// Creation des donnees utilisateur
-		String paramValue = "userdata=" + controller.getUser().toJson();
+		String paramValue = "userdata=" + gson.toJson(controller.getUser());
 		
 		try {
 		
@@ -46,7 +50,6 @@ public class ResquestTimer extends TimerTask {
 			
 			String jsonResponse = Controller.getResponseContent(con);
 			
-			Gson gson = new Gson();
 			ServerResponse serverResponse = gson.fromJson(jsonResponse, ServerResponse.class);
 	
 			if(serverResponse.getCode() != ChatServer.NO_ERROR)
@@ -59,6 +62,9 @@ public class ResquestTimer extends TimerTask {
 			//if(!connectedUsers.isEmpty())
 				controller.receiveConnectedUsersFromServer(connectedUsers);
 		
+		} catch (JsonSyntaxException e) {
+			GUI.showError("Erreur lors de la reception des donnees du serveur.");
+			System.exit(Controller.EXIT_ERROR_GET_CONNECTED_USERS);
 		} catch (ConnectionError | NumberFormatException e) {
 			GUI.showError("Impossible de se connecter au serveur.\nVerifiez la configuration de la connexion ou utilisez le protocole UDP.");
 			System.exit(Controller.EXIT_ERROR_SERVER_UNAVAILABLE);

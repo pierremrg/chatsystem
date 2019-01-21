@@ -115,16 +115,5 @@ public class User implements Serializable{
 	public String toString() {		
 		return "{" + Integer.toString(id) + ", " + username + "}";
 	}
-	
-	/**
-	 * Retourne l'utilisateur sous forme de chaine de caracteres au format JSON
-	 * @return L'utilisateur sous forme de chaine de caracteres au format JSON
-	 */
-	public String toJson() {
-		Gson gson = new Gson();
-		
-		// Creation des donnees utilisateur
-		return gson.toJson(this);
-	}
 
 }
