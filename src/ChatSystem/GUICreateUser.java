@@ -132,17 +132,17 @@ public class GUICreateUser extends JFrame {
 						guiConnect.setVisible(true);
 						guiConnect.setEnabled(true);
 					} catch (IOException | NoSuchAlgorithmException e1) {
-						GUI.showError("Erreur ecriture fichier");
+						GUI.showError("Erreur lors de l'ecriture du fichier de donnees.");
 					}
 				} else {
 					setAlwaysOnTop(false);
-					GUI.showError("Erreur mot de passe");
+					GUI.showError("Les mots de passe indiques sont differents.");
 					passwordField.setText("");
 					confirmPasswordField.setText("");
 				}
 			} else {
 				setAlwaysOnTop(false);
-				GUI.showError("Champs vide");
+				GUI.showError("Veuillez remplir tous les champs.");
 			}
 		}
 

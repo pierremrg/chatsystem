@@ -196,12 +196,12 @@ public class GUIConnect extends JFrame {
 					setVisible(false);
 				
 				} else {
-					GUI.showError("Erreur connexion");
+					GUI.showError("L'identifiant ou le mot de passe est incorrect.");
 					usernameField.setText("");
 					passwordField.setText("");
 				}
 			} catch (ClassNotFoundException | IOException | NoSuchAlgorithmException e1) {
-				GUI.showError("Erreur ecriture fichier");
+				GUI.showError("Erreur lors de la lecture du fichier de donnees.");
 			}
 		}
 	}

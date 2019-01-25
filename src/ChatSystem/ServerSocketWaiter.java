@@ -49,7 +49,7 @@ public class ServerSocketWaiter extends Thread {
 			}
 			
 		} catch (IOException e) {
-			GUI.showError("Erreur : impossible de recevoir les connexions.");
+			GUI.showError("Impossible de recevoir les connexions.");
 		}
 		
 	}

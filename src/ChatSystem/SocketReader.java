@@ -39,7 +39,7 @@ public class SocketReader extends Thread {
 		try {
 
 			Message message = null;
-			System.out.println("SocketReader connected..."); // TODO a supprimer
+			//System.out.println("SocketReader connected...");
 
 			BufferedReader in_data = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
@@ -47,8 +47,7 @@ public class SocketReader extends Thread {
 			String stringData = in_data.readLine();
 
 			// Tant que la connexion est ouverte, on lit les messages
-		 // TODO : "-1" a supprimer ? Pas d'utilite, non ?
-			while (stringData != null && !stringData.equals("-1")) {
+			while (stringData != null) {
 
 				// On decode le message recu et on l'envoie au controller
 				message = decodeMessageFromString(stringData);
@@ -70,14 +69,14 @@ public class SocketReader extends Thread {
 			GUI.showError("Erreur dans la lecture des messages recus.");
 			
 		} finally {
-			System.out.println("Deconnecting reader..."); // TODO A supprimer
+			//System.out.println("Deconnecting reader...");
 			
 			try {
 				socket.close();
 			} catch (Exception e) {
-				GUI.showError("Erreur lors de la deconnexion du lecteur des messages reçus.");
+				GUI.showError("Erreur lors de la deconnexion du lecteur des messages recus.");
 			}
-			System.out.println("Reader deconnected"); // TODO A supprimer
+			//System.out.println("Reader deconnected");
 		}
 
 	}

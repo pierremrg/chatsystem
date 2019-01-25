@@ -2,7 +2,6 @@ package ChatSystemServer;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -25,14 +24,12 @@ import ChatSystem.User;
 public class ChatServer extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
+	public static final int ACTION_TEST_SERVER = 0;
 	public static final int ACTION_USER_CONNECTION = 1;
 	public static final int ACTION_USER_DECONNECTION = 2;
 
 	// Delai de deconnexion automatique : 5 secondes
 	public static final int AUTO_DECONNECTION_DELAY = 5000;
-	
-	// TODO a supprimer
-	public static final int ACTION_REMOVE_ALL_USERS = 50;
 	
 	public static final int NO_ERROR = 0;
 	public static final int ERROR_NO_ACTION = 1;
@@ -106,8 +103,15 @@ public class ChatServer extends HttpServlet {
 		Gson gson = new GsonBuilder().setDateFormat("dd/MM/yyyy-hh:mm:ss").create();
 		String jsonData;
 		
-		// La requete doit contenir une action
-		if(parameters.containsKey("action")) {
+		// Requete de test
+		if(parameters.containsKey("test")) {
+			serverResponse.setData("Le serveur fonctionnement correctement.");
+			jsonData = gson.toJson(serverResponse);
+			out.write(jsonData);
+		}
+		
+		// Sinon, la requete doit contenir une action
+		else if(parameters.containsKey("action")) {
 			
 			try {
 				int action = Integer.parseInt(parameters.get("action"));
@@ -126,9 +130,7 @@ public class ChatServer extends HttpServlet {
 						
 						// Gestion de la deconnexion automatique
 						deconnectOldUsers();
-//						SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy-hh:mm:ss");
 						newUser.setLastVisit(new Date());
-//						newUser.setLastVisit(dateFormat.format(new Date()));
 						
 						// On se met a la fin (et on n'apparait pas a soi-meme)
 						if(connectedUsers.contains(newUser))
@@ -165,15 +167,6 @@ public class ChatServer extends HttpServlet {
 					else {
 						serverResponse.setCode(ERROR_NO_USER_DATA);
 					}
-					
-				}
-
-				/**
-				 * Vide la liste des utilisateurs connectes
-				 */
-				else if(action == ACTION_REMOVE_ALL_USERS) {
-					
-					connectedUsers.clear();
 					
 				}
 				

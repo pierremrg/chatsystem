@@ -178,7 +178,7 @@ public class GUIModifUser extends JFrame {
 				gui.setVisible(true);
 				gui.setEnabled(true);
 			} catch (ClassNotFoundException | IOException e1) {
-				GUI.showError("Erreur ecriture fichier");
+				GUI.showError("Erreur lors de l'ecriture du fichier de donnees.");
 			} 
 		}
 	}	
@@ -209,24 +209,24 @@ public class GUIModifUser extends JFrame {
 						gui.setVisible(true);
 						gui.setEnabled(true);
 					} catch (ClassNotFoundException | NoSuchAlgorithmException | IOException e1) {
-						GUI.showError("Erreur ecriture fichier");
+						GUI.showError("Erreur lors de l'ecriture du fichier de donnees.");
 					} catch (PasswordError e1) {
 						setAlwaysOnTop(false);
-						GUI.showError("Erreur ancien mot de passe");
+						GUI.showError("L'ancien mot de passe est incorrect.");
 						oldPasswordField.setText("");
 						newPasswordField.setText("");
 						newConfirmPasswordField.setText("");
 					}
 				}
 				else {
-					GUI.showError("Erreur nouveau mot de passe different");
+					GUI.showError("Les nouveaux mots de passe ne correspondent pas.");
 					oldPasswordField.setText("");
 					newPasswordField.setText("");
 					newConfirmPasswordField.setText("");
 				}
 			}else {
 				setAlwaysOnTop(false);
-				GUI.showError("Champs vide");
+				GUI.showError("Veuillez remplir tous les champs.");
 			}
 				
 		}

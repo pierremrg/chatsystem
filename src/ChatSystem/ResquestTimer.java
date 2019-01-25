@@ -59,8 +59,7 @@ public class ResquestTimer extends TimerTask {
 			User[] responseUsers = gson.fromJson(serverResponse.getData(), User[].class);
 			ArrayList<User> connectedUsers = new ArrayList<User>(Arrays.asList(responseUsers));
 			
-			//if(!connectedUsers.isEmpty())
-				controller.receiveConnectedUsersFromServer(connectedUsers);
+			controller.receiveConnectedUsersFromServer(connectedUsers);
 		
 		} catch (JsonSyntaxException e) {
 			GUI.showError("Erreur lors de la reception des donnees du serveur.");

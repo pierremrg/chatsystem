@@ -24,7 +24,6 @@ import java.util.Random;
 import java.util.Timer;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import ChatSystem.DataManager.PasswordError;
 import ChatSystemServer.ChatServer;

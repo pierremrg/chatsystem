@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.Date;
 
-import com.google.gson.Gson;
-
 /**
  * Represente un utilisateur de l'application
  */
