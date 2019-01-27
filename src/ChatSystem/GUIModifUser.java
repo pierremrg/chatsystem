@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -154,6 +155,11 @@ public class GUIModifUser extends JFrame {
 		modifUserPanel.add(modifPasswordButton, c);
 		
 		add(modifUserPanel);
+		
+		/* Icone du programme */
+		ImageIcon icon = new ImageIcon(getClass().getResource("/icon.png"));
+		setIconImage(icon.getImage());
+		
 		setVisible(true);		
 	}
 	

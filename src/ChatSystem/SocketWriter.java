@@ -1,6 +1,8 @@
 package ChatSystem;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
@@ -55,10 +57,27 @@ public class SocketWriter extends Thread {
 						break;
 					
 					// On envoie le message s'il est bien destine a ce groupe
-					if(group.equals(messageToSend.getReceiverGroup())) {					
-						out.println(encodeMessageToString(messageToSend));
-						//System.out.println("Message envoye");
-						controller.messageSent();
+					if(group.equals(messageToSend.getReceiverGroup())) {	
+						
+						// Envoi d'un fichier ou d'une image
+						if(messageToSend.getFunction() == Message.FUNCTION_FILE || messageToSend.getFunction() == Message.FUNCTION_IMAGE) {
+							
+							// Envoi de deux messages : le message prevu + un message contenant le fichier
+							out.println(encodeMessageToString(messageToSend));
+							
+							File file = new File(messageToSend.getContent());
+							out.println(encodeFileToString(file));
+							
+							controller.messageSent();
+						}
+						
+						// Envoi d'un message texte
+						else {
+							out.println(encodeMessageToString(messageToSend));
+							//System.out.println("Message envoye");
+							controller.messageSent();
+						}
+						
 					}
 					
 				}
@@ -100,5 +119,23 @@ public class SocketWriter extends Thread {
 		oo.close();
 		
 		return Base64.getEncoder().encodeToString(bStream.toByteArray());
+	}
+	
+	/**
+	 * Permet d'encoder un fichier sous forme de chaine de caracteres
+	 * @param file Le fichier a encoder
+	 * @return Le fichier encode sous forme de chaine de caracteres
+	 * @throws IOException Si une erreur survient
+	 */
+	private static String encodeFileToString(File file) throws IOException {
+		
+		FileInputStream imageFile = new FileInputStream(file);
+		
+		byte[] imageData = new byte[(int) file.length()];
+		imageFile.read(imageData);
+		
+		imageFile.close();
+		
+		return Base64.getEncoder().encodeToString(imageData);
 	}
 }

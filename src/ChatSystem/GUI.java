@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketException;
@@ -22,8 +23,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -50,7 +53,6 @@ public class GUI extends JFrame{
 	private static final long serialVersionUID = 1L;
 
 	private static Controller controller;
-	
 	private Map<Integer, Boolean> newMessageGroups = new HashMap<Integer, Boolean>();
 	
 	private JPanel panel; // Panel principal
@@ -63,12 +65,19 @@ public class GUI extends JFrame{
 	private JLabel labelGroups; // Label "Conversations demarees"
 	private JLabel labelConnectedUsers; // Label "Utilisateurs connectes"
 	private JButton userButton; // Bouton "Profil"
+	private JButton sendFileButton; // Bouton "Envoyer un fichier"
+	
+	/* Gestion du theme */
+	public static String mainColor;
+	public static String backgroundColor;
+	public static String lightColor;
+	public static String foreColor;
 	
 	@SuppressWarnings("unchecked")
 	public GUI(String username) {
 		
 		/* Fenetre principale */
-		super("Chatsystem");
+		super("Systeme de chat");
 
 		addWindowListener(new windowClosingListener());
 		setSize(new Dimension(900, 500));
@@ -84,13 +93,17 @@ public class GUI extends JFrame{
 		
 		
 		/* Bouton Envoyer */
-		sendButton = new JButton("Envoyer");
+		sendButton = new JButton("Envoyer le message");
 		sendButton.addActionListener(new sendMessageListener());
 		sendButton.setEnabled(false);
+		sendButton.setBackground(Color.WHITE);
+		sendButton.setIcon(new ImageIcon(getClass().getResource("/send.png")));
+		sendButton.setHorizontalAlignment(SwingConstants.LEFT);
+		sendButton.setIconTextGap(15);
 		c.fill = GridBagConstraints.BOTH;
-		c.weightx = 0.2;
+		c.weightx = 0.1;
 		c.gridx = 3;
-		c.gridy = 3;
+		c.gridy = 4;
 		c.gridwidth = 1;
 		c.gridheight = 1;
 		panel.add(sendButton, c);
@@ -104,7 +117,7 @@ public class GUI extends JFrame{
 		c.fill = GridBagConstraints.BOTH;
 		c.weightx = 0.6;
 		c.gridx = 1;
-		c.gridy = 3;
+		c.gridy = 4;
 		c.gridwidth = 2;
 		c.gridheight = 1;
 		panel.add(textField, c);
@@ -130,7 +143,7 @@ public class GUI extends JFrame{
 		c.gridx = 1;
 		c.gridy = 0;
 		c.gridwidth = 2;
-		c.gridheight = 3;
+		c.gridheight = 4;
 		panel.add(scrollMessageArea, c);
 		
 		
@@ -146,7 +159,7 @@ public class GUI extends JFrame{
 		c.weighty = 1;
 		c.gridx = 0;
 		c.gridy = 1;
-		c.gridheight = 3;
+		c.gridheight = 4;
 		c.gridwidth = 1;
 		panel.add(groupList, c);
 		
@@ -172,7 +185,7 @@ public class GUI extends JFrame{
 		c.weightx = 0.1;
 		c.weighty = 2;
 		c.gridx = 3;
-		c.gridy = 2;
+		c.gridy = 3;
 		c.gridheight = 1;
 		c.gridwidth = 1;
 		panel.add(connectedUsersList, c);
@@ -183,23 +196,78 @@ public class GUI extends JFrame{
 		c.weightx = 0.1;
 		c.weighty = 0.01;
 		c.gridx = 3;
-		c.gridy = 1;
+		c.gridy = 2;
 		c.gridwidth = 1;
 		c.gridheight = 1;
 		panel.add(labelConnectedUsers, c);
 		
 		
 		/* Bouton "Profil" */
-		userButton = new JButton("Mon profil");
+		userButton = new JButton("Editer mon profil");
 		userButton.addActionListener(new editUserListener(this));
+		userButton.setBackground(Color.WHITE);
+		userButton.setIcon(new ImageIcon(getClass().getResource("/profile.png")));
+		userButton.setHorizontalAlignment(SwingConstants.LEFT);
+		userButton.setIconTextGap(15);
 		c.fill = GridBagConstraints.BOTH;
-		c.weightx = 0.2;
+		c.weightx = 0.1;
 		c.gridx = 3;
 		c.gridy = 0;
 		c.gridwidth = 1;
 		c.gridheight = 1;
 		panel.add(userButton, c);
 		
+		
+		/* Bouton "Envoyer un fichier" */
+		sendFileButton = new JButton("Envoyer un fichier");
+		sendFileButton.setEnabled(false);
+		sendFileButton.setBackground(Color.WHITE);
+		sendFileButton.setIcon(new ImageIcon(getClass().getResource("/sendfile.png")));
+		sendFileButton.setHorizontalAlignment(SwingConstants.LEFT);
+		sendFileButton.setIconTextGap(15);
+		sendFileButton.addActionListener(new sendFileListener());
+		c.fill = GridBagConstraints.BOTH;
+		c.weightx = 0.1;
+		c.gridx = 3;
+		c.gridy = 1;
+		c.gridwidth = 1;
+		c.gridheight = 1;
+		panel.add(sendFileButton, c);
+		
+		
+		/* Icone du programme */
+		ImageIcon icon = new ImageIcon(getClass().getResource("/icon.png"));
+		setIconImage(icon.getImage());
+		
+		
+		/* Theme sombre */
+		if(DataManager.getSetting("general", "theme", "light").equals("dark")) {
+			mainColor = "#3A3E43";
+			backgroundColor = "#2D3136";
+			lightColor = "#4A4E53";
+			foreColor = "#FAFAFA";
+			
+			panel.setBackground(Color.decode(backgroundColor));
+			groupList.setBackground(Color.decode(mainColor));
+			labelGroups.setForeground(Color.decode(foreColor));
+			connectedUsersList.setBackground(Color.decode(mainColor));
+			labelConnectedUsers.setForeground(Color.decode(foreColor));
+			messagesArea.setBackground(Color.decode(mainColor));
+			textField.setBackground(Color.decode(mainColor));
+			textField.setForeground(Color.decode(foreColor));
+			sendButton.setBackground(Color.decode(lightColor));
+			sendButton.setForeground(Color.decode(foreColor));
+			sendFileButton.setBackground(Color.decode(lightColor));
+			sendFileButton.setForeground(Color.decode(foreColor));
+			userButton.setBackground(Color.decode(lightColor));
+			userButton.setForeground(Color.decode(foreColor));
+		}
+		else {
+			mainColor = "#FFFFFF";
+			backgroundColor = "#C8C8C8";
+			lightColor = "#E6E6E6";
+			foreColor = "#000000";
+		}
 		
 		/* Affichage */
 		add(panel);
@@ -249,11 +317,12 @@ public class GUI extends JFrame{
 
 	        // Coloration de l'item selectionne
 	        if(isSelected)
-	        	setBackground(new Color(230,230,230));
+	        	setBackground(Color.decode(lightColor));
+	        
 	        else
-	        	setBackground(Color.WHITE);
+	        	setBackground(Color.decode(mainColor));
 	        
-	        
+	        setForeground(Color.decode(foreColor));
 	        setBorder(new EmptyBorder(10, 10, 10, 10));
 
 	        return this;
@@ -320,6 +389,47 @@ public class GUI extends JFrame{
 	}
 	
 	/**
+	 * Listener de l'envoi d'un fichier
+	 */
+	public class sendFileListener implements ActionListener {
+		
+		public void actionPerformed(ActionEvent e) {
+			
+			// Selection du fichier a envoyer
+			JFileChooser chooser = new JFileChooser(System.getProperty("user.dir"));
+			chooser.setDialogTitle("Selectionner le fichier a envoyer");
+			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			chooser.setMultiSelectionEnabled(false);
+			int returnValue = chooser.showDialog(null, "Envoyer");
+			
+			// On envoie le message que si l'utilisateur le veut
+			if(returnValue == JFileChooser.APPROVE_OPTION) {
+				
+				/* Envoi du fichier */
+				try {
+					if(connectedUsersList.getSelectedIndex() == -1)
+						return;
+					
+					// Obtention du groupe a partir de son nom
+					String groupName = connectedUsersList.getSelectedValue();
+					
+					// Envoi du message
+					File selectedFile = chooser.getSelectedFile();
+					controller.sendMessage(selectedFile.toString(), groupName, Message.FUNCTION_FILE);
+					
+					displayMessages(controller.getGroupByName(groupName));
+				
+				} catch (Exception e1) {
+					showError("Impossible d'envoyer le fichier a cet utilisateur.");
+				}
+				
+			}
+				
+		}
+		
+	}
+	
+	/**
 	 * Listener de la fermeture de la fenetre
 	 */
 	public class windowClosingListener implements WindowListener {
@@ -378,6 +488,7 @@ public class GUI extends JFrame{
 					connectedUsersList.clearSelection();
 					textField.setEditable(false);		
 					sendButton.setEnabled(false);
+					sendFileButton.setEnabled(false);
 				}
 				
 				
@@ -406,10 +517,12 @@ public class GUI extends JFrame{
 				if(connectedUsersList.getSelectedIndex() == -1) {
 					textField.setEditable(false);
 					sendButton.setEnabled(false);
+					sendFileButton.setEnabled(false);
 				}
 				else {
 					textField.setEditable(true);
 					sendButton.setEnabled(true);
+					sendFileButton.setEnabled(true);
 				}
 				
 
@@ -610,6 +723,38 @@ public class GUI extends JFrame{
 			
 			for(Message m : groupMessages) {
 				String username, date, content = m.getContent();
+				
+				// Format du contenu
+				// Si image
+				if(m.getFunction() == Message.FUNCTION_IMAGE) {
+					File file = new File(content);
+					
+					// On l'affiche si elle existe encore sur le disque
+					if(file.exists()) {
+						content = "<img src='file:" + content + "' width='300' height='300' alt='image' />";
+					}
+					else {
+						if(m.getSender().equals(controller.getUser()))
+							content = "Vous avez envoye une image :<br/>";
+						else
+							content = "Vous avez recu une image :<br/>";
+						
+						content += "<strong>" + file.getName() + "</strong>";
+					}
+					
+				}
+				
+				// Si fichier
+				else if(m.getFunction() == Message.FUNCTION_FILE) {
+					File file = new File(content);
+					
+					if(m.getSender().equals(controller.getUser()))
+						content = "Vous avez envoye un fichier :<br/>";
+					else
+						content = "Vous avez recu un fichier :<br/>";
+						
+					content += "<strong>" + file.getName() + "</strong>";
+				}
 				
 				// Format de la date
 				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");

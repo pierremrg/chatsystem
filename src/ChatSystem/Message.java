@@ -19,6 +19,8 @@ public class Message implements Serializable {
 	// Fonctions du message
 	public static final int FUNCTION_NORMAL = 0;
 	public static final int FUNCTION_STOP = 1;
+	public static final int FUNCTION_FILE = 2;
+	public static final int FUNCTION_IMAGE = 3;
 	
 	/**
 	 * Cree un message
@@ -50,6 +52,14 @@ public class Message implements Serializable {
 	 */
 	public String getContent() {
 		return content;
+	}
+	
+	/**
+	 * Modifie le contenu du message
+	 * @param content Le contenu du message
+	 */
+	public void setContent(String content) {
+		this.content = content;
 	}
 
 	/**

@@ -14,6 +14,7 @@ import java.net.SocketException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -103,6 +104,10 @@ public class GUIConnect extends JFrame {
 		connectPanel.add(createUserButton, c);
 
 		add(connectPanel);
+		
+		/* Icone du programme */
+		ImageIcon icon = new ImageIcon(getClass().getResource("/icon.png"));
+		setIconImage(icon.getImage());
 
 		setVisible(true);
 	}

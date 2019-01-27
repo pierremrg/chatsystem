@@ -1,6 +1,7 @@
 package ChatSystem;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +15,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -359,7 +361,7 @@ public class Controller {
 		if(receivedUser == null)
 			return;
 
-//		System.out.println("connexion recue! iduser=" +receivedUser.getID());
+		//System.out.println("connexion recue! iduser=" +receivedUser.getID());
 
 		boolean listHasChanged = false;
 		boolean userHasChanged = false;
@@ -542,6 +544,22 @@ public class Controller {
 
 		}
 		
+		// Transformation d'un message "FILE" en message "IMAGE" si besoin
+		// Dans le cas d'un fichier, le contenu est le chemin vers le fichier
+		if(function == Message.FUNCTION_FILE) {
+			File file = new File(textToSend);
+			String mimeType = Files.probeContentType(file.toPath());
+			
+			if(mimeType != null) {
+				switch(mimeType) {
+					case "image/jpeg":
+					case "image/png":
+					case "image/gif":
+						function = Message.FUNCTION_IMAGE;
+				}
+			}
+		}
+		
 		// Envoi du message
 		Message message = new Message(new Date(), textToSend, user, group, function);
 		messageToSend = message;
@@ -657,7 +675,8 @@ public class Controller {
 		
 		user.setUsername(newUsername);
 		
-		udp.sendUdpMessage(udp.createMessage(Udp.STATUS_USERNAME_CHANGED, user), ipBroadcast);
+		if(!useServer)
+			udp.sendUdpMessage(udp.createMessage(Udp.STATUS_USERNAME_CHANGED, user), ipBroadcast);
 		
 	}
 	

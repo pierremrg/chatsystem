@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -100,8 +101,12 @@ public class GUICreateUser extends JFrame {
 		createUserPanel.add(createUserButton, c);
 
 		add(createUserPanel);
+		
+		/* Icone du programme */
+		ImageIcon icon = new ImageIcon(getClass().getResource("/icon.png"));
+		setIconImage(icon.getImage());
+		
 		setVisible(true);
-
 	}
 
 	/**
